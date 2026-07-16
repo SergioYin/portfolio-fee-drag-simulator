@@ -1,0 +1,67 @@
+{
+  "assumptions": {
+    "annual_contribution": 6000.0,
+    "cash_return": 0.02,
+    "contribution_timing": "beginning",
+    "gross_return": 0.05,
+    "initial_value": 100000.0,
+    "realized_gain_rate": 0.35,
+    "rebalance_cost": 0.0002,
+    "rebalance_frequency": "annual",
+    "tax_rate": 0.15,
+    "taxable_allocation": 0.7,
+    "turnover_rate": 0.12,
+    "years": 20
+  },
+  "holdings": [
+    {
+      "account": "Taxable",
+      "allocation": 0.45,
+      "expense_ratio": 0.0003,
+      "name": "Total US Market",
+      "ticker": "VTI",
+      "weighted_fee": 0.000135
+    },
+    {
+      "account": "Taxable",
+      "allocation": 0.25,
+      "expense_ratio": 0.0007,
+      "name": "Total International Market",
+      "ticker": "VXUS",
+      "weighted_fee": 0.000175
+    },
+    {
+      "account": "Retirement",
+      "allocation": 0.2,
+      "expense_ratio": 0.0003,
+      "name": "Total Bond Market",
+      "ticker": "BND",
+      "weighted_fee": 6e-05
+    },
+    {
+      "account": "Retirement",
+      "allocation": 0.1,
+      "expense_ratio": 0.001,
+      "name": "Treasury Money Market",
+      "ticker": "CASH",
+      "weighted_fee": 0.0001
+    }
+  ],
+  "safety_boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "schema": "portfolio-fee-drag-packet-v2",
+  "summary": {
+    "cash_allocation": 0.1,
+    "cash_drag_rate": 0.003,
+    "fee_drag": 56388.26,
+    "gross_future_value": 473645.28,
+    "net_future_value": 417257.02,
+    "net_return_after_all_drags": 0.04192,
+    "net_return_after_expenses": 0.04192,
+    "rebalance_drag_rate": 0.0002,
+    "total_annual_drag_rate": 0.00808,
+    "total_drag": 56388.26,
+    "turnover_tax_drag_rate": 0.00441,
+    "weighted_expense_ratio": 0.00047
+  },
+  "warnings": []
+}

@@ -1,0 +1,110 @@
+{
+  "files": [
+    {
+      "bytes": 96,
+      "path": ".gitignore",
+      "sha256": "9cc7bb1276c2d50d69f5bd858bb7a004998314077d697700ed0729c2a3513f0c"
+    },
+    {
+      "bytes": 1067,
+      "path": "LICENSE",
+      "sha256": "d3e4669f22f295c841f35f586ec645f7fd9c785e5a7d9433d7a3397d65532df8"
+    },
+    {
+      "bytes": 3501,
+      "path": "README.md",
+      "sha256": "467794574d444d5610e48096681e418e05baa1c1a15abdb8314ca625a4167951"
+    },
+    {
+      "bytes": 2808,
+      "path": "demo/dashboard.html",
+      "sha256": "966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381"
+    },
+    {
+      "bytes": 1848,
+      "path": "demo/fee_drag_packet.json",
+      "sha256": "4935b05dddbbf2bfc1c89565c1aa75dc6bbb669121f5161584b2835dad6d26e4"
+    },
+    {
+      "bytes": 1242,
+      "path": "demo/fee_drag_packet.md",
+      "sha256": "05d2a314c932096978e463b097a6db13c65a06cff3126014bff60161613b1201"
+    },
+    {
+      "bytes": 511,
+      "path": "demo/history_comparison.md",
+      "sha256": "726e1d20c2ccd31ba109d655eada3f26dc9965fd307980e2679fb40ad75ba44a"
+    },
+    {
+      "bytes": 615,
+      "path": "demo/maturity_report.md",
+      "sha256": "649c111d22e1c7edd7f18ce51f1a1e0ec73e422ec9d3babbccdceda8c90d4e8a"
+    },
+    {
+      "bytes": 163,
+      "path": "demo/public_scan.json",
+      "sha256": "a3d6f463adeae96282b4a11e6e510bd7d6d273914bb68613de65a8230f3c486f"
+    },
+    {
+      "bytes": 344,
+      "path": "demo/review_ledger.md",
+      "sha256": "217f56ffb2eda84d4c268ca19133aeddcd1db051dedd15b849a5a07c26362046"
+    },
+    {
+      "bytes": 944,
+      "path": "demo/sensitivity_matrix.md",
+      "sha256": "8264514679ce3d7a08b227a8a3ea62d14d98940decd11222aed19e5df2db65bf"
+    },
+    {
+      "bytes": 67,
+      "path": "portfolio_fee_drag_simulator/__init__.py",
+      "sha256": "b63aaf45e757e3081c6fbc884f0499f37f2a60611825497b0b8a03034dd7ff94"
+    },
+    {
+      "bytes": 80,
+      "path": "portfolio_fee_drag_simulator/__main__.py",
+      "sha256": "6a170fc866c867a1e5812daad308396f0940a23f2ecf55e56be39d5d67d23f10"
+    },
+    {
+      "bytes": 17551,
+      "path": "portfolio_fee_drag_simulator/cli.py",
+      "sha256": "d11847642fdda8024e054678cae67a5accaf63b31a55f3ef3ef9e4690260a513"
+    },
+    {
+      "bytes": 328,
+      "path": "portfolio_fee_drag_simulator/data/example_assumptions.json",
+      "sha256": "45ec78a459ca951ce62f1501a07c46be68dc4a89425f8a3f1ceb83c775fa4443"
+    },
+    {
+      "bytes": 365,
+      "path": "portfolio_fee_drag_simulator/data/example_history.json",
+      "sha256": "0fcb2782f6a1047a0bf7e53f768e6140b3a0c87ed5d1ca373b1382397bb32fdb"
+    },
+    {
+      "bytes": 233,
+      "path": "portfolio_fee_drag_simulator/data/example_holdings.csv",
+      "sha256": "af5da85f54750994ce49ae227e3b75502273e67373dd01d23e8762e860f55505"
+    },
+    {
+      "bytes": 13751,
+      "path": "portfolio_fee_drag_simulator/model.py",
+      "sha256": "beec399f883161077d46edd3e447be28f047ce8d5cd860528bdc27eb0690a047"
+    },
+    {
+      "bytes": 1059,
+      "path": "pyproject.toml",
+      "sha256": "75e6c722d27913accc05ada2f25c25982981341861da799bcad94898c4c6be3c"
+    },
+    {
+      "bytes": 950,
+      "path": "skills/agent/portfolio-fee-drag-simulator/SKILL.md",
+      "sha256": "386e3090efc909c8ea460d4ea884a0230dc1d3891fdb47fd4dc4e170ae45cd10"
+    },
+    {
+      "bytes": 2582,
+      "path": "tests/test_cli.py",
+      "sha256": "d95da4c21c431f4b731ba6c6daa1b5a3df1d3d2c050cef2d73aad9495ef358be"
+    }
+  ],
+  "schema": "portfolio-fee-drag-release-manifest-v1"
+}

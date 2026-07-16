@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Fee Drag Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1f2937; }
+    main { max-width: 960px; margin: auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .metric { border: 1px solid #d1d5db; border-radius: 8px; padding: 1rem; }
+    .label { color: #4b5563; font-size: 0.875rem; }
+    .value { font-size: 1.5rem; font-weight: 700; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 0.625rem; text-align: left; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Portfolio Fee Drag Dashboard</h1>
+  <p>Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.</p>
+  <section class="grid">
+    <div class="metric"><div class="label">Weighted expense ratio</div><div class="value">0.047%</div></div>
+    <div class="metric"><div class="label">Cash drag rate</div><div class="value">0.300%</div></div>
+    <div class="metric"><div class="label">Turnover/tax drag rate</div><div class="value">0.441%</div></div>
+    <div class="metric"><div class="label">Rebalance drag rate</div><div class="value">0.020%</div></div>
+    <div class="metric"><div class="label">Total annual drag rate</div><div class="value">0.808%</div></div>
+    <div class="metric"><div class="label">Gross future value</div><div class="value">$473,645.28</div></div>
+    <div class="metric"><div class="label">Net future value</div><div class="value">$417,257.02</div></div>
+    <div class="metric"><div class="label">Estimated total drag</div><div class="value">$56,388.26</div></div>
+  </section>
+  <h2>Scenario Assumptions</h2>
+  <table><tbody>
+    <tr><th>Cash return</th><td>2.000%</td><th>Contribution timing</th><td>beginning</td></tr>
+    <tr><th>Turnover rate</th><td>12.000%</td><th>Taxable allocation</th><td>70.000%</td></tr>
+    <tr><th>Realized gain rate</th><td>35.000%</td><th>Tax rate</th><td>15.000%</td></tr>
+    <tr><th>Rebalance frequency</th><td>annual</td><th>Cost per rebalance</th><td>0.020%</td></tr>
+  </tbody></table>
+  <h2>Holdings</h2>
+  <table><thead><tr><th>Ticker</th><th>Account</th><th>Allocation</th><th>Expense Ratio</th></tr></thead><tbody><tr><td>VTI</td><td>Taxable</td><td>45.000%</td><td>0.030%</td></tr>
+<tr><td>VXUS</td><td>Taxable</td><td>25.000%</td><td>0.070%</td></tr>
+<tr><td>BND</td><td>Retirement</td><td>20.000%</td><td>0.030%</td></tr>
+<tr><td>CASH</td><td>Retirement</td><td>10.000%</td><td>0.100%</td></tr></tbody></table>
+</main>
+</body>
+</html>

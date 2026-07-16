@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portfolio-fee-drag-simulator"
+version = "0.1.0"
+description = "Zero-dependency CLI for static portfolio fee drag review packets."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Token Lab" }]
+keywords = ["portfolio", "fees", "expense-ratio", "simulation", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: End Users/Desktop",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = []
+
+[project.scripts]
+portfolio-fee-drag = "portfolio_fee_drag_simulator.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["portfolio_fee_drag_simulator*"]
+
+[tool.setuptools.package-data]
+portfolio_fee_drag_simulator = ["data/*.csv", "data/*.json"]
+
