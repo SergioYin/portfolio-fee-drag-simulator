@@ -1,6 +1,6 @@
 # Fixture Doctor
 
-Version: 0.9.0
+Version: 1.0.0
 Status: pass
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.

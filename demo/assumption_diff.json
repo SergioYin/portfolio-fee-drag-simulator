@@ -71,5 +71,5 @@
   ],
   "review_note": "Field deltas are review prompts only; this output contains no tax, legal, investment, or buy/sell/hold advice.",
   "schema": "portfolio-fee-drag-assumption-diff-v1",
-  "version": "0.9.0"
+  "version": "1.0.0"
 }

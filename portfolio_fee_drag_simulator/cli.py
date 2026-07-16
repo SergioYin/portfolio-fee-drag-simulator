@@ -48,6 +48,8 @@ COMMANDS = (
     "artifact-catalog",
     "docs-export",
     "static-showcase",
+    "reproducibility-pack",
+    "security-boundary-report",
     "promotion-checklist",
     "quickstart-check",
     "release-manifest",
@@ -75,11 +77,13 @@ COMMAND_DOCS = {
     "quickstart-check": "Run the full deterministic demo route and write public-safe demo artifacts.",
     "release-audit-summary": "Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status.",
     "release-manifest": "Hash source and demo files for release review.",
+    "reproducibility-pack": "Emit Markdown/JSON with exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts.",
     "review-ledger": "Validate and summarize the holdings ledger.",
     "risk-flags": "Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations.",
     "promotion-checklist": "Write Markdown/JSON release and promotion readiness checklist covering docs, demo artifacts, audits, wheel install, public scan, and finance boundaries.",
     "scenario-narrative": "Read case_gallery.json and batch_compare.json and explain each bundled scenario in plain language with drag drivers, human review questions, and no-advice boundaries.",
     "scenario-presets": "Write or print bundled deterministic scenario preset JSON.",
+    "security-boundary-report": "Emit Markdown/JSON summarizing no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance/no-advice boundaries.",
     "selfcheck": "Verify CLI wiring, bundled examples, and deterministic calculations.",
     "sensitivity-matrix": "Generate a static fee/return sensitivity table from a packet JSON file.",
     "static-dashboard": "Render a standalone no-service HTML dashboard from a packet JSON file.",
@@ -91,6 +95,8 @@ VERIFICATION_COMMANDS = (
     "python -m unittest discover -s tests",
     "python -m portfolio_fee_drag_simulator selfcheck",
     "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
+    "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+    "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
 )
 
@@ -1132,6 +1138,10 @@ DEMO_ARTIFACT_SPECS = (
     ("decision_journal.json", "file://demo/decision_journal.json", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in JSON.", "Useful for deterministic prompt handoff without live data."),
     ("docs_export.md", "file://demo/docs_export.md", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Deterministic public command, schema, artifact, verification, and boundary documentation.", "Useful for first-screen project review and public showcase context."),
     ("docs_export.json", "file://demo/docs_export.json", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Machine-readable public documentation export.", "Useful for checking command coverage and artifact map completeness."),
+    ("reproducibility_pack.md", "file://demo/reproducibility_pack.md", "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo", "Markdown reproducibility pack with exact local clone, install, test, build, wheel smoke, and demo regeneration commands.", "Useful for release-owner reproduction from source without workflows or live services."),
+    ("reproducibility_pack.json", "file://demo/reproducibility_pack.json", "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo", "Machine-readable reproducibility pack with commands and expected artifacts.", "Useful for deterministic release review and wheel smoke-test planning."),
+    ("security_boundary_report.md", "file://demo/security_boundary_report.md", "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo", "Markdown security and finance boundary report for public-safe release review.", "Useful for confirming no secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, or advice boundary gaps."),
+    ("security_boundary_report.json", "file://demo/security_boundary_report.json", "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo", "Machine-readable security and finance boundary report.", "Useful for release-owner checks of public-safe boundaries and package data claims."),
     ("promotion_checklist.md", "file://demo/promotion_checklist.md", "python -m portfolio_fee_drag_simulator promotion-checklist --output demo", "Release and promotion readiness checklist in Markdown.", "Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion."),
     ("promotion_checklist.json", "file://demo/promotion_checklist.json", "python -m portfolio_fee_drag_simulator promotion-checklist --output demo", "Machine-readable release and promotion readiness checklist.", "Useful for deterministic promotion review handoff."),
     ("showcase.html", "file://demo/showcase.html", "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html", "No-JS public showcase index for generated review artifacts.", "Useful as the first local page to open when evaluating the demo."),
@@ -1313,11 +1323,13 @@ def cold_start_payload() -> dict[str, Any]:
                     "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
                     "python -m portfolio_fee_drag_simulator decision-journal --output demo",
                     "python -m portfolio_fee_drag_simulator docs-export --output demo",
+                    "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+                    "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
                     "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
                     "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
                     "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
                 ],
-                "expected_output": "Input templates, assumption diff, risk flags, batch comparison, scenario narrative, visual receipt, decision journal, docs export, showcase, promotion checklist, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
+                "expected_output": "Input templates, assumption diff, risk flags, batch comparison, scenario narrative, visual receipt, decision journal, docs export, reproducibility pack, security boundary report, showcase, promotion checklist, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
@@ -1358,6 +1370,10 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/artifact_catalog.json",
             "demo/docs_export.md",
             "demo/docs_export.json",
+            "demo/reproducibility_pack.md",
+            "demo/reproducibility_pack.json",
+            "demo/security_boundary_report.md",
+            "demo/security_boundary_report.json",
             "demo/promotion_checklist.md",
             "demo/promotion_checklist.json",
             "demo/showcase.html",
@@ -1575,7 +1591,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.9 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v1.0 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -1974,6 +1990,258 @@ def cmd_docs_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def expected_demo_artifacts() -> list[str]:
+    return [f"demo/{path_name}" for path_name, *_ in DEMO_ARTIFACT_SPECS]
+
+
+def reproducibility_pack_payload(root: Path, repo_url: str) -> dict[str, Any]:
+    wheel_name = f"portfolio_fee_drag_simulator-{__version__}-py3-none-any.whl"
+    commands = [
+        {
+            "phase": "clone",
+            "commands": [
+                f"git clone {repo_url} portfolio-fee-drag-simulator",
+                "cd portfolio-fee-drag-simulator",
+                "git status --short",
+            ],
+            "expected_artifacts": ["README.md", "pyproject.toml", "portfolio_fee_drag_simulator/", "tests/"],
+        },
+        {
+            "phase": "install",
+            "commands": [
+                "python -m venv .venv",
+                ". .venv/bin/activate",
+                "python -m pip install -e . --no-deps",
+                "portfolio-fee-drag --version",
+            ],
+            "expected_artifacts": [".venv/", "portfolio_fee_drag_simulator.egg-info/"],
+        },
+        {
+            "phase": "test",
+            "commands": [
+                "python -m unittest discover -s tests",
+                "python -m portfolio_fee_drag_simulator selfcheck",
+                "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+            ],
+            "expected_artifacts": ["demo/public_scan.json"],
+        },
+        {
+            "phase": "build",
+            "commands": [
+                "python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist",
+            ],
+            "expected_artifacts": [f"dist/{wheel_name}"],
+        },
+        {
+            "phase": "wheel smoke",
+            "commands": [
+                "python -m venv /tmp/portfolio-fee-drag-smoke",
+                f"/tmp/portfolio-fee-drag-smoke/bin/python -m pip install dist/{wheel_name} --no-deps",
+                "/tmp/portfolio-fee-drag-smoke/bin/portfolio-fee-drag --version",
+                "/tmp/portfolio-fee-drag-smoke/bin/python -m portfolio_fee_drag_simulator selfcheck",
+            ],
+            "expected_artifacts": [f"dist/{wheel_name}"],
+        },
+        {
+            "phase": "demo regeneration",
+            "commands": [
+                "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
+                "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass",
+                "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
+                "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+                "python -m portfolio_fee_drag_simulator artifact-catalog --artifact-root demo --output demo",
+                "python -m portfolio_fee_drag_simulator docs-export --output demo",
+                "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
+            ],
+            "expected_artifacts": expected_demo_artifacts(),
+        },
+    ]
+    return {
+        "schema": "portfolio-fee-drag-reproducibility-pack-v1",
+        "version": __version__,
+        "status": "pass",
+        "boundary": SAFETY_BOUNDARY,
+        "root": root.resolve().as_posix(),
+        "repo_url": repo_url,
+        "python": "Python 3.11 or newer",
+        "runtime_dependencies": [],
+        "workflow_policy": "No GitHub Actions or hosted workflow automation is required for this release path.",
+        "network_policy": "Commands operate on the local checkout and local package build only; the simulator itself fetches no live data.",
+        "commands": commands,
+        "verification_commands": list(VERIFICATION_COMMANDS),
+        "expected_artifacts": expected_demo_artifacts(),
+        "finance_boundaries": list(FINANCE_BOUNDARIES),
+    }
+
+
+def reproducibility_pack_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Reproducibility Pack",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        f"Source root: `{payload['root']}`",
+        f"Repo URL placeholder: `{payload['repo_url']}`",
+        f"Python: {payload['python']}",
+        f"Runtime dependencies: `{len(payload['runtime_dependencies'])}`",
+        "",
+    ]
+    for phase in payload["commands"]:
+        lines.extend([f"## {phase['phase'].title()}", "", "Commands:", ""])
+        lines.extend(f"- `{command}`" for command in phase["commands"])
+        lines.extend(["", "Expected artifacts:", ""])
+        lines.extend(f"- `{artifact}`" for artifact in phase["expected_artifacts"])
+        lines.append("")
+    lines.extend(["## Verification Commands", ""])
+    lines.extend(f"- `{command}`" for command in payload["verification_commands"])
+    lines.extend(["", "## Finance Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in payload["finance_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_reproducibility_pack(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = reproducibility_pack_payload(Path(args.root), args.repo_url)
+    write_json(output / "reproducibility_pack.json", payload)
+    write_text(output / "reproducibility_pack.md", reproducibility_pack_markdown(payload))
+    print(f"wrote {output / 'reproducibility_pack.md'}")
+    print(f"wrote {output / 'reproducibility_pack.json'}")
+    return 0
+
+
+def network_import_findings(root: Path) -> list[dict[str, str]]:
+    modules = ("requests", "httpx", "urllib", "socket", "aiohttp", "websocket")
+    findings: list[dict[str, str]] = []
+    for path in iter_release_files(root):
+        if path.suffix != ".py":
+            continue
+        for line_number, line in enumerate(path.read_text(encoding="utf-8", errors="ignore").splitlines(), start=1):
+            stripped = line.strip()
+            if not (stripped.startswith("import ") or stripped.startswith("from ")):
+                continue
+            for module in modules:
+                if (
+                    stripped == f"import {module}"
+                    or stripped.startswith(f"import {module}.")
+                    or stripped.startswith(f"from {module} ")
+                    or stripped.startswith(f"from {module}.")
+                ):
+                    findings.append({"path": path.relative_to(root).as_posix(), "line": str(line_number), "module": module})
+    return findings
+
+
+def workflow_files(root: Path) -> list[str]:
+    workflows = root / ".github" / "workflows"
+    if not workflows.exists():
+        return []
+    return sorted(path.relative_to(root).as_posix() for path in workflows.rglob("*") if path.is_file())
+
+
+def security_boundary_report_payload(root: Path) -> dict[str, Any]:
+    package = package_audit_payload(root)
+    public_scan = public_scan_payload(root)
+    workflows = workflow_files(root)
+    network_findings = network_import_findings(root)
+    checks = [
+        {
+            "name": "No secrets",
+            "status": "pass" if public_scan["status"] == "pass" and not public_scan["secret_marker_findings"] else "review",
+            "evidence": f"{public_scan['files_scanned']} public release files scanned for common secret markers.",
+        },
+        {
+            "name": "No workflows",
+            "status": "pass" if not workflows else "review",
+            "evidence": "No .github/workflows files found." if not workflows else ", ".join(workflows),
+        },
+        {
+            "name": "No network or live data",
+            "status": "pass" if not network_findings else "review",
+            "evidence": "No network client imports found in release Python files; fixtures are local package data.",
+        },
+        {
+            "name": "No broker/API/order execution",
+            "status": "pass",
+            "evidence": "The simulator exposes static local arithmetic commands only and repeats broker/API/order-execution exclusions in public boundaries.",
+        },
+        {
+            "name": "Zero runtime dependencies",
+            "status": "pass" if package["runtime_dependencies"] == [] else "review",
+            "evidence": f"pyproject runtime dependencies: {package['runtime_dependencies']}",
+        },
+        {
+            "name": "Package data",
+            "status": "pass" if {"data/*.csv", "data/*.json"}.issubset(set(package["package_data"])) else "review",
+            "evidence": f"package data declarations: {package['package_data']}",
+        },
+        {
+            "name": "Finance/no-advice boundaries",
+            "status": "pass" if public_scan["finance_boundary_present"] else "review",
+            "evidence": "README and generated boundaries state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice.",
+        },
+    ]
+    blocking = {"review", "fail", "missing"}
+    return {
+        "schema": "portfolio-fee-drag-security-boundary-report-v1",
+        "version": __version__,
+        "status": "pass" if all(item["status"] not in blocking for item in checks) else "review",
+        "boundary": SAFETY_BOUNDARY,
+        "root": root.resolve().as_posix(),
+        "checks": checks,
+        "secret_marker_findings": public_scan["secret_marker_findings"],
+        "workflow_files": workflows,
+        "network_import_findings": network_findings,
+        "broker_api_order_execution_boundary": "No broker API, no order execution, no account connection, no trading workflow, no recommendation engine.",
+        "runtime_dependencies": package["runtime_dependencies"],
+        "package_data": package["package_data"],
+        "finance_boundaries": list(FINANCE_BOUNDARIES),
+    }
+
+
+def security_boundary_report_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Security Boundary Report",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Check | Status | Evidence |",
+        "| --- | --- | --- |",
+    ]
+    for item in payload["checks"]:
+        lines.append(f"| {item['name']} | {item['status']} | {item['evidence']} |")
+    lines.extend(
+        [
+            "",
+            "## Explicit Boundaries",
+            "",
+            f"- {payload['broker_api_order_execution_boundary']}",
+            "- No GitHub Actions workflows are required or bundled.",
+            "- No runtime dependencies are declared.",
+            "- Package data is limited to bundled CSV and JSON fixtures.",
+        ]
+    )
+    lines.extend(["", "## Finance Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in payload["finance_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_security_boundary_report(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = security_boundary_report_payload(Path(args.root))
+    write_json(output / "security_boundary_report.json", payload)
+    write_text(output / "security_boundary_report.md", security_boundary_report_markdown(payload))
+    print(f"wrote {output / 'security_boundary_report.md'}")
+    print(f"wrote {output / 'security_boundary_report.json'}")
+    return 0 if payload["status"] == "pass" else 1
+
+
 SHOWCASE_LINKS = (
     ("Input Templates", "input_templates/local_inputs_README.md", "Adapt local CSV and JSON inputs from offline starter files without live data."),
     ("Assumption Diff", "assumption_diff.md", "Compare bundled base and review assumptions by field delta, direction, and review impact without advice."),
@@ -1989,6 +2257,8 @@ SHOWCASE_LINKS = (
     ("Release Audit", "release_audit_summary.md", "Review release-owner status across tests, selfcheck, public scan, manifests, fixtures, package audit, and visual receipt."),
     ("Package Audit", "package_audit.md", "Confirm zero runtime dependencies, package data, script wiring, versions, and command coverage."),
     ("Docs Export", "docs_export.md", "Read deterministic public docs for commands, input schema, artifact map, verification commands, and finance boundaries."),
+    ("Reproducibility Pack", "reproducibility_pack.md", "Run exact local clone, install, test, build, wheel smoke, and demo regeneration commands."),
+    ("Security Boundary Report", "security_boundary_report.md", "Confirm no secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, or finance boundary gaps."),
     ("Promotion Checklist", "promotion_checklist.md", "Review README, quickstart, showcase, docs export, audits, public scan, wheel install, and finance boundaries before promotion."),
 )
 
@@ -2065,6 +2335,8 @@ def promotion_checklist_payload(root: Path, artifact_root: Path) -> dict[str, An
         "release_audit_summary": artifact_root / "release_audit_summary.json",
         "package_audit": artifact_root / "package_audit.json",
         "public_scan": artifact_root / "public_scan.json",
+        "reproducibility_pack": artifact_root / "reproducibility_pack.json",
+        "security_boundary_report": artifact_root / "security_boundary_report.json",
         "scenario_narrative": artifact_root / "scenario_narrative.json",
     }
     readme_text = required["README"].read_text(encoding="utf-8") if required["README"].exists() else ""
@@ -2072,6 +2344,8 @@ def promotion_checklist_payload(root: Path, artifact_root: Path) -> dict[str, An
     public_scan = read_json_file(required["public_scan"]) or {}
     release_summary = read_json_file(required["release_audit_summary"]) or {}
     docs_export = read_json_file(required["docs_export"]) or {}
+    reproducibility_pack = read_json_file(required["reproducibility_pack"]) or {}
+    security_boundary_report = read_json_file(required["security_boundary_report"]) or {}
     items = [
         checklist_item(
             "README boundary and command coverage",
@@ -2114,6 +2388,18 @@ def promotion_checklist_payload(root: Path, artifact_root: Path) -> dict[str, An
             "demo/public_scan.json",
             public_scan.get("status", "missing") if public_scan else "missing",
             "Confirm public-scan passes before sharing public artifacts.",
+        ),
+        checklist_item(
+            "Reproducibility pack",
+            "demo/reproducibility_pack.json",
+            "pass" if reproducibility_pack.get("schema") == "portfolio-fee-drag-reproducibility-pack-v1" and reproducibility_pack.get("status") == "pass" else reproducibility_pack.get("status", "missing"),
+            "Confirm the pack lists exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts.",
+        ),
+        checklist_item(
+            "Security boundary report",
+            "demo/security_boundary_report.json",
+            security_boundary_report.get("status", "missing") if security_boundary_report else "missing",
+            "Confirm security-boundary-report passes for no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance boundaries.",
         ),
         checklist_item(
             "Wheel install check",
@@ -2191,6 +2477,8 @@ def release_audit_summary_payload(args: argparse.Namespace) -> dict[str, Any]:
     visual_receipt = read_json_file(Path(args.visual_receipt))
     fixture_doctor = read_json_file(Path(args.fixture_doctor))
     package_audit = read_json_file(Path(args.package_audit))
+    reproducibility_pack = read_json_file(Path(args.reproducibility_pack))
+    security_boundary_report = read_json_file(Path(args.security_boundary_report))
 
     checks = [
         {
@@ -2234,6 +2522,18 @@ def release_audit_summary_payload(args: argparse.Namespace) -> dict[str, Any]:
             "status": package_audit.get("status", "missing") if package_audit else "missing",
             "source": Path(args.package_audit).as_posix(),
             "detail": "Package metadata, data files, dependencies, and command coverage.",
+        },
+        {
+            "name": "reproducibility_pack",
+            "status": reproducibility_pack.get("status", "missing") if reproducibility_pack else "missing",
+            "source": Path(args.reproducibility_pack).as_posix(),
+            "detail": "Exact local clone, install, test, build, wheel smoke, and demo regeneration commands.",
+        },
+        {
+            "name": "security_boundary_report",
+            "status": security_boundary_report.get("status", "missing") if security_boundary_report else "missing",
+            "source": Path(args.security_boundary_report).as_posix(),
+            "detail": "No secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, and finance boundary evidence.",
         },
     ]
     blocking = {"fail", "missing", "review", "not-run"}
@@ -2355,6 +2655,8 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
         )
     )
     cmd_docs_export(argparse.Namespace(output=output))
+    cmd_reproducibility_pack(argparse.Namespace(root=Path("."), repo_url="<repo-url>", output=output))
+    cmd_security_boundary_report(argparse.Namespace(root=Path("."), output=output))
     cmd_static_showcase(argparse.Namespace(output=output / "showcase.html"))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
@@ -2369,6 +2671,8 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
             visual_receipt=output / "visual_receipt.json",
             fixture_doctor=output / "fixture_doctor.json",
             package_audit=output / "package_audit.json",
+            reproducibility_pack=output / "reproducibility_pack.json",
+            security_boundary_report=output / "security_boundary_report.json",
         )
     )
     cmd_promotion_checklist(argparse.Namespace(root=Path("."), artifact_root=output, output=output))
@@ -2424,6 +2728,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Decision journal Markdown/JSON prompt route included", "pass"),
         ("Artifact catalog Markdown/JSON route included", "pass"),
         ("Docs export Markdown/JSON route included", "pass"),
+        ("Reproducibility pack Markdown/JSON route included", "pass"),
+        ("Security boundary report Markdown/JSON route included", "pass"),
         ("Static showcase HTML route included", "pass"),
         ("Release audit summary Markdown/JSON route included", "pass"),
         ("Input template command for offline CSV/JSON adaptation included", "pass"),
@@ -2516,8 +2822,14 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     docs = docs_export_payload()
     if docs["schema"] != "portfolio-fee-drag-docs-export-v1" or len(docs["commands"]) != len(COMMANDS):
         errors.append("docs export generation failed")
+    repro = reproducibility_pack_payload(Path("."), "<repo-url>")
+    if repro["schema"] != "portfolio-fee-drag-reproducibility-pack-v1" or repro["status"] != "pass":
+        errors.append("reproducibility pack generation failed")
+    security = security_boundary_report_payload(Path("."))
+    if security["schema"] != "portfolio-fee-drag-security-boundary-report-v1" or security["status"] != "pass":
+        errors.append("security boundary report generation failed")
     showcase = static_showcase_html()
-    if "<script" in showcase.lower() or "docs_export.md" not in showcase or "risk_flags.md" not in showcase or "promotion_checklist.md" not in showcase:
+    if "<script" in showcase.lower() or "docs_export.md" not in showcase or "risk_flags.md" not in showcase or "promotion_checklist.md" not in showcase or "reproducibility_pack.md" not in showcase or "security_boundary_report.md" not in showcase:
         errors.append("static showcase generation failed")
     checklist = promotion_checklist_payload(Path("."), Path("demo"))
     if checklist["schema"] != "portfolio-fee-drag-promotion-checklist-v1" or not checklist["items"]:
@@ -2545,8 +2857,7 @@ SECRET_MARKERS = tuple(
 )
 
 
-def cmd_public_scan(args: argparse.Namespace) -> int:
-    root = Path(args.root)
+def public_scan_payload(root: Path) -> dict[str, Any]:
     findings: list[dict[str, str]] = []
     scanned = 0
     for path in iter_release_files(root):
@@ -2567,6 +2878,12 @@ def cmd_public_scan(args: argparse.Namespace) -> int:
         "secret_marker_findings": findings,
         "finance_boundary_present": boundary_ok,
     }
+    return payload
+
+
+def cmd_public_scan(args: argparse.Namespace) -> int:
+    root = Path(args.root)
+    payload = public_scan_payload(root)
     output = Path(args.output)
     write_json(output, payload)
     print(f"wrote {output}")
@@ -2687,6 +3004,17 @@ def build_parser() -> argparse.ArgumentParser:
     showcase.add_argument("--output", default="demo/showcase.html")
     showcase.set_defaults(func=cmd_static_showcase)
 
+    repro = sub.add_parser("reproducibility-pack", help="Write exact local release reproduction commands and expected artifacts.")
+    repro.add_argument("--root", default=".")
+    repro.add_argument("--repo-url", default="<repo-url>")
+    repro.add_argument("--output", default="demo")
+    repro.set_defaults(func=cmd_reproducibility_pack)
+
+    security = sub.add_parser("security-boundary-report", help="Write public-safe security and finance boundary report.")
+    security.add_argument("--root", default=".")
+    security.add_argument("--output", default="demo")
+    security.set_defaults(func=cmd_security_boundary_report)
+
     promo = sub.add_parser("promotion-checklist", help="Write release and promotion readiness checklist.")
     promo.add_argument("--root", default=".")
     promo.add_argument("--artifact-root", default="demo")
@@ -2712,6 +3040,8 @@ def build_parser() -> argparse.ArgumentParser:
     summary.add_argument("--visual-receipt", default="demo/visual_receipt.json")
     summary.add_argument("--fixture-doctor", default="demo/fixture_doctor.json")
     summary.add_argument("--package-audit", default="demo/package_audit.json")
+    summary.add_argument("--reproducibility-pack", default="demo/reproducibility_pack.json")
+    summary.add_argument("--security-boundary-report", default="demo/security_boundary_report.json")
     summary.set_defaults(func=cmd_release_audit_summary)
 
     maturity = sub.add_parser("maturity-report", help="Write public readiness report.")

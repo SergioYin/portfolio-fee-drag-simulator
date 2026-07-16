@@ -1,6 +1,6 @@
 # Portfolio Fee Drag Docs Export
 
-Version: 0.9.0
+Version: 1.0.0
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
@@ -26,10 +26,12 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | `quickstart-check` | Run the full deterministic demo route and write public-safe demo artifacts. |
 | `release-audit-summary` | Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. |
 | `release-manifest` | Hash source and demo files for release review. |
+| `reproducibility-pack` | Emit Markdown/JSON with exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts. |
 | `review-ledger` | Validate and summarize the holdings ledger. |
 | `risk-flags` | Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations. |
 | `scenario-narrative` | Read case_gallery.json and batch_compare.json and explain each bundled scenario in plain language with drag drivers, human review questions, and no-advice boundaries. |
 | `scenario-presets` | Write or print bundled deterministic scenario preset JSON. |
+| `security-boundary-report` | Emit Markdown/JSON summarizing no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance/no-advice boundaries. |
 | `selfcheck` | Verify CLI wiring, bundled examples, and deterministic calculations. |
 | `sensitivity-matrix` | Generate a static fee/return sensitivity table from a packet JSON file. |
 | `static-dashboard` | Render a standalone no-service HTML dashboard from a packet JSON file. |
@@ -116,6 +118,10 @@ Calculation notes:
 | `decision_journal.json` | `file://demo/decision_journal.json` | `python -m portfolio_fee_drag_simulator decision-journal --output demo` | Useful for deterministic prompt handoff without live data. |
 | `docs_export.md` | `file://demo/docs_export.md` | `python -m portfolio_fee_drag_simulator docs-export --output demo` | Useful for first-screen project review and public showcase context. |
 | `docs_export.json` | `file://demo/docs_export.json` | `python -m portfolio_fee_drag_simulator docs-export --output demo` | Useful for checking command coverage and artifact map completeness. |
+| `reproducibility_pack.md` | `file://demo/reproducibility_pack.md` | `python -m portfolio_fee_drag_simulator reproducibility-pack --output demo` | Useful for release-owner reproduction from source without workflows or live services. |
+| `reproducibility_pack.json` | `file://demo/reproducibility_pack.json` | `python -m portfolio_fee_drag_simulator reproducibility-pack --output demo` | Useful for deterministic release review and wheel smoke-test planning. |
+| `security_boundary_report.md` | `file://demo/security_boundary_report.md` | `python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo` | Useful for confirming no secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, or advice boundary gaps. |
+| `security_boundary_report.json` | `file://demo/security_boundary_report.json` | `python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo` | Useful for release-owner checks of public-safe boundaries and package data claims. |
 | `promotion_checklist.md` | `file://demo/promotion_checklist.md` | `python -m portfolio_fee_drag_simulator promotion-checklist --output demo` | Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion. |
 | `promotion_checklist.json` | `file://demo/promotion_checklist.json` | `python -m portfolio_fee_drag_simulator promotion-checklist --output demo` | Useful for deterministic promotion review handoff. |
 | `showcase.html` | `file://demo/showcase.html` | `python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html` | Useful as the first local page to open when evaluating the demo. |
@@ -125,6 +131,8 @@ Calculation notes:
 - `python -m unittest discover -s tests`
 - `python -m portfolio_fee_drag_simulator selfcheck`
 - `python -m portfolio_fee_drag_simulator quickstart-check --output demo`
+- `python -m portfolio_fee_drag_simulator reproducibility-pack --output demo`
+- `python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo`
 - `python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json`
 
 ## Finance Boundaries

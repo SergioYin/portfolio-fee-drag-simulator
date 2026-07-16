@@ -1,6 +1,6 @@
 # Release Audit Summary
 
-Version: 0.9.0
+Version: 1.0.0
 Status: review
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
@@ -14,6 +14,8 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | visual_receipt | pass | `demo/visual_receipt.json` | Dashboard and gallery artifact receipt. |
 | fixture_doctor | pass | `demo/fixture_doctor.json` | Holdings, assumptions, and scenario preset validation. |
 | package_audit | pass | `demo/package_audit.json` | Package metadata, data files, dependencies, and command coverage. |
+| reproducibility_pack | pass | `demo/reproducibility_pack.json` | Exact local clone, install, test, build, wheel smoke, and demo regeneration commands. |
+| security_boundary_report | pass | `demo/security_boundary_report.json` | No secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, and finance boundary evidence. |
 
 ## Release Owner Actions
 

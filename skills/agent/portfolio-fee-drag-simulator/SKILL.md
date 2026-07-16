@@ -28,6 +28,8 @@ python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator decision-journal --output demo
 python -m portfolio_fee_drag_simulator docs-export --output demo
+python -m portfolio_fee_drag_simulator reproducibility-pack --output demo
+python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo
 python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html
 python -m portfolio_fee_drag_simulator promotion-checklist --output demo
 python -m portfolio_fee_drag_simulator artifact-catalog --output demo
@@ -51,7 +53,10 @@ python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 - Decision journal outputs should include deterministic Markdown and JSON prompts for assumptions changed, human verification needs, no-advice boundary, and a blank next review date field.
 - Artifact catalog outputs should include deterministic Markdown and JSON inventory rows with route, bytes, SHA-256, producer command, role, and promotion usefulness.
 - Docs export outputs should include deterministic Markdown and JSON covering command summaries, input schema, artifact map, verification commands, and finance boundaries.
+- Reproducibility pack outputs should include deterministic Markdown and JSON with exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts.
+- Security boundary report outputs should include deterministic Markdown and JSON covering no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance/no-advice boundaries.
 - Static showcase output should be no-JS HTML linking input templates, assumption diff, risk flags, dashboard, case gallery, batch compare, scenario narrative, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, docs export, and promotion checklist with short user-value copy.
-- Release audit summary outputs should include Markdown and JSON combining tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. Do not mark tests as pass unless the test command actually ran.
-- Promotion checklist outputs should include Markdown and JSON release/promotion readiness prompts referencing README, quickstart, demo/showcase.html, docs_export, release_audit_summary, package_audit, public_scan, wheel install, and finance boundaries.
+- Static showcase output should include the reproducibility pack and security boundary report links.
+- Release audit summary outputs should include Markdown and JSON combining tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, package audit, reproducibility pack, and security boundary report status. Do not mark tests as pass unless the test command actually ran.
+- Promotion checklist outputs should include Markdown and JSON release/promotion readiness prompts referencing README, quickstart, demo/showcase.html, docs_export, release_audit_summary, package_audit, public_scan, reproducibility_pack, security_boundary_report, wheel install, and finance boundaries.
 - Do not add GitHub Actions workflows.

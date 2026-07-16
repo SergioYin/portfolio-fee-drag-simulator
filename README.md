@@ -13,7 +13,7 @@ pip install -e .
 portfolio-fee-drag quickstart-check --output demo
 ```
 
-First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, assumption diff, risk flags, dashboard, case gallery, batch comparison, scenario narrative, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, docs export, and promotion checklist.
+First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, assumption diff, risk flags, dashboard, case gallery, batch comparison, scenario narrative, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, docs export, reproducibility pack, security boundary report, and promotion checklist.
 
 The quickstart writes deterministic demo artifacts:
 
@@ -58,6 +58,10 @@ The quickstart writes deterministic demo artifacts:
 - `demo/artifact_catalog.json`
 - `demo/docs_export.md`
 - `demo/docs_export.json`
+- `demo/reproducibility_pack.md`
+- `demo/reproducibility_pack.json`
+- `demo/security_boundary_report.md`
+- `demo/security_boundary_report.json`
 - `demo/promotion_checklist.md`
 - `demo/promotion_checklist.json`
 - `demo/showcase.html`
@@ -85,6 +89,8 @@ The quickstart writes deterministic demo artifacts:
 - `artifact-catalog`: inventory deterministic demo artifacts with route, bytes, SHA-256, producer command, role, and promotion usefulness.
 - `docs-export`: create deterministic Markdown/JSON docs summarizing commands, input schema, artifact map, verification commands, and finance boundaries.
 - `static-showcase`: create a no-JS public showcase page linking the generated review artifacts with short user-value copy.
+- `reproducibility-pack`: emit Markdown/JSON with exact local commands for clone, install, test, build, wheel smoke, and demo regeneration plus expected artifacts.
+- `security-boundary-report`: emit Markdown/JSON summarizing no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance/no-advice boundaries.
 - `promotion-checklist`: create Markdown/JSON release and promotion readiness prompts covering README, quickstart, `demo/showcase.html`, docs export, release audit summary, package audit, public scan, wheel install, and finance boundaries.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
@@ -142,7 +148,7 @@ The command emits `holdings_template.csv`, `assumptions_template.json`, and `loc
 
 ## Advanced Review Workflow
 
-Version 0.9 includes deterministic review artifacts for comparing assumption sets, surfacing threshold prompts, narrating bundled scenarios, and checking promotion readiness:
+Version 1.0 includes deterministic review artifacts for comparing assumption sets, surfacing threshold prompts, narrating bundled scenarios, and checking release hardening:
 
 ```bash
 portfolio-fee-drag assumption-diff --output demo
@@ -155,7 +161,7 @@ portfolio-fee-drag risk-flags --output demo
 
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.9 bundles three deterministic scenario presets:
+Version 1.0 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -227,11 +233,13 @@ Export public docs and the static showcase:
 
 ```bash
 portfolio-fee-drag docs-export --output demo
+portfolio-fee-drag reproducibility-pack --output demo
+portfolio-fee-drag security-boundary-report --root . --output demo
 portfolio-fee-drag static-showcase --output demo/showcase.html
 portfolio-fee-drag promotion-checklist --output demo
 ```
 
-The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated assumption diff, risk flags, dashboard, gallery, scenario narrative, receipt, walkthrough, decision journal, audits, catalog, docs export, and promotion checklist. The promotion checklist emits `promotion_checklist.md` and `promotion_checklist.json` for release-owner review of README, quickstart, showcase, docs export, release audit summary, package audit, public scan, wheel install, and finance boundaries.
+The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The reproducibility pack emits `reproducibility_pack.md` and `reproducibility_pack.json` with exact local clone, install, test, build, wheel smoke, and demo regeneration commands. The security boundary report emits `security_boundary_report.md` and `security_boundary_report.json` covering no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and no-advice boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated assumption diff, risk flags, dashboard, gallery, scenario narrative, receipt, walkthrough, decision journal, audits, catalog, docs export, reproducibility pack, security boundary report, and promotion checklist. The promotion checklist emits `promotion_checklist.md` and `promotion_checklist.json` for release-owner review of README, quickstart, showcase, docs export, release audit summary, package audit, public scan, wheel install, hardening reports, and finance boundaries.
 
 ## Release-Owner Audit
 

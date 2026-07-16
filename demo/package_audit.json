@@ -19,10 +19,12 @@
     "quickstart-check",
     "release-audit-summary",
     "release-manifest",
+    "reproducibility-pack",
     "review-ledger",
     "risk-flags",
     "scenario-narrative",
     "scenario-presets",
+    "security-boundary-report",
     "selfcheck",
     "sensitivity-matrix",
     "static-dashboard",
@@ -30,8 +32,8 @@
     "visual-receipt"
   ],
   "extra_commands": [],
-  "import_version": "0.9.0",
-  "installed_distribution_available": false,
+  "import_version": "1.0.0",
+  "installed_distribution_available": true,
   "installed_distribution_version": "source-tree-audit",
   "issues": [],
   "missing_commands": [],
@@ -40,10 +42,10 @@
     "data/*.json"
   ],
   "project_name": "portfolio-fee-drag-simulator",
-  "project_version": "0.9.0",
+  "project_version": "1.0.0",
   "runtime_dependencies": [],
   "schema": "portfolio-fee-drag-package-audit-v1",
   "script_target": "portfolio_fee_drag_simulator.cli:main",
   "status": "pass",
-  "version": "0.9.0"
+  "version": "1.0.0"
 }

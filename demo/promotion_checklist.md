@@ -1,6 +1,6 @@
 # Promotion Checklist
 
-Version: 0.9.0
+Version: 1.0.0
 Status: review
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
@@ -14,6 +14,8 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Release audit summary | `demo/release_audit_summary.json` | review | Release owner should rerun release-audit-summary with tests-status pass only after tests have actually run. |
 | Package audit and zero dependencies | `demo/package_audit.json` | pass | Confirm package-audit reports zero runtime dependencies, package data, script wiring, version alignment, and command coverage. |
 | Public scan | `demo/public_scan.json` | pass | Confirm public-scan passes before sharing public artifacts. |
+| Reproducibility pack | `demo/reproducibility_pack.json` | pass | Confirm the pack lists exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts. |
+| Security boundary report | `demo/security_boundary_report.json` | pass | Confirm security-boundary-report passes for no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance boundaries. |
 | Wheel install check | `dist/*.whl` | manual | Build and install a wheel in a clean environment, then run portfolio-fee-drag --version and portfolio-fee-drag selfcheck. |
 | Finance boundaries | `README.md and generated artifacts` | pass | Confirm all public-facing artifacts retain the no live data, no broker, no advice, no recommendation boundary. |
 

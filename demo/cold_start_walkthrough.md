@@ -65,11 +65,13 @@ Commands:
 - `python -m portfolio_fee_drag_simulator visual-receipt --output demo`
 - `python -m portfolio_fee_drag_simulator decision-journal --output demo`
 - `python -m portfolio_fee_drag_simulator docs-export --output demo`
+- `python -m portfolio_fee_drag_simulator reproducibility-pack --output demo`
+- `python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo`
 - `python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html`
 - `python -m portfolio_fee_drag_simulator promotion-checklist --output demo`
 - `python -m portfolio_fee_drag_simulator artifact-catalog --output demo`
 
-Expected output: Input templates, assumption diff, risk flags, batch comparison, scenario narrative, visual receipt, decision journal, docs export, showcase, promotion checklist, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.
+Expected output: Input templates, assumption diff, risk flags, batch comparison, scenario narrative, visual receipt, decision journal, docs export, reproducibility pack, security boundary report, showcase, promotion checklist, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.
 
 ## Expected Artifacts
 
@@ -110,6 +112,10 @@ Expected output: Input templates, assumption diff, risk flags, batch comparison,
 - `demo/artifact_catalog.json`
 - `demo/docs_export.md`
 - `demo/docs_export.json`
+- `demo/reproducibility_pack.md`
+- `demo/reproducibility_pack.json`
+- `demo/security_boundary_report.md`
+- `demo/security_boundary_report.json`
 - `demo/promotion_checklist.md`
 - `demo/promotion_checklist.json`
 - `demo/showcase.html`

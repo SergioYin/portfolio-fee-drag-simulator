@@ -50,6 +50,18 @@
       "status": "pass"
     },
     {
+      "artifact": "demo/reproducibility_pack.json",
+      "name": "Reproducibility pack",
+      "review_prompt": "Confirm the pack lists exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo/security_boundary_report.json",
+      "name": "Security boundary report",
+      "review_prompt": "Confirm security-boundary-report passes for no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance boundaries.",
+      "status": "pass"
+    },
+    {
       "artifact": "dist/*.whl",
       "name": "Wheel install check",
       "review_prompt": "Build and install a wheel in a clean environment, then run portfolio-fee-drag --version and portfolio-fee-drag selfcheck.",
@@ -69,5 +81,5 @@
   "root": ".",
   "schema": "portfolio-fee-drag-promotion-checklist-v1",
   "status": "review",
-  "version": "0.9.0"
+  "version": "1.0.0"
 }

@@ -67,6 +67,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "artifact_catalog.json").exists())
             self.assertTrue((out / "docs_export.md").exists())
             self.assertTrue((out / "docs_export.json").exists())
+            self.assertTrue((out / "reproducibility_pack.md").exists())
+            self.assertTrue((out / "reproducibility_pack.json").exists())
+            self.assertTrue((out / "security_boundary_report.md").exists())
+            self.assertTrue((out / "security_boundary_report.json").exists())
             self.assertTrue((out / "promotion_checklist.md").exists())
             self.assertTrue((out / "promotion_checklist.json").exists())
             self.assertTrue((out / "showcase.html").exists())
@@ -143,6 +147,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("risk_flags.json", catalog_paths)
             self.assertIn("docs_export.md", catalog_paths)
             self.assertIn("docs_export.json", catalog_paths)
+            self.assertIn("reproducibility_pack.md", catalog_paths)
+            self.assertIn("reproducibility_pack.json", catalog_paths)
+            self.assertIn("security_boundary_report.md", catalog_paths)
+            self.assertIn("security_boundary_report.json", catalog_paths)
             self.assertIn("showcase.html", catalog_paths)
             self.assertIn("input_templates/local_inputs_README.md", catalog_paths)
             self.assertIn("batch_compare.md", catalog_paths)
@@ -157,6 +165,17 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual({item["name"] for item in docs["commands"]}, set(COMMANDS))
             self.assertIn("artifact_map", docs)
             self.assertIn("finance_boundaries", docs)
+            repro = json.loads((out / "reproducibility_pack.json").read_text())
+            self.assertEqual(repro["schema"], "portfolio-fee-drag-reproducibility-pack-v1")
+            self.assertEqual(repro["status"], "pass")
+            self.assertTrue(any(item["phase"] == "wheel smoke" for item in repro["commands"]))
+            self.assertIn("demo/security_boundary_report.json", repro["expected_artifacts"])
+            security = json.loads((out / "security_boundary_report.json").read_text())
+            self.assertEqual(security["schema"], "portfolio-fee-drag-security-boundary-report-v1")
+            self.assertEqual(security["status"], "pass")
+            self.assertEqual(security["runtime_dependencies"], [])
+            self.assertEqual(security["workflow_files"], [])
+            self.assertIn("data/*.json", security["package_data"])
             showcase = (out / "showcase.html").read_text()
             self.assertIn("dashboard.html", showcase)
             self.assertIn("case_gallery.html", showcase)
@@ -167,6 +186,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("release_audit_summary.md", showcase)
             self.assertIn("package_audit.md", showcase)
             self.assertIn("docs_export.md", showcase)
+            self.assertIn("reproducibility_pack.md", showcase)
+            self.assertIn("security_boundary_report.md", showcase)
             self.assertIn("input_templates/local_inputs_README.md", showcase)
             self.assertIn("assumption_diff.md", showcase)
             self.assertIn("risk_flags.md", showcase)
@@ -177,6 +198,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             checklist = json.loads((out / "promotion_checklist.json").read_text())
             self.assertEqual(checklist["schema"], "portfolio-fee-drag-promotion-checklist-v1")
             self.assertTrue(any(item["name"] == "Wheel install check" for item in checklist["items"]))
+            self.assertTrue(any(item["name"] == "Reproducibility pack" for item in checklist["items"]))
+            self.assertTrue(any(item["name"] == "Security boundary report" for item in checklist["items"]))
             self.assertTrue(any("No live market data" in item for item in checklist["finance_boundaries"]))
             summary = json.loads((out / "release_audit_summary.json").read_text())
             self.assertEqual(summary["status"], "review")
@@ -246,7 +269,7 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(main(["docs-export", "--output", str(out)]), 0)
             docs = json.loads((out / "docs_export.json").read_text())
             self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
-            self.assertEqual(docs["version"], "0.9.0")
+            self.assertEqual(docs["version"], "1.0.0")
             self.assertEqual([item["name"] for item in docs["commands"]], sorted(COMMANDS))
             self.assertEqual(docs["input_schema"]["holdings_csv"]["columns"][0]["name"], "account")
             self.assertTrue(any(item["path"] == "showcase.html" for item in docs["artifact_map"]))
@@ -255,7 +278,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue(any(item["path"] == "batch_compare.md" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "scenario_narrative.md" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "promotion_checklist.md" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "reproducibility_pack.md" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "security_boundary_report.md" for item in docs["artifact_map"]))
             self.assertIn("python -m unittest discover -s tests", docs["verification_commands"])
+            self.assertIn("python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo", docs["verification_commands"])
             self.assertTrue(any("No live market data" in item for item in docs["finance_boundaries"]))
 
             self.assertEqual(main(["static-showcase", "--output", str(out / "showcase.html")]), 0)
@@ -268,7 +294,30 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("batch_compare.md", showcase)
             self.assertIn("scenario_narrative.md", showcase)
             self.assertIn("promotion_checklist.md", showcase)
+            self.assertIn("reproducibility_pack.md", showcase)
+            self.assertIn("security_boundary_report.md", showcase)
             self.assertNotIn("<script", showcase.lower())
+
+    def test_reproducibility_pack_and_security_boundary_report_commands_export_hardening_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["reproducibility-pack", "--root", ".", "--output", str(out)]), 0)
+            repro = json.loads((out / "reproducibility_pack.json").read_text())
+            self.assertEqual(repro["schema"], "portfolio-fee-drag-reproducibility-pack-v1")
+            self.assertEqual(repro["status"], "pass")
+            self.assertTrue(any(item["phase"] == "build" for item in repro["commands"]))
+            self.assertTrue(any("quickstart-check" in command for item in repro["commands"] for command in item["commands"]))
+            self.assertIn("demo/reproducibility_pack.md", repro["expected_artifacts"])
+
+            self.assertEqual(main(["security-boundary-report", "--root", ".", "--output", str(out)]), 0)
+            security = json.loads((out / "security_boundary_report.json").read_text())
+            self.assertEqual(security["schema"], "portfolio-fee-drag-security-boundary-report-v1")
+            self.assertEqual(security["status"], "pass")
+            self.assertEqual(security["secret_marker_findings"], [])
+            self.assertEqual(security["workflow_files"], [])
+            self.assertEqual(security["network_import_findings"], [])
+            self.assertEqual(security["runtime_dependencies"], [])
+            self.assertIn("data/*.csv", security["package_data"])
 
     def test_assumption_diff_and_risk_flags_commands_export_review_prompts(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -347,12 +396,16 @@ class PortfolioFeeDragTests(unittest.TestCase):
                     "Release audit summary",
                     "Package audit and zero dependencies",
                     "Public scan",
+                    "Reproducibility pack",
+                    "Security boundary report",
                     "Wheel install check",
                     "Finance boundaries",
                 }.issubset(names)
             )
             markdown = (out / "promotion_checklist.md").read_text()
             self.assertIn("Wheel install", markdown)
+            self.assertIn("Reproducibility pack", markdown)
+            self.assertIn("Security boundary report", markdown)
             self.assertIn("No live market data", markdown)
 
     def test_release_audit_summary_can_pass_after_release_owner_checks(self):
@@ -378,6 +431,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
                     str(out / "fixture_doctor.json"),
                     "--package-audit",
                     str(out / "package_audit.json"),
+                    "--reproducibility-pack",
+                    str(out / "reproducibility_pack.json"),
+                    "--security-boundary-report",
+                    str(out / "security_boundary_report.json"),
                 ]
             )
             self.assertEqual(code, 0)

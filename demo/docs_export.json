@@ -281,6 +281,34 @@
       "user_value": "Useful for checking command coverage and artifact map completeness."
     },
     {
+      "path": "reproducibility_pack.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+      "role": "Markdown reproducibility pack with exact local clone, install, test, build, wheel smoke, and demo regeneration commands.",
+      "route": "file://demo/reproducibility_pack.md",
+      "user_value": "Useful for release-owner reproduction from source without workflows or live services."
+    },
+    {
+      "path": "reproducibility_pack.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+      "role": "Machine-readable reproducibility pack with commands and expected artifacts.",
+      "route": "file://demo/reproducibility_pack.json",
+      "user_value": "Useful for deterministic release review and wheel smoke-test planning."
+    },
+    {
+      "path": "security_boundary_report.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
+      "role": "Markdown security and finance boundary report for public-safe release review.",
+      "route": "file://demo/security_boundary_report.md",
+      "user_value": "Useful for confirming no secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, or advice boundary gaps."
+    },
+    {
+      "path": "security_boundary_report.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
+      "role": "Machine-readable security and finance boundary report.",
+      "route": "file://demo/security_boundary_report.json",
+      "user_value": "Useful for release-owner checks of public-safe boundaries and package data claims."
+    },
+    {
       "path": "promotion_checklist.md",
       "producer_command": "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
       "role": "Release and promotion readiness checklist in Markdown.",
@@ -377,6 +405,10 @@
       "summary": "Hash source and demo files for release review."
     },
     {
+      "name": "reproducibility-pack",
+      "summary": "Emit Markdown/JSON with exact local clone, install, test, build, wheel smoke, and demo regeneration commands plus expected artifacts."
+    },
+    {
       "name": "review-ledger",
       "summary": "Validate and summarize the holdings ledger."
     },
@@ -391,6 +423,10 @@
     {
       "name": "scenario-presets",
       "summary": "Write or print bundled deterministic scenario preset JSON."
+    },
+    {
+      "name": "security-boundary-report",
+      "summary": "Emit Markdown/JSON summarizing no secrets, no workflows, no network/live data, no broker/API/order execution, zero runtime dependencies, package data, and finance/no-advice boundaries."
     },
     {
       "name": "selfcheck",
@@ -540,7 +576,9 @@
     "python -m unittest discover -s tests",
     "python -m portfolio_fee_drag_simulator selfcheck",
     "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
+    "python -m portfolio_fee_drag_simulator reproducibility-pack --output demo",
+    "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "0.9.0"
+  "version": "1.0.0"
 }

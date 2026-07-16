@@ -42,6 +42,18 @@
       "name": "package_audit",
       "source": "demo/package_audit.json",
       "status": "pass"
+    },
+    {
+      "detail": "Exact local clone, install, test, build, wheel smoke, and demo regeneration commands.",
+      "name": "reproducibility_pack",
+      "source": "demo/reproducibility_pack.json",
+      "status": "pass"
+    },
+    {
+      "detail": "No secrets, workflows, network/live data, broker/API/order execution, runtime dependencies, and finance boundary evidence.",
+      "name": "security_boundary_report",
+      "source": "demo/security_boundary_report.json",
+      "status": "pass"
     }
   ],
   "release_owner_actions": [
@@ -49,5 +61,5 @@
   ],
   "schema": "portfolio-fee-drag-release-audit-summary-v1",
   "status": "review",
-  "version": "0.9.0"
+  "version": "1.0.0"
 }

@@ -1,0 +1,58 @@
+{
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "broker_api_order_execution_boundary": "No broker API, no order execution, no account connection, no trading workflow, no recommendation engine.",
+  "checks": [
+    {
+      "evidence": "59 public release files scanned for common secret markers.",
+      "name": "No secrets",
+      "status": "pass"
+    },
+    {
+      "evidence": "No .github/workflows files found.",
+      "name": "No workflows",
+      "status": "pass"
+    },
+    {
+      "evidence": "No network client imports found in release Python files; fixtures are local package data.",
+      "name": "No network or live data",
+      "status": "pass"
+    },
+    {
+      "evidence": "The simulator exposes static local arithmetic commands only and repeats broker/API/order-execution exclusions in public boundaries.",
+      "name": "No broker/API/order execution",
+      "status": "pass"
+    },
+    {
+      "evidence": "pyproject runtime dependencies: []",
+      "name": "Zero runtime dependencies",
+      "status": "pass"
+    },
+    {
+      "evidence": "package data declarations: ['data/*.csv', 'data/*.json']",
+      "name": "Package data",
+      "status": "pass"
+    },
+    {
+      "evidence": "README and generated boundaries state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice.",
+      "name": "Finance/no-advice boundaries",
+      "status": "pass"
+    }
+  ],
+  "finance_boundaries": [
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Outputs are deterministic examples from local CSV/JSON inputs and are not suitability analysis for any person or account."
+  ],
+  "network_import_findings": [],
+  "package_data": [
+    "data/*.csv",
+    "data/*.json"
+  ],
+  "root": "/home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator",
+  "runtime_dependencies": [],
+  "schema": "portfolio-fee-drag-security-boundary-report-v1",
+  "secret_marker_findings": [],
+  "status": "pass",
+  "version": "1.0.0",
+  "workflow_files": []
+}

@@ -21,6 +21,8 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Decision journal Markdown/JSON prompt route included | pass |
 | Artifact catalog Markdown/JSON route included | pass |
 | Docs export Markdown/JSON route included | pass |
+| Reproducibility pack Markdown/JSON route included | pass |
+| Security boundary report Markdown/JSON route included | pass |
 | Static showcase HTML route included | pass |
 | Release audit summary Markdown/JSON route included | pass |
 | Input template command for offline CSV/JSON adaptation included | pass |
