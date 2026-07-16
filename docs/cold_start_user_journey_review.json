@@ -1,0 +1,230 @@
+{
+  "schema": "portfolio-fee-drag-cold-start-user-journey-review-v1",
+  "version": "1.0.1",
+  "review_date": "2026-07-17",
+  "timestamps": {
+    "local": "2026-07-17T03:06:16+08:00",
+    "utc": "2026-07-16T19:06:11Z"
+  },
+  "reviewer_stance": "skeptical first-time public user after release readiness review",
+  "runtime_behavior_changed": false,
+  "p0_p1_found": false,
+  "verdict": "No P0 or P1 issue was found. The wheel-based cold-start path works when the user has both a repository clone and the v1.0.1 wheel release asset.",
+  "environment": {
+    "source_workspace": "/home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator",
+    "fresh_clone": "/tmp/pfds_cold_start_review_20260717/repo",
+    "clean_venv": "/tmp/pfds_cold_start_review_20260717/venv",
+    "generated_demo": "/tmp/pfds_cold_start_review_20260717/demo",
+    "evidence_dir": "/tmp/pfds_cold_start_review_20260717/evidence",
+    "clone_commit_short": "3a09ed0",
+    "wheel_path": "/home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator/dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+    "wheel_sha256": "389c8ca7463610f40259e818cbb0519f70c230195a740d5a80b5b9ea341f4f9c"
+  },
+  "journey_steps": [
+    {
+      "name": "timestamp_utc",
+      "command": "date -u +%Y-%m-%dT%H:%M:%SZ",
+      "expected_output": "2026-07-16T19:06:11Z",
+      "status": "pass",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "timestamp_local",
+      "command": "date +%Y-%m-%dT%H:%M:%S%z",
+      "expected_output": "2026-07-17T03:06:16+0800",
+      "status": "pass",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "clone",
+      "command": "git clone /home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator /tmp/pfds_cold_start_review_20260717/repo",
+      "expected_output": "Cloning into '/tmp/pfds_cold_start_review_20260717/repo'... done.",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/repo"
+    },
+    {
+      "name": "clone_revision",
+      "command": "git rev-parse --short HEAD",
+      "expected_output": "3a09ed0",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/repo"
+    },
+    {
+      "name": "check_clone_for_wheel",
+      "command": "ls -l dist",
+      "expected_output": "ls: cannot access 'dist': No such file or directory",
+      "status": "review",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "create_venv",
+      "command": "python -m venv /tmp/pfds_cold_start_review_20260717/venv",
+      "expected_output": "exit code 0",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/venv"
+    },
+    {
+      "name": "install_from_wheel",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/python -m pip install --no-deps /home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator/dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+      "expected_output": "Successfully installed portfolio-fee-drag-simulator-1.0.1",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/venv"
+    },
+    {
+      "name": "version",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/portfolio-fee-drag --version",
+      "expected_output": "portfolio-fee-drag 1.0.1",
+      "status": "pass",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "console_help",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/portfolio-fee-drag --help",
+      "expected_output": "usage text with registered commands including quickstart-check, selfcheck, and public-scan",
+      "status": "pass",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "module_help",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/python -m portfolio_fee_drag_simulator --help",
+      "expected_output": "same command surface as the console script",
+      "status": "pass",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "selfcheck",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/portfolio-fee-drag selfcheck --output /tmp/pfds_cold_start_review_20260717/evidence/selfcheck.json",
+      "expected_output": "{\"status\": \"pass\", \"version\": \"1.0.1\", \"errors\": []}",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/evidence/selfcheck.json"
+    },
+    {
+      "name": "quickstart_check",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/portfolio-fee-drag quickstart-check --output /tmp/pfds_cold_start_review_20260717/demo",
+      "expected_output": "quickstart check complete",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/demo"
+    },
+    {
+      "name": "artifact_count",
+      "command": "find /tmp/pfds_cold_start_review_20260717/demo -type f | wc -l",
+      "expected_output": "49",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/demo"
+    },
+    {
+      "name": "open_showcase_by_file_path",
+      "command": "sed -n '1,120p' /tmp/pfds_cold_start_review_20260717/demo/showcase.html",
+      "expected_output": "HTML title, expected links, visible finance boundary, and no script tag in inspected page",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/demo/showcase.html"
+    },
+    {
+      "name": "showcase_expected_links_and_boundaries",
+      "command": "rg -n \"<script|dashboard.html|case_gallery.html|docs_export.md|security_boundary_report.md|promotion_checklist.md|buy/sell/hold|No live|Static local\" /tmp/pfds_cold_start_review_20260717/demo/showcase.html /tmp/pfds_cold_start_review_20260717/demo/docs_export.md /tmp/pfds_cold_start_review_20260717/demo/artifact_catalog.md",
+      "expected_output": "expected links and finance boundary text found; no script tag match found",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/demo/showcase.html"
+    },
+    {
+      "name": "public_scan",
+      "command": "/tmp/pfds_cold_start_review_20260717/venv/bin/portfolio-fee-drag public-scan --root /tmp/pfds_cold_start_review_20260717/repo --output /tmp/pfds_cold_start_review_20260717/evidence/public_scan.json",
+      "expected_output": "{\"status\": \"pass\", \"files_scanned\": 61, \"secret_marker_findings\": [], \"finance_boundary_present\": true}",
+      "status": "pass",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/evidence/public_scan.json"
+    }
+  ],
+  "finance_boundaries": [
+    "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Outputs are deterministic examples from local CSV/JSON inputs and are not suitability analysis for any person or account."
+  ],
+  "generated_artifacts": {
+    "file_count": 49,
+    "cataloged_artifact_count": 47,
+    "catalog_excludes_itself": true,
+    "important_paths": [
+      "/tmp/pfds_cold_start_review_20260717/demo/showcase.html",
+      "/tmp/pfds_cold_start_review_20260717/demo/docs_export.md",
+      "/tmp/pfds_cold_start_review_20260717/demo/artifact_catalog.json",
+      "/tmp/pfds_cold_start_review_20260717/demo/security_boundary_report.json",
+      "/tmp/pfds_cold_start_review_20260717/demo/public_scan.json",
+      "/tmp/pfds_cold_start_review_20260717/evidence/public_scan.json"
+    ],
+    "showcase_sha256": "cee5e46fdba10a60f392872be29ea20ca7409be494708e1d730750c00132b5b7",
+    "docs_export_md_sha256": "c3aa75015fe4ec130567029a7c1b0b3d206bbf07a1e8c1f20636f9b2a9e2c13f"
+  },
+  "issues": [
+    {
+      "id": "CS-001",
+      "severity": "P2",
+      "area": "wheel onboarding",
+      "finding": "A fresh repository clone does not include dist, so install-from-wheel requires a separately downloaded or attached v1.0.1 wheel.",
+      "evidence": "ls -l dist in /tmp/pfds_cold_start_review_20260717/repo returned no such file or directory; wheel install succeeded from the source workspace release asset path.",
+      "recommended_action": "In release notes, say whether users should install from PyPI, a GitHub release wheel, or editable source."
+    },
+    {
+      "id": "CS-002",
+      "severity": "P2",
+      "area": "release evidence consistency",
+      "finding": "The wheel used in this cold-start review has a different SHA-256 from the wheel hash recorded in the prior release readiness review.",
+      "evidence": "Current wheel SHA-256 is 389c8ca7463610f40259e818cbb0519f70c230195a740d5a80b5b9ea341f4f9c; docs/release_readiness_review.md records a different reviewed wheel SHA from a prior /tmp build.",
+      "recommended_action": "Attach the exact final wheel hash in the release note or final audit transcript."
+    },
+    {
+      "id": "CS-003",
+      "severity": "P3",
+      "area": "help discoverability",
+      "finding": "Help renders correctly but exposes 29 commands in one dense list.",
+      "evidence": "portfolio-fee-drag --help output includes the full command set in one positional list.",
+      "recommended_action": "Lead release notes or README with install, --help, quickstart-check, and opening demo/showcase.html."
+    },
+    {
+      "id": "CS-004",
+      "severity": "P3",
+      "area": "showcase opening evidence",
+      "finding": "The sandbox can inspect the static HTML file but cannot prove an end-user GUI browser render.",
+      "evidence": "sed and rg checks found title, expected links, and finance boundaries in showcase.html; no script tag match was found.",
+      "recommended_action": "For final promotion, include a screenshot or manual browser note if visual proof is required."
+    },
+    {
+      "id": "CS-005",
+      "severity": "P3",
+      "area": "public scan depth",
+      "finding": "Built-in public-scan passes but is intentionally simple and is not an entropy scanner or git-history scan.",
+      "evidence": "public-scan JSON reports 61 files scanned, no secret marker findings, and finance boundary present.",
+      "recommended_action": "Run an external secret scanner before public tagging if the repository has ever contained private sample data."
+    }
+  ],
+  "final_verification_results": [
+    {
+      "name": "unit_tests",
+      "command": "python -m unittest discover -s tests",
+      "status": "pass",
+      "expected_output": "Ran 15 tests ... OK",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "selfcheck",
+      "command": "python -m portfolio_fee_drag_simulator selfcheck",
+      "status": "pass",
+      "expected_output": "{\"status\": \"pass\", \"version\": \"1.0.1\", \"errors\": []}",
+      "evidence_path": "terminal transcript"
+    },
+    {
+      "name": "quickstart_check",
+      "command": "python -m portfolio_fee_drag_simulator quickstart-check --output /tmp/pfds_cold_start_review_20260717/final_quickstart",
+      "status": "pass",
+      "expected_output": "quickstart check complete; 49 files generated",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/final_quickstart"
+    },
+    {
+      "name": "public_scan",
+      "command": "python -m portfolio_fee_drag_simulator public-scan --root . --output /tmp/pfds_cold_start_review_20260717/final_public_scan.json",
+      "status": "pass",
+      "expected_output": "{\"status\": \"pass\", \"files_scanned\": 63, \"secret_marker_findings\": [], \"finance_boundary_present\": true}",
+      "evidence_path": "/tmp/pfds_cold_start_review_20260717/final_public_scan.json"
+    }
+  ]
+}
