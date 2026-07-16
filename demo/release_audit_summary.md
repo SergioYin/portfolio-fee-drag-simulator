@@ -1,13 +1,13 @@
 # Release Audit Summary
 
-Version: 0.8.0
-Status: pass
+Version: 0.9.0
+Status: review
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
 | Check | Status | Source | Detail |
 | --- | --- | --- | --- |
-| tests | pass | `python -m unittest discover -s tests` | Release owner supplied test status. |
+| tests | not-run | `python -m unittest discover -s tests` | Release owner supplied test status. |
 | selfcheck | pass | `demo/selfcheck.json` | CLI wiring and bundled deterministic calculations. |
 | public_scan | pass | `demo/public_scan.json` | Public wording, secret marker, and finance boundary scan. |
 | release_manifest | pass | `demo/release_manifest.json` | Source artifact hash manifest. |
@@ -17,4 +17,4 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 
 ## Release Owner Actions
 
-- No release-owner actions required.
+- tests: resolve status not-run from python -m unittest discover -s tests

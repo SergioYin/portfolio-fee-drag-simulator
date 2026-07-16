@@ -1,0 +1,73 @@
+{
+  "artifact_root": "demo",
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "finance_boundaries": [
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Outputs are deterministic examples from local CSV/JSON inputs and are not suitability analysis for any person or account."
+  ],
+  "items": [
+    {
+      "artifact": "README.md",
+      "name": "README boundary and command coverage",
+      "review_prompt": "Confirm README documents quickstart, scenario narrative, promotion checklist, and finance boundaries before promotion.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo",
+      "name": "Quickstart demo artifacts",
+      "review_prompt": "Run quickstart-check and confirm the generated demo includes showcase, scenario narrative, and promotion checklist artifacts.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo/showcase.html",
+      "name": "Static showcase",
+      "review_prompt": "Open demo/showcase.html and confirm it links public-safe review artifacts without JavaScript.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo/docs_export.json",
+      "name": "Docs export",
+      "review_prompt": "Confirm docs_export covers commands, input schema, artifact map, verification commands, and finance boundaries.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo/release_audit_summary.json",
+      "name": "Release audit summary",
+      "review_prompt": "Release owner should rerun release-audit-summary with tests-status pass only after tests have actually run.",
+      "status": "review"
+    },
+    {
+      "artifact": "demo/package_audit.json",
+      "name": "Package audit and zero dependencies",
+      "review_prompt": "Confirm package-audit reports zero runtime dependencies, package data, script wiring, version alignment, and command coverage.",
+      "status": "pass"
+    },
+    {
+      "artifact": "demo/public_scan.json",
+      "name": "Public scan",
+      "review_prompt": "Confirm public-scan passes before sharing public artifacts.",
+      "status": "pass"
+    },
+    {
+      "artifact": "dist/*.whl",
+      "name": "Wheel install check",
+      "review_prompt": "Build and install a wheel in a clean environment, then run portfolio-fee-drag --version and portfolio-fee-drag selfcheck.",
+      "status": "manual"
+    },
+    {
+      "artifact": "README.md and generated artifacts",
+      "name": "Finance boundaries",
+      "review_prompt": "Confirm all public-facing artifacts retain the no live data, no broker, no advice, no recommendation boundary.",
+      "status": "pass"
+    }
+  ],
+  "manual_items": [
+    "Wheel install check is intentionally manual because this zero-dependency repo does not add workflow automation.",
+    "Promotion is a human release-owner decision; generated checks are evidence, not approval."
+  ],
+  "root": ".",
+  "schema": "portfolio-fee-drag-promotion-checklist-v1",
+  "status": "review",
+  "version": "0.9.0"
+}

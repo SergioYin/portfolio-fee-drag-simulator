@@ -1,0 +1,161 @@
+{
+  "batch_compare_source": "demo/batch_compare.json",
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "case_gallery_source": "demo/case_gallery.json",
+  "review_note": "Narratives are plain-language explanations for human review only; they are not tax, legal, investment, or buy/sell/hold advice.",
+  "scenarios": [
+    {
+      "description": "A staged-deployment scenario with high cash allocation and conservative turnover assumptions.",
+      "key_drag_drivers": [
+        {
+          "label": "cash drag",
+          "name": "cash_drag_rate",
+          "plain_language": "Cash Drag contributes 1.665% to the annual drag arithmetic.",
+          "rate": 0.01665
+        },
+        {
+          "label": "expense ratio",
+          "name": "weighted_expense_ratio",
+          "plain_language": "Expense Ratio contributes 0.068% to the annual drag arithmetic.",
+          "rate": 0.000685
+        },
+        {
+          "label": "turnover/tax drag",
+          "name": "turnover_tax_drag_rate",
+          "plain_language": "Turnover/Tax Drag contributes 0.044% to the annual drag arithmetic.",
+          "rate": 0.00043875
+        }
+      ],
+      "metrics": {
+        "cash_allocation": 0.45,
+        "cash_drag_rate": 0.01665,
+        "rebalance_drag_rate": 0.0,
+        "total_annual_drag_rate": 0.01777375,
+        "total_dollar_drag": 297218.06,
+        "turnover_tax_drag_rate": 0.00043875,
+        "weighted_expense_ratio": 0.000685
+      },
+      "no_advice_boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+      "plain_language_summary": "Cash-Heavy Waitlist is a static local scenario over 25 years. It compares a gross future value of $1,032,382.15 with a net future value of $735,164.08 after configured expense, cash, turnover/tax, and rebalance drags.",
+      "questions_for_human_review": [
+        "Do the holdings, allocations, and cash-like classifications match the intended local case?",
+        "Who verified the gross return, cash return, turnover, realized gain, tax rate, taxable allocation, rebalance, and contribution timing assumptions?",
+        "Which driver is largest, and does a human reviewer need to add context for why that input differs from the other bundled cases?",
+        "Is the no-advice boundary visible wherever this scenario is shared?"
+      ],
+      "rank_context": {
+        "cash_drag_rank": 1,
+        "fee_drag_rank": 2,
+        "total_annual_drag_rank": 2,
+        "total_dollar_drag_rank": 2,
+        "turnover_tax_drag_rank": 3
+      },
+      "slug": "cash-heavy-waitlist",
+      "title": "Cash-Heavy Waitlist"
+    },
+    {
+      "description": "A taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.",
+      "key_drag_drivers": [
+        {
+          "label": "turnover/tax drag",
+          "name": "turnover_tax_drag_rate",
+          "plain_language": "Turnover/Tax Drag contributes 6.075% to the annual drag arithmetic.",
+          "rate": 0.06075
+        },
+        {
+          "label": "expense ratio",
+          "name": "weighted_expense_ratio",
+          "plain_language": "Expense Ratio contributes 0.818% to the annual drag arithmetic.",
+          "rate": 0.008175
+        },
+        {
+          "label": "cash drag",
+          "name": "cash_drag_rate",
+          "plain_language": "Cash Drag contributes 0.175% to the annual drag arithmetic.",
+          "rate": 0.00175
+        }
+      ],
+      "metrics": {
+        "cash_allocation": 0.05,
+        "cash_drag_rate": 0.00175,
+        "rebalance_drag_rate": 0.001,
+        "total_annual_drag_rate": 0.071675,
+        "total_dollar_drag": 777032.57,
+        "turnover_tax_drag_rate": 0.06075,
+        "weighted_expense_ratio": 0.008175
+      },
+      "no_advice_boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+      "plain_language_summary": "High-Turnover Taxable Fund is a static local scenario over 25 years. It compares a gross future value of $1,057,702.68 with a net future value of $280,670.11 after configured expense, cash, turnover/tax, and rebalance drags.",
+      "questions_for_human_review": [
+        "Do the holdings, allocations, and cash-like classifications match the intended local case?",
+        "Who verified the gross return, cash return, turnover, realized gain, tax rate, taxable allocation, rebalance, and contribution timing assumptions?",
+        "Which driver is largest, and does a human reviewer need to add context for why that input differs from the other bundled cases?",
+        "Is the no-advice boundary visible wherever this scenario is shared?"
+      ],
+      "rank_context": {
+        "cash_drag_rank": 3,
+        "fee_drag_rank": 1,
+        "total_annual_drag_rank": 1,
+        "total_dollar_drag_rank": 1,
+        "turnover_tax_drag_rank": 1
+      },
+      "slug": "high-turnover-taxable-fund",
+      "title": "High-Turnover Taxable Fund"
+    },
+    {
+      "description": "A diversified low-expense ETF-style allocation with modest turnover and limited cash drag.",
+      "key_drag_drivers": [
+        {
+          "label": "cash drag",
+          "name": "cash_drag_rate",
+          "plain_language": "Cash Drag contributes 0.150% to the annual drag arithmetic.",
+          "rate": 0.0015
+        },
+        {
+          "label": "turnover/tax drag",
+          "name": "turnover_tax_drag_rate",
+          "plain_language": "Turnover/Tax Drag contributes 0.066% to the annual drag arithmetic.",
+          "rate": 0.00066
+        },
+        {
+          "label": "expense ratio",
+          "name": "weighted_expense_ratio",
+          "plain_language": "Expense Ratio contributes 0.045% to the annual drag arithmetic.",
+          "rate": 0.000455
+        }
+      ],
+      "metrics": {
+        "cash_allocation": 0.05,
+        "cash_drag_rate": 0.0015,
+        "rebalance_drag_rate": 0.0001,
+        "total_annual_drag_rate": 0.002715,
+        "total_dollar_drag": 54874.59,
+        "turnover_tax_drag_rate": 0.00066,
+        "weighted_expense_ratio": 0.000455
+      },
+      "no_advice_boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+      "plain_language_summary": "Low-Cost ETF is a static local scenario over 25 years. It compares a gross future value of $1,057,702.68 with a net future value of $1,002,828.08 after configured expense, cash, turnover/tax, and rebalance drags.",
+      "questions_for_human_review": [
+        "Do the holdings, allocations, and cash-like classifications match the intended local case?",
+        "Who verified the gross return, cash return, turnover, realized gain, tax rate, taxable allocation, rebalance, and contribution timing assumptions?",
+        "Which driver is largest, and does a human reviewer need to add context for why that input differs from the other bundled cases?",
+        "Is the no-advice boundary visible wherever this scenario is shared?"
+      ],
+      "rank_context": {
+        "cash_drag_rank": 2,
+        "fee_drag_rank": 3,
+        "total_annual_drag_rank": 3,
+        "total_dollar_drag_rank": 3,
+        "turnover_tax_drag_rank": 2
+      },
+      "slug": "low-cost-etf",
+      "title": "Low-Cost ETF"
+    }
+  ],
+  "schema": "portfolio-fee-drag-scenario-narrative-v1",
+  "source_schemas": {
+    "batch_compare": "portfolio-fee-drag-batch-compare-v1",
+    "case_gallery": "portfolio-fee-drag-case-gallery-v1"
+  },
+  "version": "0.9.0"
+}

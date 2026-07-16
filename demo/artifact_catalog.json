@@ -38,7 +38,7 @@
       "promotion_usefulness": "Useful for reviewing local assumption field deltas without advice.",
       "role": "Markdown comparison of bundled base and review assumptions.",
       "route": "file://demo/assumption_diff.md",
-      "sha256": "92f77fad9718658e17bb1bbf543158790987b0d6377cb209c9370513a8bfcf24"
+      "sha256": "f170dea0d23fa4de6729584d315b8e25b304c4f241c3c3789cbb34c16d2a1678"
     },
     {
       "bytes": 2394,
@@ -48,7 +48,7 @@
       "promotion_usefulness": "Useful for deterministic review workflow handoff without recommendations.",
       "role": "Machine-readable assumption field deltas.",
       "route": "file://demo/assumption_diff.json",
-      "sha256": "8dfddd22351be3c53c296234a0d87f827d98368280382ccd009783cc5968d0a5"
+      "sha256": "e2d0da24857daf2e8306405493d7a008854ac68f6c6fdeeea27c72bc0c547c6b"
     },
     {
       "bytes": 1497,
@@ -58,7 +58,7 @@
       "promotion_usefulness": "Useful for prompting human review of cash, expense, turnover/tax, allocation, horizon, and rebalancing inputs.",
       "role": "Markdown review prompts for configured risk flag thresholds.",
       "route": "file://demo/risk_flags.md",
-      "sha256": "3952df51864ccdd7047631fc0af340d6ac8a7aeff642b53b5eb6ef32f7ba552d"
+      "sha256": "e4c623092abdb6db6aa8dec5c6d402a98d3444f4de0264a403eb07cbf3a245bb"
     },
     {
       "bytes": 2191,
@@ -68,7 +68,7 @@
       "promotion_usefulness": "Useful for deterministic advanced review workflow checks.",
       "role": "Machine-readable review prompts for configured risk flag thresholds.",
       "route": "file://demo/risk_flags.json",
-      "sha256": "e015571cad50abc7b0efb91e212ec76828e57272fe9bd907ab471a12a65b26b4"
+      "sha256": "87a5f2309cac53d3a9f60ffaab42432f8e16932a00684016f73fe899be7cec4e"
     },
     {
       "bytes": 1242,
@@ -138,7 +138,7 @@
       "promotion_usefulness": "Useful for verifying scenario coverage and reproducibility.",
       "role": "Bundled deterministic scenario preset export.",
       "route": "file://demo/scenario_presets.json",
-      "sha256": "789c272cd643c613fb0c205a03db0c6d6b6f35a3744635c5b5b7b008c21dcc2a"
+      "sha256": "5b21fb16b0f009dca32ee5edda53b64a90601ed13eaa22040307056de10f90f5"
     },
     {
       "bytes": 2693,
@@ -158,7 +158,7 @@
       "promotion_usefulness": "Useful for downstream static review and prompt generation.",
       "role": "Machine-readable case gallery with complete packet payloads.",
       "route": "file://demo/case_gallery.json",
-      "sha256": "f1583f111c7d31fac76c56ea662aecbc3cecc00211421d06b38e04eab0038de1"
+      "sha256": "4fcce6b368aedf68f593bde6c4f58e46172939d1d56e1e6f480b995adbf7fc25"
     },
     {
       "bytes": 2854,
@@ -178,7 +178,7 @@
       "promotion_usefulness": "Useful for comparing cases with review questions instead of recommendations.",
       "role": "Markdown ranking of scenario presets by drag dimensions.",
       "route": "file://demo/batch_compare.md",
-      "sha256": "c0f244bce4e74a16dcf5c55679dbbc5059f514e6f9b9c4ed96c89dfea18bae71"
+      "sha256": "a6b05a1703a0abfa8433b53f381cbe5ff71c13bf5a46525f21297162c18955e5"
     },
     {
       "bytes": 5261,
@@ -188,7 +188,27 @@
       "promotion_usefulness": "Useful for deterministic case sorting across local review dimensions.",
       "role": "Machine-readable ranking of scenario presets by drag dimensions.",
       "route": "file://demo/batch_compare.json",
-      "sha256": "36a0484caf0275c16a8fa867602a39efdfc558dcb77e5d661c318206f1394a11"
+      "sha256": "13542a5dca88bfc78537d068fb4dc703b093034a0b3c7be9b72eb0772eb6725a"
+    },
+    {
+      "bytes": 4551,
+      "exists": true,
+      "path": "scenario_narrative.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-narrative --output demo",
+      "promotion_usefulness": "Useful for promotion review of how bundled scenarios are explained to humans.",
+      "role": "Plain-language scenario narrative with drivers, review questions, and no-advice boundaries.",
+      "route": "file://demo/scenario_narrative.md",
+      "sha256": "3ac9865066121bcf1a3492a0d7aacbb38041c2278c1c3d775cfa507f24b01cad"
+    },
+    {
+      "bytes": 7838,
+      "exists": true,
+      "path": "scenario_narrative.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-narrative --output demo",
+      "promotion_usefulness": "Useful for checking bundled scenario explanations without live data or recommendations.",
+      "role": "Machine-readable scenario narrative with driver and ranking context.",
+      "route": "file://demo/scenario_narrative.json",
+      "sha256": "f323390256966de336fa3fada8cc0dd2a15a5d8439336a3281ca4f30ad90f6d5"
     },
     {
       "bytes": 1779,
@@ -198,7 +218,7 @@
       "promotion_usefulness": "Useful for promotion review of visual demo assets.",
       "role": "Human-readable receipt for dashboard and gallery artifacts.",
       "route": "file://demo/visual_receipt.md",
-      "sha256": "d69e61a95a4a5b8e5f4081b75d194e696faa62ecaea8adab7a5d548985ee6da6"
+      "sha256": "da7f115e927d10198a82ca42c5c5bb94cec1f846b0acc356058680715339b458"
     },
     {
       "bytes": 2261,
@@ -208,7 +228,7 @@
       "promotion_usefulness": "Useful for release-owner checks that need hashes and byte counts.",
       "role": "Machine-readable receipt for dashboard and gallery artifacts.",
       "route": "file://demo/visual_receipt.json",
-      "sha256": "57657c0498a858ef6b3675059559e1b420f1ebabbefdb92719c40c138bfac47e"
+      "sha256": "7f63f9e9ee9d135bf82a05c62f3f5884cfcb2d113980753d4feb112c12134780"
     },
     {
       "bytes": 2830,
@@ -218,27 +238,27 @@
       "promotion_usefulness": "Useful for local visual artifact verification.",
       "role": "Standalone HTML receipt for dashboard and gallery artifacts.",
       "route": "file://demo/visual_receipt.html",
-      "sha256": "668b0f03f2fd95ab948843a312350d61d769db6ccf62b82d2f4dc1832bb57054"
+      "sha256": "bcf3cf09ef1b4c25cb41b9ccdbcaa90a4a08141d79391694bd5d98c39663e80f"
     },
     {
-      "bytes": 3925,
+      "bytes": 4249,
       "exists": true,
       "path": "cold_start_walkthrough.md",
       "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
       "promotion_usefulness": "Useful for onboarding and public README validation.",
       "role": "First-run walkthrough in Markdown.",
       "route": "file://demo/cold_start_walkthrough.md",
-      "sha256": "ee560031f1758795359318b94464f11752d359ed1cd8e801782bd8bc197a8df1"
+      "sha256": "59796aa72a4c3b21d047885729f9596c65ef1e0be5fe949b12661293e18d9443"
     },
     {
-      "bytes": 4735,
+      "bytes": 5085,
       "exists": true,
       "path": "cold_start_walkthrough.json",
       "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
       "promotion_usefulness": "Useful for deterministic checklist review.",
       "role": "First-run walkthrough in JSON.",
       "route": "file://demo/cold_start_walkthrough.json",
-      "sha256": "230d86de2dfc609e20185aff084708a6899cb65dfb7719a12a999a0b1a1a48b1"
+      "sha256": "71e2db4086044bd8576cee23f95755de6fd7fa7b8485087d07ae0bf98ef38515"
     },
     {
       "bytes": 627,
@@ -248,7 +268,7 @@
       "promotion_usefulness": "Useful for release readiness review.",
       "role": "Human-readable fixture validation report.",
       "route": "file://demo/fixture_doctor.md",
-      "sha256": "d4baeab316eb0ba1845a00d946a842fb25b188171993eec309453a112a56d252"
+      "sha256": "f38bb8d73e2e130e211eb44ee828a1f2f4c4ae83fe412f50c945806ef961dcde"
     },
     {
       "bytes": 975,
@@ -258,7 +278,7 @@
       "promotion_usefulness": "Useful for automated release-owner status checks.",
       "role": "Machine-readable fixture validation report.",
       "route": "file://demo/fixture_doctor.json",
-      "sha256": "ea988f253908baf29e4116a28b7c05898e05f9cce2ebcc657cd0ee5b1c72f15e"
+      "sha256": "7c60139287b86aa0f1c3c1f8509ab2e9ae8bb2146e9011237b3d05333897ea70"
     },
     {
       "bytes": 569,
@@ -268,17 +288,17 @@
       "promotion_usefulness": "Useful for confirming zero-dependency and command coverage claims.",
       "role": "Human-readable package audit report.",
       "route": "file://demo/package_audit.md",
-      "sha256": "78598a35f1785cb3d6ef08d1b5ec1bf81faf7f25691bf1c67e9966ea3ac32320"
+      "sha256": "7fddfd78de2b4d7250eb1ccc4ff4b2777cbd0d1af8eb75e4153c69e4d175dbca"
     },
     {
-      "bytes": 1289,
+      "bytes": 1342,
       "exists": true,
       "path": "package_audit.json",
       "producer_command": "python -m portfolio_fee_drag_simulator package-audit --root . --output demo",
       "promotion_usefulness": "Useful for release-owner status checks.",
       "role": "Machine-readable package audit report.",
       "route": "file://demo/package_audit.json",
-      "sha256": "03b53407defb6ba4fed31382ec0a496ef5ee3de68691b4320a33f35fba441841"
+      "sha256": "13a607e26fd82fa50afb160400c5794f8ce4d5d1f9d082ac87d7e5d532931dd4"
     },
     {
       "bytes": 243,
@@ -288,7 +308,7 @@
       "promotion_usefulness": "Useful as a quick health signal before promotion.",
       "role": "Machine-readable CLI and deterministic calculation selfcheck.",
       "route": "file://demo/selfcheck.json",
-      "sha256": "1a682ee3c25d955bf5225ec1e557bdb6ab39f4ad09feb931950a48cca003a137"
+      "sha256": "1d144fed14a13c14ae9a119f6fc1161461870c544f1d80d2d8cbf29cd5515b46"
     },
     {
       "bytes": 163,
@@ -298,17 +318,17 @@
       "promotion_usefulness": "Useful for checking public-safe language and obvious secret markers.",
       "role": "Public-readiness scan output.",
       "route": "file://demo/public_scan.json",
-      "sha256": "05b205c73f7ebce267d0fad3107111198dcd5d5a312ed5019b6e171b64ec9c2c"
+      "sha256": "764afc62664b3c926af46319f9738374ed5b5d0ee6e932c8f5d9ed98dfc99f0e"
     },
     {
-      "bytes": 8697,
+      "bytes": 9347,
       "exists": true,
       "path": "release_manifest.json",
       "producer_command": "python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json",
       "promotion_usefulness": "Useful for release review and reproducibility checks.",
       "role": "Source and artifact hash manifest.",
       "route": "file://demo/release_manifest.json",
-      "sha256": "b522f21e57ec3b4de96b183bc38e0badb530fb20005c63d48f41f06e2ff125c9"
+      "sha256": "7e53c9653350c2bb8477928637b9e4b395349f5ec8ac8707fdcf52d0938e89e1"
     },
     {
       "bytes": 1124,
@@ -318,7 +338,7 @@
       "promotion_usefulness": "Useful for promotion decisions after owner-run tests.",
       "role": "Human-readable release-owner audit summary.",
       "route": "file://demo/release_audit_summary.md",
-      "sha256": "5ee7770b786a88d3494d6e30f1e74237bf57f717d3cf50ea58979c530adb991f"
+      "sha256": "7ac8a7ccc9953343db84218f0dc559603f2f701eefd6d9915276c24ca601586c"
     },
     {
       "bytes": 1664,
@@ -328,17 +348,17 @@
       "promotion_usefulness": "Useful for deterministic release status review.",
       "role": "Machine-readable release-owner audit summary.",
       "route": "file://demo/release_audit_summary.json",
-      "sha256": "818552bfb5250e5aaaa3924f445364206df72a4dd2901dc58a541edf3477ad7f"
+      "sha256": "a6745c24fa4c8a3300503fd9ba0bb20c3a42df3e7e037fab6358ec8611205ca0"
     },
     {
-      "bytes": 1481,
+      "bytes": 1617,
       "exists": true,
       "path": "maturity_report.md",
       "producer_command": "python -m portfolio_fee_drag_simulator maturity-report --output demo/maturity_report.md",
       "promotion_usefulness": "Useful for explaining maturity scope and remaining boundaries.",
       "role": "Public-readiness checklist.",
       "route": "file://demo/maturity_report.md",
-      "sha256": "d3a4dc6aa27bf86265408a6c5b84f9c4b6e8b149711fb09b9946090212a57f76"
+      "sha256": "387021f7a1cc7be06d55fe810483cb5b8bd1228abe701e082fe239e55e9ce7cb"
     },
     {
       "bytes": 3212,
@@ -348,7 +368,7 @@
       "promotion_usefulness": "Useful for human review of assumptions, verification needs, and boundaries.",
       "role": "Research-note prompt journal in Markdown.",
       "route": "file://demo/decision_journal.md",
-      "sha256": "c345bdb1c0a085f5903abe840cda668b9110bea04d0ef2e6775f8114ebc46c10"
+      "sha256": "0b1a59afcf6c3993d99f84eb93cf28eb7d8d4f058260ca490d62fbb30f14bbfd"
     },
     {
       "bytes": 3849,
@@ -358,42 +378,62 @@
       "promotion_usefulness": "Useful for deterministic prompt handoff without live data.",
       "role": "Research-note prompt journal in JSON.",
       "route": "file://demo/decision_journal.json",
-      "sha256": "f8ac7289df8ad49571c5acc15392914d87cde787a1505e46f1ef792bda01376d"
+      "sha256": "3d19aeac77e52b1a8b3c1f15f9ce33c134424c6d8aa8c64502d38075c0771268"
     },
     {
-      "bytes": 14014,
+      "bytes": 15331,
       "exists": true,
       "path": "docs_export.md",
       "producer_command": "python -m portfolio_fee_drag_simulator docs-export --output demo",
       "promotion_usefulness": "Useful for first-screen project review and public showcase context.",
       "role": "Deterministic public command, schema, artifact, verification, and boundary documentation.",
       "route": "file://demo/docs_export.md",
-      "sha256": "b7867a758f409bc8c65fd2dd54102897f3bfc07ab63bc3fb0e136a8f81e52185"
+      "sha256": "37d7ad8ee5e86b7ab2a33647b9adc30dbdedb2261d523eb10ce4a51a63be4ba8"
     },
     {
-      "bytes": 22569,
+      "bytes": 24644,
       "exists": true,
       "path": "docs_export.json",
       "producer_command": "python -m portfolio_fee_drag_simulator docs-export --output demo",
       "promotion_usefulness": "Useful for checking command coverage and artifact map completeness.",
       "role": "Machine-readable public documentation export.",
       "route": "file://demo/docs_export.json",
-      "sha256": "ef3b5c849d33cde146940d9322b6c568b84148025134d1e72b9c35c3906ebc10"
+      "sha256": "9e3c00f7d7f244a7825c6b82009d7016e742531a381754c332f966ec9bb16992"
     },
     {
-      "bytes": 4431,
+      "bytes": 2422,
+      "exists": true,
+      "path": "promotion_checklist.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
+      "promotion_usefulness": "Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion.",
+      "role": "Release and promotion readiness checklist in Markdown.",
+      "route": "file://demo/promotion_checklist.md",
+      "sha256": "9b24587e136308de19b3691c8d29be91ae45be100d2a2a6bc3d89b6bda9b939f"
+    },
+    {
+      "bytes": 3237,
+      "exists": true,
+      "path": "promotion_checklist.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
+      "promotion_usefulness": "Useful for deterministic promotion review handoff.",
+      "role": "Machine-readable release and promotion readiness checklist.",
+      "route": "file://demo/promotion_checklist.json",
+      "sha256": "f0c7fce96718ef3641877fc407e73c525f6fa067bb5c261288087929a90bf5a8"
+    },
+    {
+      "bytes": 4922,
       "exists": true,
       "path": "showcase.html",
       "producer_command": "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
       "promotion_usefulness": "Useful as the first local page to open when evaluating the demo.",
       "role": "No-JS public showcase index for generated review artifacts.",
       "route": "file://demo/showcase.html",
-      "sha256": "6cf22e01f3b3cb2b65ebf0e8a21ad6a273923826a0161aacd0c7600f2ff60d42"
+      "sha256": "f1b95b225d048d2b98d96c3b10c6782928e3084aed10052ea5af740facda110d"
     }
   ],
   "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
   "catalog_scope": "Inventories deterministic demo artifacts produced before artifact-catalog is run; the catalog does not hash itself.",
   "complete": true,
   "schema": "portfolio-fee-drag-artifact-catalog-v1",
-  "version": "0.8.0"
+  "version": "0.9.0"
 }

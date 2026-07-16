@@ -13,7 +13,7 @@ pip install -e .
 portfolio-fee-drag quickstart-check --output demo
 ```
 
-First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, assumption diff, risk flags, dashboard, case gallery, batch comparison, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
+First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, assumption diff, risk flags, dashboard, case gallery, batch comparison, scenario narrative, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, docs export, and promotion checklist.
 
 The quickstart writes deterministic demo artifacts:
 
@@ -36,6 +36,8 @@ The quickstart writes deterministic demo artifacts:
 - `demo/case_gallery.html`
 - `demo/batch_compare.md`
 - `demo/batch_compare.json`
+- `demo/scenario_narrative.md`
+- `demo/scenario_narrative.json`
 - `demo/visual_receipt.md`
 - `demo/visual_receipt.json`
 - `demo/visual_receipt.html`
@@ -56,6 +58,8 @@ The quickstart writes deterministic demo artifacts:
 - `demo/artifact_catalog.json`
 - `demo/docs_export.md`
 - `demo/docs_export.json`
+- `demo/promotion_checklist.md`
+- `demo/promotion_checklist.json`
 - `demo/showcase.html`
 - `demo/public_scan.json`
 
@@ -66,6 +70,7 @@ The quickstart writes deterministic demo artifacts:
 - `risk-flags`: read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations.
 - `build-packet`: create Markdown and JSON packet artifacts from holdings and assumptions.
 - `batch-compare`: rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag, with next-action review questions instead of recommendations.
+- `scenario-narrative`: read `case_gallery.json` and `batch_compare.json` and explain bundled scenarios in plain language with key drag drivers, human review questions, and no-advice boundaries.
 - `compare-history`: compare bundled or supplied historical scenario snapshots.
 - `sensitivity-matrix`: generate a static fee/return sensitivity table.
 - `review-ledger`: validate and summarize a holdings ledger.
@@ -80,6 +85,7 @@ The quickstart writes deterministic demo artifacts:
 - `artifact-catalog`: inventory deterministic demo artifacts with route, bytes, SHA-256, producer command, role, and promotion usefulness.
 - `docs-export`: create deterministic Markdown/JSON docs summarizing commands, input schema, artifact map, verification commands, and finance boundaries.
 - `static-showcase`: create a no-JS public showcase page linking the generated review artifacts with short user-value copy.
+- `promotion-checklist`: create Markdown/JSON release and promotion readiness prompts covering README, quickstart, `demo/showcase.html`, docs export, release audit summary, package audit, public scan, wheel install, and finance boundaries.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
 - `release-audit-summary`: combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status into Markdown and JSON for release owners.
@@ -136,7 +142,7 @@ The command emits `holdings_template.csv`, `assumptions_template.json`, and `loc
 
 ## Advanced Review Workflow
 
-Version 0.8 adds deterministic review artifacts for comparing assumption sets and surfacing threshold prompts:
+Version 0.9 includes deterministic review artifacts for comparing assumption sets, surfacing threshold prompts, narrating bundled scenarios, and checking promotion readiness:
 
 ```bash
 portfolio-fee-drag assumption-diff --output demo
@@ -149,7 +155,7 @@ portfolio-fee-drag risk-flags --output demo
 
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.8 bundles three deterministic scenario presets:
+Version 0.9 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -176,6 +182,14 @@ portfolio-fee-drag batch-compare --output demo
 ```
 
 The batch comparison emits `batch_compare.md` and `batch_compare.json`. It ranks cases by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag. It includes next-action review questions for human reviewers, not recommendations.
+
+Explain the bundled scenarios for promotion review:
+
+```bash
+portfolio-fee-drag scenario-narrative --output demo
+```
+
+The scenario narrative emits `scenario_narrative.md` and `scenario_narrative.json`. It reads `case_gallery.json` and `batch_compare.json`, explains each bundled scenario in plain language, lists key drag drivers, includes questions for human review, and repeats the no-advice boundary.
 
 Build the visual receipt after dashboard and gallery artifacts exist:
 
@@ -214,9 +228,10 @@ Export public docs and the static showcase:
 ```bash
 portfolio-fee-drag docs-export --output demo
 portfolio-fee-drag static-showcase --output demo/showcase.html
+portfolio-fee-drag promotion-checklist --output demo
 ```
 
-The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated assumption diff, risk flags, dashboard, gallery, receipt, walkthrough, decision journal, audits, catalog, and docs export.
+The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated assumption diff, risk flags, dashboard, gallery, scenario narrative, receipt, walkthrough, decision journal, audits, catalog, docs export, and promotion checklist. The promotion checklist emits `promotion_checklist.md` and `promotion_checklist.json` for release-owner review of README, quickstart, showcase, docs export, release audit summary, package audit, public scan, wheel install, and finance boundaries.
 
 ## Release-Owner Audit
 
@@ -254,6 +269,7 @@ python -m portfolio_fee_drag_simulator input-template --output demo/input_templa
 python -m portfolio_fee_drag_simulator assumption-diff --output demo
 python -m portfolio_fee_drag_simulator risk-flags --output demo
 python -m portfolio_fee_drag_simulator batch-compare --output demo
+python -m portfolio_fee_drag_simulator scenario-narrative --output demo
 python -m portfolio_fee_drag_simulator fixture-doctor --output demo
 python -m portfolio_fee_drag_simulator package-audit --root . --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
@@ -261,6 +277,7 @@ python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator decision-journal --output demo
 python -m portfolio_fee_drag_simulator docs-export --output demo
 python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html
+python -m portfolio_fee_drag_simulator promotion-checklist --output demo
 python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
 python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json

@@ -47,6 +47,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "case_gallery.html").exists())
             self.assertTrue((out / "batch_compare.md").exists())
             self.assertTrue((out / "batch_compare.json").exists())
+            self.assertTrue((out / "scenario_narrative.md").exists())
+            self.assertTrue((out / "scenario_narrative.json").exists())
             self.assertTrue((out / "visual_receipt.md").exists())
             self.assertTrue((out / "visual_receipt.json").exists())
             self.assertTrue((out / "visual_receipt.html").exists())
@@ -65,6 +67,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "artifact_catalog.json").exists())
             self.assertTrue((out / "docs_export.md").exists())
             self.assertTrue((out / "docs_export.json").exists())
+            self.assertTrue((out / "promotion_checklist.md").exists())
+            self.assertTrue((out / "promotion_checklist.json").exists())
             self.assertTrue((out / "showcase.html").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
@@ -81,6 +85,11 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(batch["schema"], "portfolio-fee-drag-batch-compare-v1")
             self.assertEqual(set(batch["rankings"]), {"total_annual_drag", "total_dollar_drag", "cash_drag", "turnover_tax_drag", "fee_drag"})
             self.assertIn("not recommendations", (out / "batch_compare.md").read_text())
+            narrative = json.loads((out / "scenario_narrative.json").read_text())
+            self.assertEqual(narrative["schema"], "portfolio-fee-drag-scenario-narrative-v1")
+            self.assertEqual(len(narrative["scenarios"]), 3)
+            self.assertIn("not tax, legal, investment, or buy/sell/hold advice", narrative["review_note"])
+            self.assertIn("Questions for human review", (out / "scenario_narrative.md").read_text())
             template_readme = (out / "input_templates" / "local_inputs_README.md").read_text()
             self.assertIn("without live data", template_readme)
             self.assertIn("not tax, legal, investment, or buy/sell/hold advice", template_readme)
@@ -138,6 +147,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("input_templates/local_inputs_README.md", catalog_paths)
             self.assertIn("batch_compare.md", catalog_paths)
             self.assertIn("batch_compare.json", catalog_paths)
+            self.assertIn("scenario_narrative.md", catalog_paths)
+            self.assertIn("scenario_narrative.json", catalog_paths)
+            self.assertIn("promotion_checklist.md", catalog_paths)
+            self.assertIn("promotion_checklist.json", catalog_paths)
             self.assertTrue(all("promotion_usefulness" in item for item in catalog["artifacts"]))
             docs = json.loads((out / "docs_export.json").read_text())
             self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
@@ -158,7 +171,13 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("assumption_diff.md", showcase)
             self.assertIn("risk_flags.md", showcase)
             self.assertIn("batch_compare.md", showcase)
+            self.assertIn("scenario_narrative.md", showcase)
+            self.assertIn("promotion_checklist.md", showcase)
             self.assertNotIn("<script", showcase.lower())
+            checklist = json.loads((out / "promotion_checklist.json").read_text())
+            self.assertEqual(checklist["schema"], "portfolio-fee-drag-promotion-checklist-v1")
+            self.assertTrue(any(item["name"] == "Wheel install check" for item in checklist["items"]))
+            self.assertTrue(any("No live market data" in item for item in checklist["finance_boundaries"]))
             summary = json.loads((out / "release_audit_summary.json").read_text())
             self.assertEqual(summary["status"], "review")
             self.assertEqual(summary["checks"][0]["status"], "not-run")
@@ -227,13 +246,15 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(main(["docs-export", "--output", str(out)]), 0)
             docs = json.loads((out / "docs_export.json").read_text())
             self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
-            self.assertEqual(docs["version"], "0.8.0")
+            self.assertEqual(docs["version"], "0.9.0")
             self.assertEqual([item["name"] for item in docs["commands"]], sorted(COMMANDS))
             self.assertEqual(docs["input_schema"]["holdings_csv"]["columns"][0]["name"], "account")
             self.assertTrue(any(item["path"] == "showcase.html" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "assumption_diff.md" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "risk_flags.md" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "batch_compare.md" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "scenario_narrative.md" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "promotion_checklist.md" for item in docs["artifact_map"]))
             self.assertIn("python -m unittest discover -s tests", docs["verification_commands"])
             self.assertTrue(any("No live market data" in item for item in docs["finance_boundaries"]))
 
@@ -245,6 +266,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("assumption_diff.md", showcase)
             self.assertIn("risk_flags.md", showcase)
             self.assertIn("batch_compare.md", showcase)
+            self.assertIn("scenario_narrative.md", showcase)
+            self.assertIn("promotion_checklist.md", showcase)
             self.assertNotIn("<script", showcase.lower())
 
     def test_assumption_diff_and_risk_flags_commands_export_review_prompts(self):
@@ -299,6 +322,38 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue(payload["next_action_review_questions"])
             markdown = (out / "batch_compare.md").read_text()
             self.assertIn("These questions are for human review only and are not recommendations.", markdown)
+
+            self.assertEqual(main(["case-gallery", "--output", str(out)]), 0)
+            self.assertEqual(main(["scenario-narrative", "--case-gallery", str(out / "case_gallery.json"), "--batch-compare", str(out / "batch_compare.json"), "--output", str(out)]), 0)
+            narrative = json.loads((out / "scenario_narrative.json").read_text())
+            self.assertEqual(narrative["schema"], "portfolio-fee-drag-scenario-narrative-v1")
+            self.assertTrue(all(item["key_drag_drivers"] for item in narrative["scenarios"]))
+            self.assertIn("No-advice boundary", (out / "scenario_narrative.md").read_text())
+
+    def test_promotion_checklist_command_exports_release_readiness_prompts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["quickstart-check", "--output", str(out)]), 0)
+            self.assertEqual(main(["promotion-checklist", "--artifact-root", str(out), "--output", str(out)]), 0)
+            payload = json.loads((out / "promotion_checklist.json").read_text())
+            self.assertEqual(payload["schema"], "portfolio-fee-drag-promotion-checklist-v1")
+            names = {item["name"] for item in payload["items"]}
+            self.assertTrue(
+                {
+                    "README boundary and command coverage",
+                    "Quickstart demo artifacts",
+                    "Static showcase",
+                    "Docs export",
+                    "Release audit summary",
+                    "Package audit and zero dependencies",
+                    "Public scan",
+                    "Wheel install check",
+                    "Finance boundaries",
+                }.issubset(names)
+            )
+            markdown = (out / "promotion_checklist.md").read_text()
+            self.assertIn("Wheel install", markdown)
+            self.assertIn("No live market data", markdown)
 
     def test_release_audit_summary_can_pass_after_release_owner_checks(self):
         with tempfile.TemporaryDirectory() as tmp:

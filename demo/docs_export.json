@@ -134,6 +134,20 @@
       "user_value": "Useful for deterministic case sorting across local review dimensions."
     },
     {
+      "path": "scenario_narrative.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-narrative --output demo",
+      "role": "Plain-language scenario narrative with drivers, review questions, and no-advice boundaries.",
+      "route": "file://demo/scenario_narrative.md",
+      "user_value": "Useful for promotion review of how bundled scenarios are explained to humans."
+    },
+    {
+      "path": "scenario_narrative.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-narrative --output demo",
+      "role": "Machine-readable scenario narrative with driver and ranking context.",
+      "route": "file://demo/scenario_narrative.json",
+      "user_value": "Useful for checking bundled scenario explanations without live data or recommendations."
+    },
+    {
       "path": "visual_receipt.md",
       "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
       "role": "Human-readable receipt for dashboard and gallery artifacts.",
@@ -267,6 +281,20 @@
       "user_value": "Useful for checking command coverage and artifact map completeness."
     },
     {
+      "path": "promotion_checklist.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
+      "role": "Release and promotion readiness checklist in Markdown.",
+      "route": "file://demo/promotion_checklist.md",
+      "user_value": "Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion."
+    },
+    {
+      "path": "promotion_checklist.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
+      "role": "Machine-readable release and promotion readiness checklist.",
+      "route": "file://demo/promotion_checklist.json",
+      "user_value": "Useful for deterministic promotion review handoff."
+    },
+    {
       "path": "showcase.html",
       "producer_command": "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
       "role": "No-JS public showcase index for generated review artifacts.",
@@ -329,6 +357,10 @@
       "summary": "Inspect zero-dependency metadata, package-data readiness, script wiring, version alignment, and command coverage."
     },
     {
+      "name": "promotion-checklist",
+      "summary": "Write Markdown/JSON release and promotion readiness checklist covering docs, demo artifacts, audits, wheel install, public scan, and finance boundaries."
+    },
+    {
       "name": "public-scan",
       "summary": "Scan local release files for common secret markers and required finance boundary language."
     },
@@ -351,6 +383,10 @@
     {
       "name": "risk-flags",
       "summary": "Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations."
+    },
+    {
+      "name": "scenario-narrative",
+      "summary": "Read case_gallery.json and batch_compare.json and explain each bundled scenario in plain language with drag drivers, human review questions, and no-advice boundaries."
     },
     {
       "name": "scenario-presets",
@@ -506,5 +542,5 @@
     "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "0.8.0"
+  "version": "0.9.0"
 }

@@ -1,6 +1,6 @@
 # Risk Flags
 
-Version: 0.8.0
+Version: 0.9.0
 Status: review
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.

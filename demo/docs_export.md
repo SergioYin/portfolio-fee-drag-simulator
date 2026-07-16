@@ -1,6 +1,6 @@
 # Portfolio Fee Drag Docs Export
 
-Version: 0.8.0
+Version: 0.9.0
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
@@ -21,12 +21,14 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | `input-template` | Write example holdings and assumptions templates plus a README fragment for adapting local CSV/JSON without live data. |
 | `maturity-report` | Write a public-readiness checklist for the current release scope. |
 | `package-audit` | Inspect zero-dependency metadata, package-data readiness, script wiring, version alignment, and command coverage. |
+| `promotion-checklist` | Write Markdown/JSON release and promotion readiness checklist covering docs, demo artifacts, audits, wheel install, public scan, and finance boundaries. |
 | `public-scan` | Scan local release files for common secret markers and required finance boundary language. |
 | `quickstart-check` | Run the full deterministic demo route and write public-safe demo artifacts. |
 | `release-audit-summary` | Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. |
 | `release-manifest` | Hash source and demo files for release review. |
 | `review-ledger` | Validate and summarize the holdings ledger. |
 | `risk-flags` | Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations. |
+| `scenario-narrative` | Read case_gallery.json and batch_compare.json and explain each bundled scenario in plain language with drag drivers, human review questions, and no-advice boundaries. |
 | `scenario-presets` | Write or print bundled deterministic scenario preset JSON. |
 | `selfcheck` | Verify CLI wiring, bundled examples, and deterministic calculations. |
 | `sensitivity-matrix` | Generate a static fee/return sensitivity table from a packet JSON file. |
@@ -93,6 +95,8 @@ Calculation notes:
 | `case_gallery.html` | `file://demo/case_gallery.html` | `python -m portfolio_fee_drag_simulator case-gallery --output demo` | Useful for public demo inspection without runtime services. |
 | `batch_compare.md` | `file://demo/batch_compare.md` | `python -m portfolio_fee_drag_simulator batch-compare --output demo` | Useful for comparing cases with review questions instead of recommendations. |
 | `batch_compare.json` | `file://demo/batch_compare.json` | `python -m portfolio_fee_drag_simulator batch-compare --output demo` | Useful for deterministic case sorting across local review dimensions. |
+| `scenario_narrative.md` | `file://demo/scenario_narrative.md` | `python -m portfolio_fee_drag_simulator scenario-narrative --output demo` | Useful for promotion review of how bundled scenarios are explained to humans. |
+| `scenario_narrative.json` | `file://demo/scenario_narrative.json` | `python -m portfolio_fee_drag_simulator scenario-narrative --output demo` | Useful for checking bundled scenario explanations without live data or recommendations. |
 | `visual_receipt.md` | `file://demo/visual_receipt.md` | `python -m portfolio_fee_drag_simulator visual-receipt --output demo` | Useful for promotion review of visual demo assets. |
 | `visual_receipt.json` | `file://demo/visual_receipt.json` | `python -m portfolio_fee_drag_simulator visual-receipt --output demo` | Useful for release-owner checks that need hashes and byte counts. |
 | `visual_receipt.html` | `file://demo/visual_receipt.html` | `python -m portfolio_fee_drag_simulator visual-receipt --output demo` | Useful for local visual artifact verification. |
@@ -112,6 +116,8 @@ Calculation notes:
 | `decision_journal.json` | `file://demo/decision_journal.json` | `python -m portfolio_fee_drag_simulator decision-journal --output demo` | Useful for deterministic prompt handoff without live data. |
 | `docs_export.md` | `file://demo/docs_export.md` | `python -m portfolio_fee_drag_simulator docs-export --output demo` | Useful for first-screen project review and public showcase context. |
 | `docs_export.json` | `file://demo/docs_export.json` | `python -m portfolio_fee_drag_simulator docs-export --output demo` | Useful for checking command coverage and artifact map completeness. |
+| `promotion_checklist.md` | `file://demo/promotion_checklist.md` | `python -m portfolio_fee_drag_simulator promotion-checklist --output demo` | Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion. |
+| `promotion_checklist.json` | `file://demo/promotion_checklist.json` | `python -m portfolio_fee_drag_simulator promotion-checklist --output demo` | Useful for deterministic promotion review handoff. |
 | `showcase.html` | `file://demo/showcase.html` | `python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html` | Useful as the first local page to open when evaluating the demo. |
 
 ## Verification Commands

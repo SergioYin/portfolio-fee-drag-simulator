@@ -27,3 +27,5 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Assumption diff Markdown/JSON route included | pass |
 | Risk flags Markdown/JSON review prompt route included | pass |
 | Batch compare Markdown/JSON ranking route included | pass |
+| Scenario narrative Markdown/JSON review layer included | pass |
+| Promotion checklist Markdown/JSON readiness layer included | pass |

@@ -33,6 +33,7 @@ COMMANDS = (
     "risk-flags",
     "build-packet",
     "batch-compare",
+    "scenario-narrative",
     "compare-history",
     "sensitivity-matrix",
     "review-ledger",
@@ -47,6 +48,7 @@ COMMANDS = (
     "artifact-catalog",
     "docs-export",
     "static-showcase",
+    "promotion-checklist",
     "quickstart-check",
     "release-manifest",
     "release-audit-summary",
@@ -75,6 +77,8 @@ COMMAND_DOCS = {
     "release-manifest": "Hash source and demo files for release review.",
     "review-ledger": "Validate and summarize the holdings ledger.",
     "risk-flags": "Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations.",
+    "promotion-checklist": "Write Markdown/JSON release and promotion readiness checklist covering docs, demo artifacts, audits, wheel install, public scan, and finance boundaries.",
+    "scenario-narrative": "Read case_gallery.json and batch_compare.json and explain each bundled scenario in plain language with drag drivers, human review questions, and no-advice boundaries.",
     "scenario-presets": "Write or print bundled deterministic scenario preset JSON.",
     "selfcheck": "Verify CLI wiring, bundled examples, and deterministic calculations.",
     "sensitivity-matrix": "Generate a static fee/return sensitivity table from a packet JSON file.",
@@ -408,6 +412,162 @@ def cmd_batch_compare(args: argparse.Namespace) -> int:
     write_text(output / "batch_compare.md", batch_compare_markdown(payload))
     print(f"wrote {output / 'batch_compare.md'}")
     print(f"wrote {output / 'batch_compare.json'}")
+    return 0
+
+
+def ranking_lookup(batch: dict[str, Any]) -> dict[tuple[str, str], int]:
+    lookup: dict[tuple[str, str], int] = {}
+    for dimension, rows in batch.get("rankings", {}).items():
+        for row in rows:
+            lookup[(dimension, row.get("slug", ""))] = int(row.get("rank", 0))
+    return lookup
+
+
+def scenario_driver_label(name: str) -> str:
+    return {
+        "weighted_expense_ratio": "expense ratio",
+        "cash_drag_rate": "cash drag",
+        "turnover_tax_drag_rate": "turnover/tax drag",
+        "rebalance_drag_rate": "rebalance drag",
+    }[name]
+
+
+def scenario_narrative_payload_from_objects(gallery: dict[str, Any], batch: dict[str, Any], case_gallery_source: str, batch_compare_source: str) -> dict[str, Any]:
+    ranks = ranking_lookup(batch)
+    batch_cases = {item.get("slug"): item for item in batch.get("cases", [])}
+    narratives: list[dict[str, Any]] = []
+    for case in sorted(gallery.get("cases", []), key=lambda item: item.get("slug", "")):
+        slug = case.get("slug", "")
+        summary = case.get("packet", {}).get("summary", {})
+        assumptions = case.get("packet", {}).get("assumptions", {})
+        batch_case = batch_cases.get(slug, {})
+        driver_values = [
+            ("weighted_expense_ratio", float(summary.get("weighted_expense_ratio", 0.0))),
+            ("cash_drag_rate", float(summary.get("cash_drag_rate", 0.0))),
+            ("turnover_tax_drag_rate", float(summary.get("turnover_tax_drag_rate", 0.0))),
+            ("rebalance_drag_rate", float(summary.get("rebalance_drag_rate", 0.0))),
+        ]
+        top_drivers = [
+            {
+                "name": name,
+                "label": scenario_driver_label(name),
+                "rate": value,
+                "plain_language": f"{scenario_driver_label(name).title()} contributes {pct(value)} to the annual drag arithmetic.",
+            }
+            for name, value in sorted(driver_values, key=lambda item: (-item[1], item[0]))[:3]
+        ]
+        narratives.append(
+            {
+                "slug": slug,
+                "title": case.get("title", slug),
+                "plain_language_summary": (
+                    f"{case.get('title', slug)} is a static local scenario over {assumptions.get('years')} years. "
+                    f"It compares a gross future value of {money(summary.get('gross_future_value', 0.0))} with a net future value of "
+                    f"{money(summary.get('net_future_value', 0.0))} after configured expense, cash, turnover/tax, and rebalance drags."
+                ),
+                "description": case.get("description", ""),
+                "key_drag_drivers": top_drivers,
+                "rank_context": {
+                    "total_annual_drag_rank": ranks.get(("total_annual_drag", slug)),
+                    "total_dollar_drag_rank": ranks.get(("total_dollar_drag", slug)),
+                    "cash_drag_rank": ranks.get(("cash_drag", slug)),
+                    "turnover_tax_drag_rank": ranks.get(("turnover_tax_drag", slug)),
+                    "fee_drag_rank": ranks.get(("fee_drag", slug)),
+                },
+                "metrics": {
+                    "weighted_expense_ratio": summary.get("weighted_expense_ratio"),
+                    "cash_allocation": summary.get("cash_allocation"),
+                    "cash_drag_rate": summary.get("cash_drag_rate"),
+                    "turnover_tax_drag_rate": summary.get("turnover_tax_drag_rate"),
+                    "rebalance_drag_rate": summary.get("rebalance_drag_rate"),
+                    "total_annual_drag_rate": summary.get("total_annual_drag_rate"),
+                    "total_dollar_drag": summary.get("total_drag", batch_case.get("total_dollar_drag")),
+                },
+                "questions_for_human_review": [
+                    "Do the holdings, allocations, and cash-like classifications match the intended local case?",
+                    "Who verified the gross return, cash return, turnover, realized gain, tax rate, taxable allocation, rebalance, and contribution timing assumptions?",
+                    "Which driver is largest, and does a human reviewer need to add context for why that input differs from the other bundled cases?",
+                    "Is the no-advice boundary visible wherever this scenario is shared?",
+                ],
+                "no_advice_boundary": SAFETY_BOUNDARY,
+            }
+        )
+    return {
+        "schema": "portfolio-fee-drag-scenario-narrative-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "case_gallery_source": case_gallery_source,
+        "batch_compare_source": batch_compare_source,
+        "source_schemas": {
+            "case_gallery": gallery.get("schema"),
+            "batch_compare": batch.get("schema"),
+        },
+        "scenarios": narratives,
+        "review_note": "Narratives are plain-language explanations for human review only; they are not tax, legal, investment, or buy/sell/hold advice.",
+    }
+
+
+def scenario_narrative_payload(case_gallery_path: Path, batch_compare_path: Path) -> dict[str, Any]:
+    gallery = load_json_object(case_gallery_path)
+    batch = load_json_object(batch_compare_path)
+    return scenario_narrative_payload_from_objects(gallery, batch, case_gallery_path.as_posix(), batch_compare_path.as_posix())
+
+
+def scenario_narrative_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Scenario Narrative",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        f"Case gallery: `{payload['case_gallery_source']}`",
+        f"Batch compare: `{payload['batch_compare_source']}`",
+        "",
+    ]
+    for item in payload["scenarios"]:
+        lines.extend(
+            [
+                f"## {item['title']}",
+                "",
+                item["plain_language_summary"],
+                "",
+                item["description"],
+                "",
+                "Key drag drivers:",
+                "",
+            ]
+        )
+        lines.extend(f"- {driver['plain_language']}" for driver in item["key_drag_drivers"])
+        ranks = item["rank_context"]
+        lines.extend(
+            [
+                "",
+                "Rank context:",
+                "",
+                f"- Total annual drag rank: `{ranks['total_annual_drag_rank']}`",
+                f"- Total dollar drag rank: `{ranks['total_dollar_drag_rank']}`",
+                f"- Cash drag rank: `{ranks['cash_drag_rank']}`",
+                f"- Turnover/tax drag rank: `{ranks['turnover_tax_drag_rank']}`",
+                f"- Fee drag rank: `{ranks['fee_drag_rank']}`",
+                "",
+                "Questions for human review:",
+                "",
+            ]
+        )
+        lines.extend(f"- {question}" for question in item["questions_for_human_review"])
+        lines.extend(["", f"No-advice boundary: {item['no_advice_boundary']}", ""])
+    lines.extend(["## Review Note", "", payload["review_note"], ""])
+    return "\n".join(lines)
+
+
+def cmd_scenario_narrative(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = scenario_narrative_payload(Path(args.case_gallery), Path(args.batch_compare))
+    write_json(output / "scenario_narrative.json", payload)
+    write_text(output / "scenario_narrative.md", scenario_narrative_markdown(payload))
+    print(f"wrote {output / 'scenario_narrative.md'}")
+    print(f"wrote {output / 'scenario_narrative.json'}")
     return 0
 
 
@@ -951,6 +1111,8 @@ DEMO_ARTIFACT_SPECS = (
     ("case_gallery.html", "file://demo/case_gallery.html", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Standalone HTML gallery for visual review.", "Useful for public demo inspection without runtime services."),
     ("batch_compare.md", "file://demo/batch_compare.md", "python -m portfolio_fee_drag_simulator batch-compare --output demo", "Markdown ranking of scenario presets by drag dimensions.", "Useful for comparing cases with review questions instead of recommendations."),
     ("batch_compare.json", "file://demo/batch_compare.json", "python -m portfolio_fee_drag_simulator batch-compare --output demo", "Machine-readable ranking of scenario presets by drag dimensions.", "Useful for deterministic case sorting across local review dimensions."),
+    ("scenario_narrative.md", "file://demo/scenario_narrative.md", "python -m portfolio_fee_drag_simulator scenario-narrative --output demo", "Plain-language scenario narrative with drivers, review questions, and no-advice boundaries.", "Useful for promotion review of how bundled scenarios are explained to humans."),
+    ("scenario_narrative.json", "file://demo/scenario_narrative.json", "python -m portfolio_fee_drag_simulator scenario-narrative --output demo", "Machine-readable scenario narrative with driver and ranking context.", "Useful for checking bundled scenario explanations without live data or recommendations."),
     ("visual_receipt.md", "file://demo/visual_receipt.md", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Human-readable receipt for dashboard and gallery artifacts.", "Useful for promotion review of visual demo assets."),
     ("visual_receipt.json", "file://demo/visual_receipt.json", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Machine-readable receipt for dashboard and gallery artifacts.", "Useful for release-owner checks that need hashes and byte counts."),
     ("visual_receipt.html", "file://demo/visual_receipt.html", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Standalone HTML receipt for dashboard and gallery artifacts.", "Useful for local visual artifact verification."),
@@ -970,6 +1132,8 @@ DEMO_ARTIFACT_SPECS = (
     ("decision_journal.json", "file://demo/decision_journal.json", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in JSON.", "Useful for deterministic prompt handoff without live data."),
     ("docs_export.md", "file://demo/docs_export.md", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Deterministic public command, schema, artifact, verification, and boundary documentation.", "Useful for first-screen project review and public showcase context."),
     ("docs_export.json", "file://demo/docs_export.json", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Machine-readable public documentation export.", "Useful for checking command coverage and artifact map completeness."),
+    ("promotion_checklist.md", "file://demo/promotion_checklist.md", "python -m portfolio_fee_drag_simulator promotion-checklist --output demo", "Release and promotion readiness checklist in Markdown.", "Useful for validating README, quickstart, showcase, docs, audits, wheel install, public scan, and finance boundaries before promotion."),
+    ("promotion_checklist.json", "file://demo/promotion_checklist.json", "python -m portfolio_fee_drag_simulator promotion-checklist --output demo", "Machine-readable release and promotion readiness checklist.", "Useful for deterministic promotion review handoff."),
     ("showcase.html", "file://demo/showcase.html", "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html", "No-JS public showcase index for generated review artifacts.", "Useful as the first local page to open when evaluating the demo."),
 )
 
@@ -1145,13 +1309,15 @@ def cold_start_payload() -> dict[str, Any]:
                     "python -m portfolio_fee_drag_simulator assumption-diff --output demo",
                     "python -m portfolio_fee_drag_simulator risk-flags --output demo",
                     "python -m portfolio_fee_drag_simulator batch-compare --output demo",
+                    "python -m portfolio_fee_drag_simulator scenario-narrative --output demo",
                     "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
                     "python -m portfolio_fee_drag_simulator decision-journal --output demo",
                     "python -m portfolio_fee_drag_simulator docs-export --output demo",
                     "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
+                    "python -m portfolio_fee_drag_simulator promotion-checklist --output demo",
                     "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
                 ],
-                "expected_output": "Input templates, assumption diff, risk flags, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
+                "expected_output": "Input templates, assumption diff, risk flags, batch comparison, scenario narrative, visual receipt, decision journal, docs export, showcase, promotion checklist, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
@@ -1170,6 +1336,8 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/case_gallery.html",
             "demo/batch_compare.md",
             "demo/batch_compare.json",
+            "demo/scenario_narrative.md",
+            "demo/scenario_narrative.json",
             "demo/visual_receipt.md",
             "demo/visual_receipt.json",
             "demo/visual_receipt.html",
@@ -1190,6 +1358,8 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/artifact_catalog.json",
             "demo/docs_export.md",
             "demo/docs_export.json",
+            "demo/promotion_checklist.md",
+            "demo/promotion_checklist.json",
             "demo/showcase.html",
         ],
         "safety_boundaries": [
@@ -1405,7 +1575,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.8 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.9 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -1811,6 +1981,7 @@ SHOWCASE_LINKS = (
     ("Dashboard", "dashboard.html", "Review the bundled packet metrics and holdings in a single standalone page."),
     ("Case Gallery", "case_gallery.html", "Compare three deterministic scenarios across expense, cash, turnover/tax, rebalance, and total drag."),
     ("Batch Compare", "batch_compare.md", "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions."),
+    ("Scenario Narrative", "scenario_narrative.md", "Read plain-language explanations for each bundled scenario, including key drag drivers, rank context, review questions, and no-advice boundaries."),
     ("Visual Receipt", "visual_receipt.html", "Check local routes, byte counts, SHA-256 hashes, producer commands, and safety boundaries for visual artifacts."),
     ("Cold-Start Walkthrough", "cold_start_walkthrough.md", "Follow a 10-minute install, run, evaluate, and boundary-review path for first-time users."),
     ("Decision Journal", "decision_journal.md", "Use deterministic prompts for human assumption review, verification notes, and no-advice language."),
@@ -1818,6 +1989,7 @@ SHOWCASE_LINKS = (
     ("Release Audit", "release_audit_summary.md", "Review release-owner status across tests, selfcheck, public scan, manifests, fixtures, package audit, and visual receipt."),
     ("Package Audit", "package_audit.md", "Confirm zero runtime dependencies, package data, script wiring, versions, and command coverage."),
     ("Docs Export", "docs_export.md", "Read deterministic public docs for commands, input schema, artifact map, verification commands, and finance boundaries."),
+    ("Promotion Checklist", "promotion_checklist.md", "Review README, quickstart, showcase, docs export, audits, public scan, wheel install, and finance boundaries before promotion."),
 )
 
 
@@ -1878,6 +2050,131 @@ def cmd_static_showcase(args: argparse.Namespace) -> int:
     write_text(output, static_showcase_html())
     print(f"wrote {output}")
     return 0
+
+
+def checklist_item(name: str, artifact: str, status: str, review_prompt: str) -> dict[str, str]:
+    return {"name": name, "artifact": artifact, "status": status, "review_prompt": review_prompt}
+
+
+def promotion_checklist_payload(root: Path, artifact_root: Path) -> dict[str, Any]:
+    required = {
+        "README": root / "README.md",
+        "quickstart": artifact_root / "showcase.html",
+        "demo_showcase": artifact_root / "showcase.html",
+        "docs_export": artifact_root / "docs_export.json",
+        "release_audit_summary": artifact_root / "release_audit_summary.json",
+        "package_audit": artifact_root / "package_audit.json",
+        "public_scan": artifact_root / "public_scan.json",
+        "scenario_narrative": artifact_root / "scenario_narrative.json",
+    }
+    readme_text = required["README"].read_text(encoding="utf-8") if required["README"].exists() else ""
+    package_payload = read_json_file(required["package_audit"]) or {}
+    public_scan = read_json_file(required["public_scan"]) or {}
+    release_summary = read_json_file(required["release_audit_summary"]) or {}
+    docs_export = read_json_file(required["docs_export"]) or {}
+    items = [
+        checklist_item(
+            "README boundary and command coverage",
+            "README.md",
+            "pass" if required["README"].exists() and all(term in readme_text for term in ("quickstart-check", "scenario-narrative", "promotion-checklist", "buy/sell/hold")) else "review",
+            "Confirm README documents quickstart, scenario narrative, promotion checklist, and finance boundaries before promotion.",
+        ),
+        checklist_item(
+            "Quickstart demo artifacts",
+            artifact_root.as_posix(),
+            "pass" if all((artifact_root / path).exists() for path in ("showcase.html", "scenario_narrative.md", "promotion_checklist.md")) else "review",
+            "Run quickstart-check and confirm the generated demo includes showcase, scenario narrative, and promotion checklist artifacts.",
+        ),
+        checklist_item(
+            "Static showcase",
+            "demo/showcase.html",
+            "pass" if required["demo_showcase"].exists() and "<script" not in required["demo_showcase"].read_text(encoding="utf-8", errors="ignore").lower() else "review",
+            "Open demo/showcase.html and confirm it links public-safe review artifacts without JavaScript.",
+        ),
+        checklist_item(
+            "Docs export",
+            "demo/docs_export.json",
+            "pass" if docs_export.get("schema") == "portfolio-fee-drag-docs-export-v1" and any(item.get("name") == "promotion-checklist" for item in docs_export.get("commands", [])) else "review",
+            "Confirm docs_export covers commands, input schema, artifact map, verification commands, and finance boundaries.",
+        ),
+        checklist_item(
+            "Release audit summary",
+            "demo/release_audit_summary.json",
+            release_summary.get("status", "missing") if release_summary else "missing",
+            "Release owner should rerun release-audit-summary with tests-status pass only after tests have actually run.",
+        ),
+        checklist_item(
+            "Package audit and zero dependencies",
+            "demo/package_audit.json",
+            "pass" if package_payload.get("status") == "pass" and package_payload.get("runtime_dependencies") == [] else package_payload.get("status", "missing"),
+            "Confirm package-audit reports zero runtime dependencies, package data, script wiring, version alignment, and command coverage.",
+        ),
+        checklist_item(
+            "Public scan",
+            "demo/public_scan.json",
+            public_scan.get("status", "missing") if public_scan else "missing",
+            "Confirm public-scan passes before sharing public artifacts.",
+        ),
+        checklist_item(
+            "Wheel install check",
+            "dist/*.whl",
+            "manual",
+            "Build and install a wheel in a clean environment, then run portfolio-fee-drag --version and portfolio-fee-drag selfcheck.",
+        ),
+        checklist_item(
+            "Finance boundaries",
+            "README.md and generated artifacts",
+            "pass" if all(boundary in readme_text for boundary in ("no live data", "broker", "tax, legal, investment", "buy/sell/hold")) else "review",
+            "Confirm all public-facing artifacts retain the no live data, no broker, no advice, no recommendation boundary.",
+        ),
+    ]
+    blocking = {"fail", "missing", "review"}
+    return {
+        "schema": "portfolio-fee-drag-promotion-checklist-v1",
+        "version": __version__,
+        "status": "review" if any(item["status"] in blocking for item in items) else "pass",
+        "boundary": SAFETY_BOUNDARY,
+        "root": root.as_posix(),
+        "artifact_root": artifact_root.as_posix(),
+        "items": items,
+        "manual_items": [
+            "Wheel install check is intentionally manual because this zero-dependency repo does not add workflow automation.",
+            "Promotion is a human release-owner decision; generated checks are evidence, not approval.",
+        ],
+        "finance_boundaries": list(FINANCE_BOUNDARIES),
+    }
+
+
+def promotion_checklist_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Promotion Checklist",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Review Area | Artifact | Status | Human Review Prompt |",
+        "| --- | --- | --- | --- |",
+    ]
+    for item in payload["items"]:
+        lines.append(f"| {item['name']} | `{item['artifact']}` | {item['status']} | {item['review_prompt']} |")
+    lines.extend(["", "## Manual Items", ""])
+    lines.extend(f"- {item}" for item in payload["manual_items"])
+    lines.extend(["", "## Finance Boundaries", ""])
+    lines.extend(f"- {item}" for item in payload["finance_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_promotion_checklist(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = promotion_checklist_payload(Path(args.root), Path(args.artifact_root))
+    write_json(output / "promotion_checklist.json", payload)
+    write_text(output / "promotion_checklist.md", promotion_checklist_markdown(payload))
+    print(f"wrote {output / 'promotion_checklist.md'}")
+    print(f"wrote {output / 'promotion_checklist.json'}")
+    return 0 if payload["status"] in {"pass", "review"} else 1
 
 
 def read_json_file(path: Path) -> dict[str, Any] | None:
@@ -2027,6 +2324,7 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_scenario_presets(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output / "scenario_presets.json"))
     cmd_case_gallery(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
     cmd_batch_compare(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
+    cmd_scenario_narrative(argparse.Namespace(case_gallery=output / "case_gallery.json", batch_compare=output / "batch_compare.json", output=output))
     cmd_maturity_report(argparse.Namespace(output=output / "maturity_report.md"))
     cmd_visual_receipt(argparse.Namespace(artifact_root=output, output=output))
     cmd_cold_start_walkthrough(argparse.Namespace(output=output))
@@ -2073,6 +2371,7 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
             package_audit=output / "package_audit.json",
         )
     )
+    cmd_promotion_checklist(argparse.Namespace(root=Path("."), artifact_root=output, output=output))
     cmd_artifact_catalog(argparse.Namespace(artifact_root=output, output=output))
     print("quickstart check complete")
     return 0
@@ -2131,6 +2430,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Assumption diff Markdown/JSON route included", "pass"),
         ("Risk flags Markdown/JSON review prompt route included", "pass"),
         ("Batch compare Markdown/JSON ranking route included", "pass"),
+        ("Scenario narrative Markdown/JSON review layer included", "pass"),
+        ("Promotion checklist Markdown/JSON readiness layer included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
     lines.extend(f"| {name} | {status} |" for name, status in checks)
@@ -2171,6 +2472,19 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     batch = batch_compare_payload(bundle)
     if batch["schema"] != "portfolio-fee-drag-batch-compare-v1" or set(batch["rankings"]) != {"total_annual_drag", "total_dollar_drag", "cash_drag", "turnover_tax_drag", "fee_drag"}:
         errors.append("batch compare generation failed")
+    gallery_payload = {
+        "schema": "portfolio-fee-drag-case-gallery-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "source_schema": bundle["schema"],
+        "cases": [
+            {key: value for key, value in row.items() if key != "packet"} | {"packet": row["packet"]}
+            for row in case_rows(bundle)
+        ],
+    }
+    narrative = scenario_narrative_payload_from_objects(gallery_payload, batch, "selfcheck:case_gallery", "selfcheck:batch_compare")
+    if narrative["schema"] != "portfolio-fee-drag-scenario-narrative-v1" or len(narrative["scenarios"]) != 3:
+        errors.append("scenario narrative generation failed")
     receipt = visual_receipt_payload(Path("demo"))
     if receipt["schema"] != "portfolio-fee-drag-visual-receipt-v1":
         errors.append("visual receipt payload generation failed")
@@ -2203,8 +2517,11 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     if docs["schema"] != "portfolio-fee-drag-docs-export-v1" or len(docs["commands"]) != len(COMMANDS):
         errors.append("docs export generation failed")
     showcase = static_showcase_html()
-    if "<script" in showcase.lower() or "docs_export.md" not in showcase or "risk_flags.md" not in showcase:
+    if "<script" in showcase.lower() or "docs_export.md" not in showcase or "risk_flags.md" not in showcase or "promotion_checklist.md" not in showcase:
         errors.append("static showcase generation failed")
+    checklist = promotion_checklist_payload(Path("."), Path("demo"))
+    if checklist["schema"] != "portfolio-fee-drag-promotion-checklist-v1" or not checklist["items"]:
+        errors.append("promotion checklist generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -2288,6 +2605,12 @@ def build_parser() -> argparse.ArgumentParser:
     batch.add_argument("--output", default="demo")
     batch.set_defaults(func=cmd_batch_compare)
 
+    narrative = sub.add_parser("scenario-narrative", help="Explain bundled scenarios with drivers, review questions, and boundaries.")
+    narrative.add_argument("--case-gallery", default="demo/case_gallery.json")
+    narrative.add_argument("--batch-compare", default="demo/batch_compare.json")
+    narrative.add_argument("--output", default="demo")
+    narrative.set_defaults(func=cmd_scenario_narrative)
+
     compare = sub.add_parser("compare-history", help="Compare scenario history snapshots.")
     compare.add_argument("--history", default=data_path("example_history.json"))
     compare.add_argument("--output", default="demo/history_comparison.md")
@@ -2363,6 +2686,12 @@ def build_parser() -> argparse.ArgumentParser:
     showcase = sub.add_parser("static-showcase", help="Render no-JS public showcase HTML.")
     showcase.add_argument("--output", default="demo/showcase.html")
     showcase.set_defaults(func=cmd_static_showcase)
+
+    promo = sub.add_parser("promotion-checklist", help="Write release and promotion readiness checklist.")
+    promo.add_argument("--root", default=".")
+    promo.add_argument("--artifact-root", default="demo")
+    promo.add_argument("--output", default="demo")
+    promo.set_defaults(func=cmd_promotion_checklist)
 
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")

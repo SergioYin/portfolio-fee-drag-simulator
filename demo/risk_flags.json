@@ -47,5 +47,5 @@
     "high_turnover_tax_drag": "turnover_tax_drag_rate >= 0.005 or turnover_rate >= 0.50",
     "long_horizon": "years >= 30"
   },
-  "version": "0.8.0"
+  "version": "0.9.0"
 }
