@@ -1,19 +1,19 @@
 # Security Boundary Report
 
-Version: 1.0.0
+Version: 1.0.1
 Status: pass
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
 | Check | Status | Evidence |
 | --- | --- | --- |
-| No secrets | pass | 59 public release files scanned for common secret markers. |
+| No secrets | pass | 59 public release files scanned for common secret markers; installed-context=False. |
 | No workflows | pass | No .github/workflows files found. |
 | No network or live data | pass | No network client imports found in release Python files; fixtures are local package data. |
 | No broker/API/order execution | pass | The simulator exposes static local arithmetic commands only and repeats broker/API/order-execution exclusions in public boundaries. |
 | Zero runtime dependencies | pass | pyproject runtime dependencies: [] |
 | Package data | pass | package data declarations: ['data/*.csv', 'data/*.json'] |
-| Finance/no-advice boundaries | pass | README and generated boundaries state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice. |
+| Finance/no-advice boundaries | pass | README/generated artifacts or installed package metadata state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice. |
 
 ## Explicit Boundaries
 

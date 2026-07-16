@@ -44,19 +44,19 @@
         "python -m pip wheel . --no-deps --no-build-isolation --wheel-dir dist"
       ],
       "expected_artifacts": [
-        "dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl"
+        "dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl"
       ],
       "phase": "build"
     },
     {
       "commands": [
         "python -m venv /tmp/portfolio-fee-drag-smoke",
-        "/tmp/portfolio-fee-drag-smoke/bin/python -m pip install dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl --no-deps",
+        "/tmp/portfolio-fee-drag-smoke/bin/python -m pip install dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl --no-deps",
         "/tmp/portfolio-fee-drag-smoke/bin/portfolio-fee-drag --version",
         "/tmp/portfolio-fee-drag-smoke/bin/python -m portfolio_fee_drag_simulator selfcheck"
       ],
       "expected_artifacts": [
-        "dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl"
+        "dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl"
       ],
       "phase": "wheel smoke"
     },
@@ -191,6 +191,6 @@
     "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "workflow_policy": "No GitHub Actions or hosted workflow automation is required for this release path."
 }

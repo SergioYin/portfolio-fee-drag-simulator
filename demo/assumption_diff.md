@@ -1,6 +1,6 @@
 # Assumption Diff
 
-Version: 1.0.0
+Version: 1.0.1
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 

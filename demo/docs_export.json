@@ -580,5 +580,5 @@
     "python -m portfolio_fee_drag_simulator security-boundary-report --root . --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

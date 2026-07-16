@@ -5,7 +5,7 @@
       "detail": "Release owner supplied test status.",
       "name": "tests",
       "source": "python -m unittest discover -s tests",
-      "status": "not-run"
+      "status": "pass"
     },
     {
       "detail": "CLI wiring and bundled deterministic calculations.",
@@ -56,10 +56,8 @@
       "status": "pass"
     }
   ],
-  "release_owner_actions": [
-    "tests: resolve status not-run from python -m unittest discover -s tests"
-  ],
+  "release_owner_actions": [],
   "schema": "portfolio-fee-drag-release-audit-summary-v1",
-  "status": "review",
-  "version": "1.0.0"
+  "status": "pass",
+  "version": "1.0.1"
 }

@@ -3,7 +3,7 @@
   "broker_api_order_execution_boundary": "No broker API, no order execution, no account connection, no trading workflow, no recommendation engine.",
   "checks": [
     {
-      "evidence": "59 public release files scanned for common secret markers.",
+      "evidence": "59 public release files scanned for common secret markers; installed-context=False.",
       "name": "No secrets",
       "status": "pass"
     },
@@ -33,7 +33,7 @@
       "status": "pass"
     },
     {
-      "evidence": "README and generated boundaries state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice.",
+      "evidence": "README/generated artifacts or installed package metadata state static local review, no live data, no broker connection, and no tax/legal/investment or buy/sell/hold advice.",
       "name": "Finance/no-advice boundaries",
       "status": "pass"
     }
@@ -53,6 +53,6 @@
   "schema": "portfolio-fee-drag-security-boundary-report-v1",
   "secret_marker_findings": [],
   "status": "pass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "workflow_files": []
 }

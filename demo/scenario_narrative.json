@@ -157,5 +157,5 @@
     "batch_compare": "portfolio-fee-drag-batch-compare-v1",
     "case_gallery": "portfolio-fee-drag-case-gallery-v1"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

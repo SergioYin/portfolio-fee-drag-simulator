@@ -269,7 +269,7 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(main(["docs-export", "--output", str(out)]), 0)
             docs = json.loads((out / "docs_export.json").read_text())
             self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
-            self.assertEqual(docs["version"], "1.0.0")
+            self.assertEqual(docs["version"], "1.0.1")
             self.assertEqual([item["name"] for item in docs["commands"]], sorted(COMMANDS))
             self.assertEqual(docs["input_schema"]["holdings_csv"]["columns"][0]["name"], "account")
             self.assertTrue(any(item["path"] == "showcase.html" for item in docs["artifact_map"]))

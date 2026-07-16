@@ -1,6 +1,6 @@
 # Reproducibility Pack
 
-Version: 1.0.0
+Version: 1.0.1
 Status: pass
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
@@ -59,20 +59,20 @@ Commands:
 
 Expected artifacts:
 
-- `dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl`
+- `dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl`
 
 ## Wheel Smoke
 
 Commands:
 
 - `python -m venv /tmp/portfolio-fee-drag-smoke`
-- `/tmp/portfolio-fee-drag-smoke/bin/python -m pip install dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl --no-deps`
+- `/tmp/portfolio-fee-drag-smoke/bin/python -m pip install dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl --no-deps`
 - `/tmp/portfolio-fee-drag-smoke/bin/portfolio-fee-drag --version`
 - `/tmp/portfolio-fee-drag-smoke/bin/python -m portfolio_fee_drag_simulator selfcheck`
 
 Expected artifacts:
 
-- `dist/portfolio_fee_drag_simulator-1.0.0-py3-none-any.whl`
+- `dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl`
 
 ## Demo Regeneration
 
