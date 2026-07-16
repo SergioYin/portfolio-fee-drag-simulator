@@ -1,0 +1,82 @@
+{
+  "audience": "First-time GitHub user with Python 3.11 or newer.",
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "expected_artifacts": [
+    "demo/fee_drag_packet.md",
+    "demo/fee_drag_packet.json",
+    "demo/dashboard.html",
+    "demo/case_gallery.md",
+    "demo/case_gallery.json",
+    "demo/case_gallery.html",
+    "demo/visual_receipt.md",
+    "demo/visual_receipt.json",
+    "demo/visual_receipt.html",
+    "demo/cold_start_walkthrough.md",
+    "demo/cold_start_walkthrough.json"
+  ],
+  "safety_boundaries": [
+    "Use only local CSV/JSON assumptions or bundled examples.",
+    "Do not treat output as tax, legal, investment, or buy/sell/hold advice.",
+    "Do not connect this project to broker APIs, live market data, order execution, portfolio optimization, or prediction services."
+  ],
+  "schema": "portfolio-fee-drag-cold-start-walkthrough-v1",
+  "steps": [
+    {
+      "commands": [
+        "git clone <repo-url>",
+        "cd portfolio-fee-drag-simulator"
+      ],
+      "expected_output": "A local folder containing README.md, pyproject.toml, portfolio_fee_drag_simulator/, tests/, and demo/.",
+      "minute": "0-1",
+      "title": "Get the source"
+    },
+    {
+      "commands": [
+        "python -m venv .venv",
+        ". .venv/bin/activate",
+        "pip install -e ."
+      ],
+      "expected_output": "The portfolio-fee-drag command is available without installing runtime dependencies.",
+      "minute": "1-3",
+      "title": "Install locally"
+    },
+    {
+      "commands": [
+        "portfolio-fee-drag quickstart-check --output demo"
+      ],
+      "expected_output": "The command prints wrote lines and ends with quickstart check complete.",
+      "minute": "3-5",
+      "title": "Generate the deterministic demo"
+    },
+    {
+      "commands": [
+        "open demo/dashboard.html",
+        "open demo/case_gallery.html",
+        "open demo/visual_receipt.html"
+      ],
+      "expected_output": "A static dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.",
+      "minute": "5-7",
+      "title": "Open the visual artifacts"
+    },
+    {
+      "commands": [
+        "python -m unittest discover -s tests",
+        "python -m portfolio_fee_drag_simulator selfcheck",
+        "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
+      ],
+      "expected_output": "Tests pass, selfcheck returns status pass, and public_scan.json has status pass.",
+      "minute": "7-9",
+      "title": "Evaluate project health"
+    },
+    {
+      "commands": [
+        "python -m portfolio_fee_drag_simulator visual-receipt --output demo"
+      ],
+      "expected_output": "visual_receipt.md, visual_receipt.json, and visual_receipt.html list local routes, bytes, hashes, regeneration commands, and safety boundaries.",
+      "minute": "9-10",
+      "title": "Know the boundary before sharing"
+    }
+  ],
+  "timebox_minutes": 10,
+  "version": "0.3.0"
+}

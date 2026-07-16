@@ -14,3 +14,5 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Contribution and rebalance assumptions included | pass |
 | Scenario presets bundled | pass |
 | Case gallery Markdown/JSON/HTML route included | pass |
+| Visual receipt Markdown/JSON/HTML route included | pass |
+| Cold-start walkthrough Markdown/JSON route included | pass |

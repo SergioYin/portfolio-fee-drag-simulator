@@ -1,0 +1,49 @@
+{
+  "artifacts": [
+    {
+      "bytes": 2808,
+      "exists": true,
+      "path": "dashboard.html",
+      "regenerate": "python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html",
+      "role": "Standalone dashboard receipt for the bundled packet.",
+      "route": "file://demo/dashboard.html",
+      "sha256": "966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381"
+    },
+    {
+      "bytes": 2693,
+      "exists": true,
+      "path": "case_gallery.md",
+      "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Markdown comparison gallery for bundled deterministic scenarios.",
+      "route": "file://demo/case_gallery.md",
+      "sha256": "4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e"
+    },
+    {
+      "bytes": 9655,
+      "exists": true,
+      "path": "case_gallery.json",
+      "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Machine-readable case gallery with complete packet payloads.",
+      "route": "file://demo/case_gallery.json",
+      "sha256": "748b47c1fa394323f75fefb5f9e2da3c11ebf79ee535b78062c7e86d1f03b9ab"
+    },
+    {
+      "bytes": 2854,
+      "exists": true,
+      "path": "case_gallery.html",
+      "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Standalone HTML gallery for visual review.",
+      "route": "file://demo/case_gallery.html",
+      "sha256": "f96b447afdeabc5b2ced578226d7b9a0366e76bbef18d04658734e5ee09edced"
+    }
+  ],
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "complete": true,
+  "safety_boundaries": [
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Hashes identify local artifact bytes; they are not an attestation that assumptions are appropriate for any person or account."
+  ],
+  "schema": "portfolio-fee-drag-visual-receipt-v1",
+  "version": "0.3.0"
+}

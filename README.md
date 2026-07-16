@@ -25,6 +25,11 @@ The quickstart writes deterministic demo artifacts:
 - `demo/case_gallery.md`
 - `demo/case_gallery.json`
 - `demo/case_gallery.html`
+- `demo/visual_receipt.md`
+- `demo/visual_receipt.json`
+- `demo/visual_receipt.html`
+- `demo/cold_start_walkthrough.md`
+- `demo/cold_start_walkthrough.json`
 - `demo/release_manifest.json`
 - `demo/maturity_report.md`
 - `demo/public_scan.json`
@@ -38,6 +43,8 @@ The quickstart writes deterministic demo artifacts:
 - `static-dashboard`: render a standalone HTML dashboard from a packet JSON file.
 - `scenario-presets`: write or print bundled scenario preset JSON.
 - `case-gallery`: render deterministic Markdown, JSON, and HTML gallery artifacts from scenario presets.
+- `visual-receipt`: hash and summarize dashboard and case gallery artifacts with local routes, byte counts, SHA-256 hashes, roles, regeneration commands, and safety boundaries.
+- `cold-start-walkthrough`: write a deterministic 10-minute Markdown/JSON guide for a first-time GitHub user to install, run, evaluate, and understand boundaries.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
 - `maturity-report`: print a public-readiness checklist.
@@ -81,9 +88,9 @@ The simulator computes a weighted expense ratio plus explicit local assumptions 
 
 It compares annual compounding at the gross return against compounding at `gross_return - total_annual_drag_rate`. All fields are deterministic local scenario inputs, not recommendations or estimates from live data.
 
-## Scenario Presets and Case Gallery
+## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.2 bundles three deterministic scenario presets:
+Version 0.3 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -103,6 +110,22 @@ portfolio-fee-drag case-gallery --output demo
 
 The gallery emits `case_gallery.md`, `case_gallery.json`, and `case_gallery.html`. It uses the same static arithmetic model and safety boundary as `build-packet`.
 
+Build the visual receipt after dashboard and gallery artifacts exist:
+
+```bash
+portfolio-fee-drag visual-receipt --output demo
+```
+
+The receipt emits `visual_receipt.md`, `visual_receipt.json`, and `visual_receipt.html`. It records local routes, bytes, SHA-256 hashes, artifact roles, regeneration commands, and safety boundaries for dashboard and case gallery review.
+
+Write the first-run walkthrough:
+
+```bash
+portfolio-fee-drag cold-start-walkthrough --output demo
+```
+
+The walkthrough emits `cold_start_walkthrough.md` and `cold_start_walkthrough.json` with a 10-minute GitHub install/run/evaluate path, expected outputs, and explicit boundaries.
+
 ## Safety Boundaries
 
 This project is for static local scenario review only. It intentionally has no live data and excludes broker APIs, order execution, predictions, portfolio optimization, tax advice, legal advice, investment advice, and buy/sell/hold recommendations.
@@ -113,6 +136,8 @@ This project is for static local scenario review only. It intentionally has no l
 python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
 python -m portfolio_fee_drag_simulator quickstart-check --output demo
+python -m portfolio_fee_drag_simulator visual-receipt --output demo
+python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
 ```
 

@@ -38,6 +38,11 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "case_gallery.md").exists())
             self.assertTrue((out / "case_gallery.json").exists())
             self.assertTrue((out / "case_gallery.html").exists())
+            self.assertTrue((out / "visual_receipt.md").exists())
+            self.assertTrue((out / "visual_receipt.json").exists())
+            self.assertTrue((out / "visual_receipt.html").exists())
+            self.assertTrue((out / "cold_start_walkthrough.md").exists())
+            self.assertTrue((out / "cold_start_walkthrough.json").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
             self.assertIn("turnover_tax_drag_rate", packet["summary"])
@@ -49,6 +54,20 @@ class PortfolioFeeDragTests(unittest.TestCase):
                 "high-turnover-taxable-fund",
                 "low-cost-etf",
             ])
+            receipt = json.loads((out / "visual_receipt.json").read_text())
+            self.assertEqual(receipt["schema"], "portfolio-fee-drag-visual-receipt-v1")
+            self.assertTrue(receipt["complete"])
+            self.assertEqual([item["path"] for item in receipt["artifacts"]], [
+                "dashboard.html",
+                "case_gallery.md",
+                "case_gallery.json",
+                "case_gallery.html",
+            ])
+            self.assertTrue(all(item["sha256"] for item in receipt["artifacts"]))
+            walkthrough = json.loads((out / "cold_start_walkthrough.json").read_text())
+            self.assertEqual(walkthrough["schema"], "portfolio-fee-drag-cold-start-walkthrough-v1")
+            self.assertEqual(walkthrough["timebox_minutes"], 10)
+            self.assertEqual(len(walkthrough["steps"]), 6)
             scan = json.loads((out / "public_scan.json").read_text())
             self.assertEqual(scan["status"], "pass")
 
@@ -60,6 +79,24 @@ class PortfolioFeeDragTests(unittest.TestCase):
             payload = json.loads(output.read_text())
             self.assertEqual(payload["schema"], "portfolio-fee-drag-scenario-presets-v1")
             self.assertEqual(len(payload["scenarios"]), 3)
+
+    def test_visual_receipt_reports_missing_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            code = main(["visual-receipt", "--artifact-root", str(out), "--output", str(out)])
+            self.assertEqual(code, 1)
+            payload = json.loads((out / "visual_receipt.json").read_text())
+            self.assertFalse(payload["complete"])
+            self.assertIsNone(payload["artifacts"][0]["sha256"])
+
+    def test_cold_start_walkthrough_command_exports_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            code = main(["cold-start-walkthrough", "--output", str(out)])
+            self.assertEqual(code, 0)
+            payload = json.loads((out / "cold_start_walkthrough.json").read_text())
+            self.assertEqual(payload["schema"], "portfolio-fee-drag-cold-start-walkthrough-v1")
+            self.assertIn("First-time GitHub user", payload["audience"])
 
     def test_module_selfcheck(self):
         result = subprocess.run(

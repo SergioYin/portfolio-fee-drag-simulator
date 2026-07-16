@@ -33,6 +33,8 @@ COMMANDS = (
     "static-dashboard",
     "scenario-presets",
     "case-gallery",
+    "visual-receipt",
+    "cold-start-walkthrough",
     "quickstart-check",
     "release-manifest",
     "maturity-report",
@@ -52,6 +54,10 @@ def write_text(path: Path, content: str) -> None:
 
 def write_json(path: Path, payload: Any) -> None:
     write_text(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_preset_bundle(path: str | Path) -> dict[str, Any]:
@@ -415,6 +421,256 @@ def cmd_case_gallery(args: argparse.Namespace) -> int:
     return 0
 
 
+VISUAL_RECEIPT_ARTIFACTS = (
+    {
+        "path": "dashboard.html",
+        "route": "file://demo/dashboard.html",
+        "role": "Standalone dashboard receipt for the bundled packet.",
+        "regenerate": "python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html",
+    },
+    {
+        "path": "case_gallery.md",
+        "route": "file://demo/case_gallery.md",
+        "role": "Markdown comparison gallery for bundled deterministic scenarios.",
+        "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+    },
+    {
+        "path": "case_gallery.json",
+        "route": "file://demo/case_gallery.json",
+        "role": "Machine-readable case gallery with complete packet payloads.",
+        "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+    },
+    {
+        "path": "case_gallery.html",
+        "route": "file://demo/case_gallery.html",
+        "role": "Standalone HTML gallery for visual review.",
+        "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+    },
+)
+
+
+def visual_receipt_payload(root: Path) -> dict[str, Any]:
+    artifacts = []
+    for spec in VISUAL_RECEIPT_ARTIFACTS:
+        path = root / spec["path"]
+        artifacts.append(
+            {
+                "path": spec["path"],
+                "route": spec["route"].replace("demo/", f"{root.as_posix().rstrip('/')}/", 1),
+                "role": spec["role"],
+                "regenerate": spec["regenerate"].replace("demo/", f"{root.as_posix().rstrip('/')}/"),
+                "exists": path.exists(),
+                "bytes": path.stat().st_size if path.exists() else 0,
+                "sha256": file_sha256(path) if path.exists() else None,
+            }
+        )
+    return {
+        "schema": "portfolio-fee-drag-visual-receipt-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "complete": all(item["exists"] for item in artifacts),
+        "artifacts": artifacts,
+        "safety_boundaries": [
+            "Static local arithmetic scenario review only.",
+            "No live market data, broker connection, order execution, prediction, optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+            "Hashes identify local artifact bytes; they are not an attestation that assumptions are appropriate for any person or account.",
+        ],
+    }
+
+
+def visual_receipt_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Portfolio Fee Drag Visual Receipt",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Artifact | Route | Bytes | SHA-256 | Role | Regenerate |",
+        "| --- | --- | ---: | --- | --- | --- |",
+    ]
+    for item in payload["artifacts"]:
+        digest = item["sha256"] or "missing"
+        lines.append(
+            f"| `{item['path']}` | `{item['route']}` | {item['bytes']} | `{digest}` | "
+            f"{item['role']} | `{item['regenerate']}` |"
+        )
+    lines.extend(["", "## Safety Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in payload["safety_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def visual_receipt_html(payload: dict[str, Any]) -> str:
+    rows = "\n".join(
+        "<tr><td>{path}</td><td><code>{route}</code></td><td>{bytes}</td><td><code>{sha}</code></td><td>{role}</td><td><code>{regen}</code></td></tr>".format(
+            path=html.escape(item["path"]),
+            route=html.escape(item["route"]),
+            bytes=item["bytes"],
+            sha=html.escape(item["sha256"] or "missing"),
+            role=html.escape(item["role"]),
+            regen=html.escape(item["regenerate"]),
+        )
+        for item in payload["artifacts"]
+    )
+    boundaries = "\n".join(f"<li>{html.escape(item)}</li>" for item in payload["safety_boundaries"])
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Fee Drag Visual Receipt</title>
+  <style>
+    body {{ font-family: system-ui, sans-serif; margin: 2rem; color: #1f2937; }}
+    main {{ max-width: 1120px; margin: auto; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }}
+    th, td {{ border-bottom: 1px solid #e5e7eb; padding: 0.625rem; text-align: left; vertical-align: top; }}
+    td:nth-child(3), th:nth-child(3) {{ text-align: right; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Portfolio Fee Drag Visual Receipt</h1>
+  <p>{html.escape(payload["boundary"])}</p>
+  <table>
+    <thead><tr><th>Artifact</th><th>Route</th><th>Bytes</th><th>SHA-256</th><th>Role</th><th>Regenerate</th></tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+  <h2>Safety Boundaries</h2>
+  <ul>{boundaries}</ul>
+</main>
+</body>
+</html>
+"""
+
+
+def cmd_visual_receipt(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    root = Path(args.artifact_root)
+    payload = visual_receipt_payload(root)
+    write_json(output / "visual_receipt.json", payload)
+    write_text(output / "visual_receipt.md", visual_receipt_markdown(payload))
+    write_text(output / "visual_receipt.html", visual_receipt_html(payload))
+    print(f"wrote {output / 'visual_receipt.md'}")
+    print(f"wrote {output / 'visual_receipt.json'}")
+    print(f"wrote {output / 'visual_receipt.html'}")
+    return 0 if payload["complete"] else 1
+
+
+def cold_start_payload() -> dict[str, Any]:
+    return {
+        "schema": "portfolio-fee-drag-cold-start-walkthrough-v1",
+        "version": __version__,
+        "timebox_minutes": 10,
+        "boundary": SAFETY_BOUNDARY,
+        "audience": "First-time GitHub user with Python 3.11 or newer.",
+        "steps": [
+            {
+                "minute": "0-1",
+                "title": "Get the source",
+                "commands": [
+                    "git clone <repo-url>",
+                    "cd portfolio-fee-drag-simulator",
+                ],
+                "expected_output": "A local folder containing README.md, pyproject.toml, portfolio_fee_drag_simulator/, tests/, and demo/.",
+            },
+            {
+                "minute": "1-3",
+                "title": "Install locally",
+                "commands": [
+                    "python -m venv .venv",
+                    ". .venv/bin/activate",
+                    "pip install -e .",
+                ],
+                "expected_output": "The portfolio-fee-drag command is available without installing runtime dependencies.",
+            },
+            {
+                "minute": "3-5",
+                "title": "Generate the deterministic demo",
+                "commands": ["portfolio-fee-drag quickstart-check --output demo"],
+                "expected_output": "The command prints wrote lines and ends with quickstart check complete.",
+            },
+            {
+                "minute": "5-7",
+                "title": "Open the visual artifacts",
+                "commands": [
+                    "open demo/dashboard.html",
+                    "open demo/case_gallery.html",
+                    "open demo/visual_receipt.html",
+                ],
+                "expected_output": "A static dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.",
+            },
+            {
+                "minute": "7-9",
+                "title": "Evaluate project health",
+                "commands": [
+                    "python -m unittest discover -s tests",
+                    "python -m portfolio_fee_drag_simulator selfcheck",
+                    "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+                ],
+                "expected_output": "Tests pass, selfcheck returns status pass, and public_scan.json has status pass.",
+            },
+            {
+                "minute": "9-10",
+                "title": "Know the boundary before sharing",
+                "commands": ["python -m portfolio_fee_drag_simulator visual-receipt --output demo"],
+                "expected_output": "visual_receipt.md, visual_receipt.json, and visual_receipt.html list local routes, bytes, hashes, regeneration commands, and safety boundaries.",
+            },
+        ],
+        "expected_artifacts": [
+            "demo/fee_drag_packet.md",
+            "demo/fee_drag_packet.json",
+            "demo/dashboard.html",
+            "demo/case_gallery.md",
+            "demo/case_gallery.json",
+            "demo/case_gallery.html",
+            "demo/visual_receipt.md",
+            "demo/visual_receipt.json",
+            "demo/visual_receipt.html",
+            "demo/cold_start_walkthrough.md",
+            "demo/cold_start_walkthrough.json",
+        ],
+        "safety_boundaries": [
+            "Use only local CSV/JSON assumptions or bundled examples.",
+            "Do not treat output as tax, legal, investment, or buy/sell/hold advice.",
+            "Do not connect this project to broker APIs, live market data, order execution, portfolio optimization, or prediction services.",
+        ],
+    }
+
+
+def cold_start_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Cold-Start Walkthrough",
+        "",
+        f"Audience: {payload['audience']}",
+        f"Timebox: {payload['timebox_minutes']} minutes",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+    ]
+    for step in payload["steps"]:
+        lines.extend([f"## {step['minute']}: {step['title']}", "", "Commands:", ""])
+        lines.extend(f"- `{command}`" for command in step["commands"])
+        lines.extend(["", f"Expected output: {step['expected_output']}", ""])
+    lines.extend(["## Expected Artifacts", ""])
+    lines.extend(f"- `{artifact}`" for artifact in payload["expected_artifacts"])
+    lines.extend(["", "## Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in payload["safety_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_cold_start_walkthrough(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = cold_start_payload()
+    write_json(output / "cold_start_walkthrough.json", payload)
+    write_text(output / "cold_start_walkthrough.md", cold_start_markdown(payload))
+    print(f"wrote {output / 'cold_start_walkthrough.md'}")
+    print(f"wrote {output / 'cold_start_walkthrough.json'}")
+    return 0
+
+
 def cmd_quickstart_check(args: argparse.Namespace) -> int:
     output = Path(args.output)
     cmd_build_packet(
@@ -439,6 +695,8 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_scenario_presets(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output / "scenario_presets.json"))
     cmd_case_gallery(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
     cmd_maturity_report(argparse.Namespace(output=output / "maturity_report.md"))
+    cmd_visual_receipt(argparse.Namespace(artifact_root=output, output=output))
+    cmd_cold_start_walkthrough(argparse.Namespace(output=output))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
     print("quickstart check complete")
@@ -485,6 +743,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Contribution and rebalance assumptions included", "pass"),
         ("Scenario presets bundled", "pass"),
         ("Case gallery Markdown/JSON/HTML route included", "pass"),
+        ("Visual receipt Markdown/JSON/HTML route included", "pass"),
+        ("Cold-start walkthrough Markdown/JSON route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
     lines.extend(f"| {name} | {status} |" for name, status in checks)
@@ -513,6 +773,12 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
         errors.append(f"unexpected scenario presets {sorted(actual_slugs)}")
     if len(case_rows(bundle)) != 3:
         errors.append("case gallery row generation failed")
+    receipt = visual_receipt_payload(Path("demo"))
+    if receipt["schema"] != "portfolio-fee-drag-visual-receipt-v1":
+        errors.append("visual receipt payload generation failed")
+    walkthrough = cold_start_payload()
+    if len(walkthrough["steps"]) != 6 or walkthrough["timebox_minutes"] != 10:
+        errors.append("cold-start walkthrough generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -606,6 +872,15 @@ def build_parser() -> argparse.ArgumentParser:
     gallery.add_argument("--presets", default=data_path("scenario_presets.json"))
     gallery.add_argument("--output", default="demo")
     gallery.set_defaults(func=cmd_case_gallery)
+
+    receipt = sub.add_parser("visual-receipt", help="Hash and summarize dashboard and gallery artifacts.")
+    receipt.add_argument("--artifact-root", default="demo")
+    receipt.add_argument("--output", default="demo")
+    receipt.set_defaults(func=cmd_visual_receipt)
+
+    cold = sub.add_parser("cold-start-walkthrough", help="Write a 10-minute first-run Markdown and JSON walkthrough.")
+    cold.add_argument("--output", default="demo")
+    cold.set_defaults(func=cmd_cold_start_walkthrough)
 
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")
