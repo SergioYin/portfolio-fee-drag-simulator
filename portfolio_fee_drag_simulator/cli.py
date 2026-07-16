@@ -17,6 +17,8 @@ from .model import (
     load_holdings,
     money,
     packet_markdown,
+    parse_assumptions,
+    parse_holdings,
     pct,
     sensitivity_rows,
     validate_holdings,
@@ -29,6 +31,8 @@ COMMANDS = (
     "sensitivity-matrix",
     "review-ledger",
     "static-dashboard",
+    "scenario-presets",
+    "case-gallery",
     "quickstart-check",
     "release-manifest",
     "maturity-report",
@@ -48,6 +52,52 @@ def write_text(path: Path, content: str) -> None:
 
 def write_json(path: Path, payload: Any) -> None:
     write_text(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def load_preset_bundle(path: str | Path) -> dict[str, Any]:
+    with Path(path).open(encoding="utf-8") as fh:
+        bundle = json.load(fh)
+    if bundle.get("schema") != "portfolio-fee-drag-scenario-presets-v1":
+        raise ValueError("unsupported scenario preset schema")
+    return bundle
+
+
+def packet_for_preset(preset: dict[str, Any]) -> dict[str, Any]:
+    holdings = parse_holdings([{key: str(value) for key, value in row.items()} for row in preset["holdings"]])
+    assumptions = parse_assumptions(preset["assumptions"])
+    packet = compute_packet(holdings, assumptions)
+    packet["case"] = {
+        "slug": preset["slug"],
+        "title": preset["title"],
+        "description": preset["description"],
+    }
+    return packet
+
+
+def case_rows(bundle: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    for preset in sorted(bundle["scenarios"], key=lambda item: item["slug"]):
+        packet = packet_for_preset(preset)
+        summary = packet["summary"]
+        rows.append(
+            {
+                "slug": preset["slug"],
+                "title": preset["title"],
+                "description": preset["description"],
+                "weighted_expense_ratio": summary["weighted_expense_ratio"],
+                "cash_allocation": summary["cash_allocation"],
+                "cash_drag_rate": summary["cash_drag_rate"],
+                "turnover_tax_drag_rate": summary["turnover_tax_drag_rate"],
+                "rebalance_drag_rate": summary["rebalance_drag_rate"],
+                "total_annual_drag_rate": summary["total_annual_drag_rate"],
+                "gross_future_value": summary["gross_future_value"],
+                "net_future_value": summary["net_future_value"],
+                "total_drag": summary["total_drag"],
+                "warnings": packet["warnings"],
+                "packet": packet,
+            }
+        )
+    return rows
 
 
 def cmd_build_packet(args: argparse.Namespace) -> int:
@@ -210,6 +260,161 @@ def cmd_static_dashboard(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_scenario_presets(args: argparse.Namespace) -> int:
+    bundle = load_preset_bundle(args.presets)
+    payload = {
+        "schema": bundle["schema"],
+        "version": bundle["version"],
+        "boundary": bundle["boundary"],
+        "scenarios": sorted(bundle["scenarios"], key=lambda item: item["slug"]),
+    }
+    if args.output:
+        output = Path(args.output)
+        write_json(output, payload)
+        print(f"wrote {output}")
+    else:
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def gallery_markdown(bundle: dict[str, Any], rows: list[dict[str, Any]]) -> str:
+    lines = [
+        "# Portfolio Fee Drag Case Gallery",
+        "",
+        f"Boundary: {SAFETY_BOUNDARY}",
+        "",
+        "Bundled deterministic scenario presets for comparing local fee-drag assumptions.",
+        "",
+        "| Case | Expense Ratio | Cash Allocation | Cash Drag | Turnover/Tax Drag | Rebalance Drag | Total Annual Drag | Total Drag |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for row in rows:
+        lines.append(
+            f"| {row['title']} | {pct(row['weighted_expense_ratio'])} | {pct(row['cash_allocation'])} | "
+            f"{pct(row['cash_drag_rate'])} | {pct(row['turnover_tax_drag_rate'])} | "
+            f"{pct(row['rebalance_drag_rate'])} | {pct(row['total_annual_drag_rate'])} | {money(row['total_drag'])} |"
+        )
+    lines.extend(["", "## Cases", ""])
+    for row in rows:
+        packet = row["packet"]
+        assumptions = packet["assumptions"]
+        lines.extend(
+            [
+                f"### {row['title']}",
+                "",
+                row["description"],
+                "",
+                f"- Slug: `{row['slug']}`",
+                f"- Initial value: {money(assumptions['initial_value'])}",
+                f"- Annual contribution: {money(assumptions['annual_contribution'])}",
+                f"- Years: {assumptions['years']}",
+                f"- Gross return assumption: {pct(assumptions['gross_return'])}",
+                f"- Net return after all drags: {pct(packet['summary']['net_return_after_all_drags'])}",
+                f"- Gross future value: {money(row['gross_future_value'])}",
+                f"- Net future value: {money(row['net_future_value'])}",
+                "",
+                "| Ticker | Account | Allocation | Expense Ratio |",
+                "| --- | --- | ---: | ---: |",
+            ]
+        )
+        for item in packet["holdings"]:
+            lines.append(
+                f"| {item['ticker']} | {item['account']} | {pct(item['allocation'])} | {pct(item['expense_ratio'])} |"
+            )
+        lines.extend(["", "Review notes:"])
+        lines.extend(f"- {warning}" for warning in row["warnings"]) if row["warnings"] else lines.append("- No ledger warnings.")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def gallery_html(rows: list[dict[str, Any]]) -> str:
+    summary_rows = "\n".join(
+        "<tr><td>{title}</td><td>{expense}</td><td>{cash}</td><td>{tax}</td><td>{total}</td><td>{drag}</td></tr>".format(
+            title=html.escape(row["title"]),
+            expense=pct(row["weighted_expense_ratio"]),
+            cash=pct(row["cash_drag_rate"]),
+            tax=pct(row["turnover_tax_drag_rate"]),
+            total=pct(row["total_annual_drag_rate"]),
+            drag=money(row["total_drag"]),
+        )
+        for row in rows
+    )
+    case_sections = "\n".join(
+        """<section>
+  <h2>{title}</h2>
+  <p>{description}</p>
+  <dl>
+    <div><dt>Cash allocation</dt><dd>{cash_allocation}</dd></div>
+    <div><dt>Total annual drag</dt><dd>{total_drag_rate}</dd></div>
+    <div><dt>Net future value</dt><dd>{net_future_value}</dd></div>
+    <div><dt>Total drag</dt><dd>{total_drag}</dd></div>
+  </dl>
+</section>""".format(
+            title=html.escape(row["title"]),
+            description=html.escape(row["description"]),
+            cash_allocation=pct(row["cash_allocation"]),
+            total_drag_rate=pct(row["total_annual_drag_rate"]),
+            net_future_value=money(row["net_future_value"]),
+            total_drag=money(row["total_drag"]),
+        )
+        for row in rows
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Fee Drag Case Gallery</title>
+  <style>
+    body {{ font-family: system-ui, sans-serif; margin: 2rem; color: #1f2937; }}
+    main {{ max-width: 1040px; margin: auto; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }}
+    th, td {{ border-bottom: 1px solid #e5e7eb; padding: 0.625rem; text-align: left; }}
+    th:not(:first-child), td:not(:first-child) {{ text-align: right; }}
+    section {{ border-top: 1px solid #d1d5db; padding: 1rem 0; }}
+    dl {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; }}
+    dt {{ color: #4b5563; font-size: 0.875rem; }}
+    dd {{ margin: 0.125rem 0 0; font-weight: 700; }}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Portfolio Fee Drag Case Gallery</h1>
+  <p>{html.escape(SAFETY_BOUNDARY)}</p>
+  <table>
+    <thead><tr><th>Case</th><th>Expense Ratio</th><th>Cash Drag</th><th>Turnover/Tax Drag</th><th>Total Annual Drag</th><th>Total Drag</th></tr></thead>
+    <tbody>{summary_rows}</tbody>
+  </table>
+  {case_sections}
+</main>
+</body>
+</html>
+"""
+
+
+def cmd_case_gallery(args: argparse.Namespace) -> int:
+    bundle = load_preset_bundle(args.presets)
+    rows = case_rows(bundle)
+    payload = {
+        "schema": "portfolio-fee-drag-case-gallery-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "source_schema": bundle["schema"],
+        "cases": [
+            {key: value for key, value in row.items() if key != "packet"} | {"packet": row["packet"]}
+            for row in rows
+        ],
+    }
+    output = Path(args.output)
+    write_json(output / "case_gallery.json", payload)
+    write_text(output / "case_gallery.md", gallery_markdown(bundle, rows))
+    write_text(output / "case_gallery.html", gallery_html(rows))
+    print(f"wrote {output / 'case_gallery.md'}")
+    print(f"wrote {output / 'case_gallery.json'}")
+    print(f"wrote {output / 'case_gallery.html'}")
+    return 0
+
+
 def cmd_quickstart_check(args: argparse.Namespace) -> int:
     output = Path(args.output)
     cmd_build_packet(
@@ -231,6 +436,8 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_compare_history(argparse.Namespace(history=data_path("example_history.json"), output=output / "history_comparison.md"))
     cmd_review_ledger(argparse.Namespace(holdings=data_path("example_holdings.csv"), output=output / "review_ledger.md"))
     cmd_static_dashboard(argparse.Namespace(packet=packet, output=output / "dashboard.html"))
+    cmd_scenario_presets(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output / "scenario_presets.json"))
+    cmd_case_gallery(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
     cmd_maturity_report(argparse.Namespace(output=output / "maturity_report.md"))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
@@ -276,6 +483,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Cash drag assumptions included", "pass"),
         ("Turnover/tax drag assumptions included", "pass"),
         ("Contribution and rebalance assumptions included", "pass"),
+        ("Scenario presets bundled", "pass"),
+        ("Case gallery Markdown/JSON/HTML route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
     lines.extend(f"| {name} | {status} |" for name, status in checks)
@@ -288,7 +497,7 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
 
 def cmd_selfcheck(args: argparse.Namespace) -> int:
     errors: list[str] = []
-    for name in ("example_holdings.csv", "example_assumptions.json", "example_history.json"):
+    for name in ("example_holdings.csv", "example_assumptions.json", "example_history.json", "scenario_presets.json"):
         if not data_path(name).exists():
             errors.append(f"missing fixture {name}")
     packet = compute_packet(load_holdings(data_path("example_holdings.csv")), load_assumptions(data_path("example_assumptions.json")))
@@ -297,6 +506,13 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     expected_keys = {"cash_drag_rate", "turnover_tax_drag_rate", "rebalance_drag_rate", "total_annual_drag_rate"}
     if not expected_keys.issubset(packet["summary"]):
         errors.append("missing expanded drag summary keys")
+    bundle = load_preset_bundle(data_path("scenario_presets.json"))
+    expected_slugs = {"cash-heavy-waitlist", "high-turnover-taxable-fund", "low-cost-etf"}
+    actual_slugs = {item["slug"] for item in bundle["scenarios"]}
+    if actual_slugs != expected_slugs:
+        errors.append(f"unexpected scenario presets {sorted(actual_slugs)}")
+    if len(case_rows(bundle)) != 3:
+        errors.append("case gallery row generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -380,6 +596,16 @@ def build_parser() -> argparse.ArgumentParser:
     dashboard.add_argument("--packet", default="demo/fee_drag_packet.json")
     dashboard.add_argument("--output", default="demo/dashboard.html")
     dashboard.set_defaults(func=cmd_static_dashboard)
+
+    presets = sub.add_parser("scenario-presets", help="Write or print bundled scenario presets.")
+    presets.add_argument("--presets", default=data_path("scenario_presets.json"))
+    presets.add_argument("--output")
+    presets.set_defaults(func=cmd_scenario_presets)
+
+    gallery = sub.add_parser("case-gallery", help="Render Markdown, JSON, and HTML case gallery artifacts.")
+    gallery.add_argument("--presets", default=data_path("scenario_presets.json"))
+    gallery.add_argument("--output", default="demo")
+    gallery.set_defaults(func=cmd_case_gallery)
 
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")

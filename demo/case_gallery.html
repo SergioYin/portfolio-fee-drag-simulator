@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Fee Drag Case Gallery</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1f2937; }
+    main { max-width: 1040px; margin: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 0.625rem; text-align: left; }
+    th:not(:first-child), td:not(:first-child) { text-align: right; }
+    section { border-top: 1px solid #d1d5db; padding: 1rem 0; }
+    dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; }
+    dt { color: #4b5563; font-size: 0.875rem; }
+    dd { margin: 0.125rem 0 0; font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Portfolio Fee Drag Case Gallery</h1>
+  <p>Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.</p>
+  <table>
+    <thead><tr><th>Case</th><th>Expense Ratio</th><th>Cash Drag</th><th>Turnover/Tax Drag</th><th>Total Annual Drag</th><th>Total Drag</th></tr></thead>
+    <tbody><tr><td>Cash-Heavy Waitlist</td><td>0.068%</td><td>1.665%</td><td>0.044%</td><td>1.777%</td><td>$297,218.06</td></tr>
+<tr><td>High-Turnover Taxable Fund</td><td>0.818%</td><td>0.175%</td><td>6.075%</td><td>7.168%</td><td>$777,032.57</td></tr>
+<tr><td>Low-Cost ETF</td><td>0.045%</td><td>0.150%</td><td>0.066%</td><td>0.272%</td><td>$54,874.59</td></tr></tbody>
+  </table>
+  <section>
+  <h2>Cash-Heavy Waitlist</h2>
+  <p>A staged-deployment scenario with high cash allocation and conservative turnover assumptions.</p>
+  <dl>
+    <div><dt>Cash allocation</dt><dd>45.000%</dd></div>
+    <div><dt>Total annual drag</dt><dd>1.777%</dd></div>
+    <div><dt>Net future value</dt><dd>$735,164.08</dd></div>
+    <div><dt>Total drag</dt><dd>$297,218.06</dd></div>
+  </dl>
+</section>
+<section>
+  <h2>High-Turnover Taxable Fund</h2>
+  <p>A taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.</p>
+  <dl>
+    <div><dt>Cash allocation</dt><dd>5.000%</dd></div>
+    <div><dt>Total annual drag</dt><dd>7.168%</dd></div>
+    <div><dt>Net future value</dt><dd>$280,670.11</dd></div>
+    <div><dt>Total drag</dt><dd>$777,032.57</dd></div>
+  </dl>
+</section>
+<section>
+  <h2>Low-Cost ETF</h2>
+  <p>A diversified low-expense ETF-style allocation with modest turnover and limited cash drag.</p>
+  <dl>
+    <div><dt>Cash allocation</dt><dd>5.000%</dd></div>
+    <div><dt>Total annual drag</dt><dd>0.272%</dd></div>
+    <div><dt>Net future value</dt><dd>$1,002,828.08</dd></div>
+    <div><dt>Total drag</dt><dd>$54,874.59</dd></div>
+  </dl>
+</section>
+</main>
+</body>
+</html>

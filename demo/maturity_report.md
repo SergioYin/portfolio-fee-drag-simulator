@@ -12,3 +12,5 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Cash drag assumptions included | pass |
 | Turnover/tax drag assumptions included | pass |
 | Contribution and rebalance assumptions included | pass |
+| Scenario presets bundled | pass |
+| Case gallery Markdown/JSON/HTML route included | pass |

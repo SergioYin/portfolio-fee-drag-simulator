@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "portfolio-fee-drag-simulator"
-version = "0.1.0"
+version = "0.2.0"
 description = "Zero-dependency CLI for static portfolio fee drag review packets."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -32,4 +32,3 @@ include = ["portfolio_fee_drag_simulator*"]
 
 [tool.setuptools.package-data]
 portfolio_fee_drag_simulator = ["data/*.csv", "data/*.json"]
-

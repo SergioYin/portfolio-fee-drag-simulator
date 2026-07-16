@@ -1,0 +1,154 @@
+{
+  "schema": "portfolio-fee-drag-scenario-presets-v1",
+  "version": "0.2.0",
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "scenarios": [
+    {
+      "slug": "low-cost-etf",
+      "title": "Low-Cost ETF",
+      "description": "A diversified low-expense ETF-style allocation with modest turnover and limited cash drag.",
+      "assumptions": {
+        "initial_value": 150000,
+        "annual_contribution": 9000,
+        "years": 25,
+        "gross_return": 0.055,
+        "cash_return": 0.025,
+        "turnover_rate": 0.04,
+        "realized_gain_rate": 0.2,
+        "tax_rate": 0.15,
+        "taxable_allocation": 0.55,
+        "rebalance_frequency": "annual",
+        "rebalance_cost": 0.0001,
+        "contribution_timing": "beginning"
+      },
+      "holdings": [
+        {
+          "account": "Taxable",
+          "ticker": "USMKT",
+          "name": "Static US Market ETF Proxy",
+          "allocation": 0.5,
+          "expense_ratio": 0.0003
+        },
+        {
+          "account": "Taxable",
+          "ticker": "INTL",
+          "name": "Static International ETF Proxy",
+          "allocation": 0.25,
+          "expense_ratio": 0.0007
+        },
+        {
+          "account": "Retirement",
+          "ticker": "BOND",
+          "name": "Static Bond ETF Proxy",
+          "allocation": 0.2,
+          "expense_ratio": 0.0004
+        },
+        {
+          "account": "Retirement",
+          "ticker": "CASH",
+          "name": "Treasury Money Market Proxy",
+          "allocation": 0.05,
+          "expense_ratio": 0.001
+        }
+      ]
+    },
+    {
+      "slug": "high-turnover-taxable-fund",
+      "title": "High-Turnover Taxable Fund",
+      "description": "A taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.",
+      "assumptions": {
+        "initial_value": 150000,
+        "annual_contribution": 9000,
+        "years": 25,
+        "gross_return": 0.055,
+        "cash_return": 0.02,
+        "turnover_rate": 0.75,
+        "realized_gain_rate": 0.45,
+        "tax_rate": 0.2,
+        "taxable_allocation": 0.9,
+        "rebalance_frequency": "quarterly",
+        "rebalance_cost": 0.00025,
+        "contribution_timing": "beginning"
+      },
+      "holdings": [
+        {
+          "account": "Taxable",
+          "ticker": "ACTIVE",
+          "name": "Static Active Equity Fund Proxy",
+          "allocation": 0.65,
+          "expense_ratio": 0.0085
+        },
+        {
+          "account": "Taxable",
+          "ticker": "SMALL",
+          "name": "Static Small Cap Fund Proxy",
+          "allocation": 0.2,
+          "expense_ratio": 0.011
+        },
+        {
+          "account": "Taxable",
+          "ticker": "BOND",
+          "name": "Static Taxable Bond Fund Proxy",
+          "allocation": 0.1,
+          "expense_ratio": 0.004
+        },
+        {
+          "account": "Taxable",
+          "ticker": "CASH",
+          "name": "Treasury Money Market Proxy",
+          "allocation": 0.05,
+          "expense_ratio": 0.001
+        }
+      ]
+    },
+    {
+      "slug": "cash-heavy-waitlist",
+      "title": "Cash-Heavy Waitlist",
+      "description": "A staged-deployment scenario with high cash allocation and conservative turnover assumptions.",
+      "assumptions": {
+        "initial_value": 150000,
+        "annual_contribution": 9000,
+        "years": 25,
+        "gross_return": 0.055,
+        "cash_return": 0.018,
+        "turnover_rate": 0.03,
+        "realized_gain_rate": 0.15,
+        "tax_rate": 0.15,
+        "taxable_allocation": 0.65,
+        "rebalance_frequency": "none",
+        "rebalance_cost": 0,
+        "contribution_timing": "end"
+      },
+      "holdings": [
+        {
+          "account": "Taxable",
+          "ticker": "USMKT",
+          "name": "Static US Market ETF Proxy",
+          "allocation": 0.3,
+          "expense_ratio": 0.0003
+        },
+        {
+          "account": "Taxable",
+          "ticker": "INTL",
+          "name": "Static International ETF Proxy",
+          "allocation": 0.15,
+          "expense_ratio": 0.0007
+        },
+        {
+          "account": "Retirement",
+          "ticker": "BOND",
+          "name": "Static Bond ETF Proxy",
+          "allocation": 0.1,
+          "expense_ratio": 0.0004
+        },
+        {
+          "account": "Taxable",
+          "ticker": "CASH",
+          "name": "Treasury Money Market Proxy",
+          "allocation": 0.45,
+          "expense_ratio": 0.001
+        }
+      ]
+    }
+  ]
+}

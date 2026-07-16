@@ -34,12 +34,32 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertTrue((out / "fee_drag_packet.md").exists())
             self.assertTrue((out / "dashboard.html").exists())
+            self.assertTrue((out / "scenario_presets.json").exists())
+            self.assertTrue((out / "case_gallery.md").exists())
+            self.assertTrue((out / "case_gallery.json").exists())
+            self.assertTrue((out / "case_gallery.html").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
             self.assertIn("turnover_tax_drag_rate", packet["summary"])
             self.assertIn("rebalance_drag_rate", packet["summary"])
+            gallery = json.loads((out / "case_gallery.json").read_text())
+            self.assertEqual(gallery["schema"], "portfolio-fee-drag-case-gallery-v1")
+            self.assertEqual([case["slug"] for case in gallery["cases"]], [
+                "cash-heavy-waitlist",
+                "high-turnover-taxable-fund",
+                "low-cost-etf",
+            ])
             scan = json.loads((out / "public_scan.json").read_text())
             self.assertEqual(scan["status"], "pass")
+
+    def test_scenario_presets_command_exports_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "scenario_presets.json"
+            code = main(["scenario-presets", "--output", str(output)])
+            self.assertEqual(code, 0)
+            payload = json.loads(output.read_text())
+            self.assertEqual(payload["schema"], "portfolio-fee-drag-scenario-presets-v1")
+            self.assertEqual(len(payload["scenarios"]), 3)
 
     def test_module_selfcheck(self):
         result = subprocess.run(

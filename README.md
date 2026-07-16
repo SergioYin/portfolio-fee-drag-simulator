@@ -21,6 +21,10 @@ The quickstart writes deterministic demo artifacts:
 - `demo/history_comparison.md`
 - `demo/review_ledger.md`
 - `demo/dashboard.html`
+- `demo/scenario_presets.json`
+- `demo/case_gallery.md`
+- `demo/case_gallery.json`
+- `demo/case_gallery.html`
 - `demo/release_manifest.json`
 - `demo/maturity_report.md`
 - `demo/public_scan.json`
@@ -32,6 +36,8 @@ The quickstart writes deterministic demo artifacts:
 - `sensitivity-matrix`: generate a static fee/return sensitivity table.
 - `review-ledger`: validate and summarize a holdings ledger.
 - `static-dashboard`: render a standalone HTML dashboard from a packet JSON file.
+- `scenario-presets`: write or print bundled scenario preset JSON.
+- `case-gallery`: render deterministic Markdown, JSON, and HTML gallery artifacts from scenario presets.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
 - `maturity-report`: print a public-readiness checklist.
@@ -75,6 +81,28 @@ The simulator computes a weighted expense ratio plus explicit local assumptions 
 
 It compares annual compounding at the gross return against compounding at `gross_return - total_annual_drag_rate`. All fields are deterministic local scenario inputs, not recommendations or estimates from live data.
 
+## Scenario Presets and Case Gallery
+
+Version 0.2 bundles three deterministic scenario presets:
+
+- `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
+- `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
+- `cash-heavy-waitlist`: staged-deployment scenario with high cash allocation and conservative turnover assumptions.
+
+Export the preset bundle:
+
+```bash
+portfolio-fee-drag scenario-presets --output demo/scenario_presets.json
+```
+
+Build the gallery:
+
+```bash
+portfolio-fee-drag case-gallery --output demo
+```
+
+The gallery emits `case_gallery.md`, `case_gallery.json`, and `case_gallery.html`. It uses the same static arithmetic model and safety boundary as `build-packet`.
+
 ## Safety Boundaries
 
 This project is for static local scenario review only. It intentionally has no live data and excludes broker APIs, order execution, predictions, portfolio optimization, tax advice, legal advice, investment advice, and buy/sell/hold recommendations.
@@ -84,6 +112,8 @@ This project is for static local scenario review only. It intentionally has no l
 ```bash
 python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
+python -m portfolio_fee_drag_simulator quickstart-check --output demo
+python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
 ```
 
 No GitHub Actions workflows are included.

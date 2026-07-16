@@ -11,9 +11,24 @@
       "sha256": "d3e4669f22f295c841f35f586ec645f7fd9c785e5a7d9433d7a3397d65532df8"
     },
     {
-      "bytes": 3501,
+      "bytes": 4769,
       "path": "README.md",
-      "sha256": "467794574d444d5610e48096681e418e05baa1c1a15abdb8314ca625a4167951"
+      "sha256": "a6c95ad543e4cf75b9f7c66ec447532dc7b0ffcec3eb8cc1256120536bf61529"
+    },
+    {
+      "bytes": 2854,
+      "path": "demo/case_gallery.html",
+      "sha256": "f96b447afdeabc5b2ced578226d7b9a0366e76bbef18d04658734e5ee09edced"
+    },
+    {
+      "bytes": 9655,
+      "path": "demo/case_gallery.json",
+      "sha256": "d0117e23af4c0bceac8e9c1b7fdc8d3d611ad484ebd3bb4d48a6515d5ea32f33"
+    },
+    {
+      "bytes": 2693,
+      "path": "demo/case_gallery.md",
+      "sha256": "4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e"
     },
     {
       "bytes": 2808,
@@ -36,14 +51,14 @@
       "sha256": "726e1d20c2ccd31ba109d655eada3f26dc9965fd307980e2679fb40ad75ba44a"
     },
     {
-      "bytes": 615,
+      "bytes": 709,
       "path": "demo/maturity_report.md",
-      "sha256": "649c111d22e1c7edd7f18ce51f1a1e0ec73e422ec9d3babbccdceda8c90d4e8a"
+      "sha256": "67c1c2cf54d7dacfd900af51e91996e8a3e39d5631ef559bbeac1456985427ac"
     },
     {
       "bytes": 163,
       "path": "demo/public_scan.json",
-      "sha256": "a3d6f463adeae96282b4a11e6e510bd7d6d273914bb68613de65a8230f3c486f"
+      "sha256": "2ec9bda1381d8b63101c974f71ec813272e68b62362c4e338a8b0b851806ec79"
     },
     {
       "bytes": 344,
@@ -51,14 +66,19 @@
       "sha256": "217f56ffb2eda84d4c268ca19133aeddcd1db051dedd15b849a5a07c26362046"
     },
     {
+      "bytes": 4612,
+      "path": "demo/scenario_presets.json",
+      "sha256": "0c56572ff7f22edece6ce1c9244ebda941fd55cae359b985546b4356f7779c35"
+    },
+    {
       "bytes": 944,
       "path": "demo/sensitivity_matrix.md",
       "sha256": "8264514679ce3d7a08b227a8a3ea62d14d98940decd11222aed19e5df2db65bf"
     },
     {
-      "bytes": 67,
+      "bytes": 66,
       "path": "portfolio_fee_drag_simulator/__init__.py",
-      "sha256": "b63aaf45e757e3081c6fbc884f0499f37f2a60611825497b0b8a03034dd7ff94"
+      "sha256": "1ce5a856029f235bee380b1e64777d8c78fa676c448fced79216b9af3648a2e6"
     },
     {
       "bytes": 80,
@@ -66,9 +86,9 @@
       "sha256": "6a170fc866c867a1e5812daad308396f0940a23f2ecf55e56be39d5d67d23f10"
     },
     {
-      "bytes": 17551,
+      "bytes": 27169,
       "path": "portfolio_fee_drag_simulator/cli.py",
-      "sha256": "d11847642fdda8024e054678cae67a5accaf63b31a55f3ef3ef9e4690260a513"
+      "sha256": "e3cc7b10ea6969a8aa83497b7330499e9c76010e79f8588c8eb13d004fceeadb"
     },
     {
       "bytes": 328,
@@ -86,24 +106,29 @@
       "sha256": "af5da85f54750994ce49ae227e3b75502273e67373dd01d23e8762e860f55505"
     },
     {
+      "bytes": 4612,
+      "path": "portfolio_fee_drag_simulator/data/scenario_presets.json",
+      "sha256": "d4c30b266d2d0e86bd4fe2d35a6f6b1378e12576b9ca340232cc0f1fbaf5b287"
+    },
+    {
       "bytes": 13751,
       "path": "portfolio_fee_drag_simulator/model.py",
       "sha256": "beec399f883161077d46edd3e447be28f047ce8d5cd860528bdc27eb0690a047"
     },
     {
-      "bytes": 1059,
+      "bytes": 1058,
       "path": "pyproject.toml",
-      "sha256": "75e6c722d27913accc05ada2f25c25982981341861da799bcad94898c4c6be3c"
+      "sha256": "142b207e8a5dbb266dfa4539dbf194c0cf010c6a95779e2be4df4212f057478d"
     },
     {
-      "bytes": 950,
+      "bytes": 1221,
       "path": "skills/agent/portfolio-fee-drag-simulator/SKILL.md",
-      "sha256": "386e3090efc909c8ea460d4ea884a0230dc1d3891fdb47fd4dc4e170ae45cd10"
+      "sha256": "b20c51f5c7e6a1f4616b5298dd3584be0935eff69209808de10e5d52fe8f4773"
     },
     {
-      "bytes": 2582,
+      "bytes": 3696,
       "path": "tests/test_cli.py",
-      "sha256": "d95da4c21c431f4b731ba6c6daa1b5a3df1d3d2c050cef2d73aad9495ef358be"
+      "sha256": "07ebc01a788eacbd955389e8aab3b2a27b41c9307103a63cc167bc4139c450ee"
     }
   ],
   "schema": "portfolio-fee-drag-release-manifest-v1"

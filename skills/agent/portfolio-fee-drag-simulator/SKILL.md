@@ -13,6 +13,8 @@ python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
 python -m portfolio_fee_drag_simulator quickstart-check --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
+python -m portfolio_fee_drag_simulator scenario-presets --output demo/scenario_presets.json
+python -m portfolio_fee_drag_simulator case-gallery --output demo
 ```
 
 ## Implementation Notes
@@ -20,5 +22,5 @@ python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public
 - Runtime dependencies must remain empty.
 - Bundled fixtures live under `portfolio_fee_drag_simulator/data/` and must remain package data.
 - Demo outputs should be deterministic and generated through `quickstart-check`.
+- Scenario preset fixtures should remain static JSON and gallery outputs should include Markdown, JSON, and HTML.
 - Do not add GitHub Actions workflows.
-
