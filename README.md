@@ -13,6 +13,8 @@ pip install -e .
 portfolio-fee-drag quickstart-check --output demo
 ```
 
+First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking the dashboard, case gallery, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
+
 The quickstart writes deterministic demo artifacts:
 
 - `demo/fee_drag_packet.md`
@@ -43,6 +45,9 @@ The quickstart writes deterministic demo artifacts:
 - `demo/maturity_report.md`
 - `demo/artifact_catalog.md`
 - `demo/artifact_catalog.json`
+- `demo/docs_export.md`
+- `demo/docs_export.json`
+- `demo/showcase.html`
 - `demo/public_scan.json`
 
 ## Commands
@@ -60,6 +65,8 @@ The quickstart writes deterministic demo artifacts:
 - `package-audit`: inspect zero-dependency metadata, package-data readiness, script wiring, and command coverage.
 - `decision-journal`: generate deterministic Markdown/JSON research-note prompts from packet, gallery, and audit artifacts, including assumptions changed, human verification needs, no-advice boundary, and a next review date field.
 - `artifact-catalog`: inventory deterministic demo artifacts with route, bytes, SHA-256, producer command, role, and promotion usefulness.
+- `docs-export`: create deterministic Markdown/JSON docs summarizing commands, input schema, artifact map, verification commands, and finance boundaries.
+- `static-showcase`: create a no-JS public showcase page linking the generated review artifacts with short user-value copy.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
 - `release-audit-summary`: combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status into Markdown and JSON for release owners.
@@ -106,7 +113,7 @@ It compares annual compounding at the gross return against compounding at `gross
 
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.5 bundles three deterministic scenario presets:
+Version 0.6 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -158,6 +165,15 @@ portfolio-fee-drag artifact-catalog --output demo
 
 The artifact catalog emits `artifact_catalog.md` and `artifact_catalog.json`. It records local routes, byte counts, SHA-256 hashes, producer commands, artifact roles, and promotion usefulness for deterministic demo artifacts produced before the catalog runs.
 
+Export public docs and the static showcase:
+
+```bash
+portfolio-fee-drag docs-export --output demo
+portfolio-fee-drag static-showcase --output demo/showcase.html
+```
+
+The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated dashboard, gallery, receipt, walkthrough, decision journal, audits, catalog, and docs export.
+
 ## Release-Owner Audit
 
 Validate bundled fixtures:
@@ -195,6 +211,8 @@ python -m portfolio_fee_drag_simulator package-audit --root . --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator decision-journal --output demo
+python -m portfolio_fee_drag_simulator docs-export --output demo
+python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html
 python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
 python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json

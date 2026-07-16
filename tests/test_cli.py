@@ -54,6 +54,9 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "release_audit_summary.json").exists())
             self.assertTrue((out / "artifact_catalog.md").exists())
             self.assertTrue((out / "artifact_catalog.json").exists())
+            self.assertTrue((out / "docs_export.md").exists())
+            self.assertTrue((out / "docs_export.json").exists())
+            self.assertTrue((out / "showcase.html").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
             self.assertIn("turnover_tax_drag_rate", packet["summary"])
@@ -99,7 +102,26 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue(catalog["complete"])
             catalog_paths = [item["path"] for item in catalog["artifacts"]]
             self.assertIn("decision_journal.json", catalog_paths)
+            self.assertIn("docs_export.md", catalog_paths)
+            self.assertIn("docs_export.json", catalog_paths)
+            self.assertIn("showcase.html", catalog_paths)
             self.assertTrue(all("promotion_usefulness" in item for item in catalog["artifacts"]))
+            docs = json.loads((out / "docs_export.json").read_text())
+            self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
+            self.assertEqual({item["name"] for item in docs["commands"]}, set(COMMANDS))
+            self.assertIn("artifact_map", docs)
+            self.assertIn("finance_boundaries", docs)
+            showcase = (out / "showcase.html").read_text()
+            self.assertIn("dashboard.html", showcase)
+            self.assertIn("case_gallery.html", showcase)
+            self.assertIn("visual_receipt.html", showcase)
+            self.assertIn("cold_start_walkthrough.md", showcase)
+            self.assertIn("decision_journal.md", showcase)
+            self.assertIn("artifact_catalog.md", showcase)
+            self.assertIn("release_audit_summary.md", showcase)
+            self.assertIn("package_audit.md", showcase)
+            self.assertIn("docs_export.md", showcase)
+            self.assertNotIn("<script", showcase.lower())
             summary = json.loads((out / "release_audit_summary.json").read_text())
             self.assertEqual(summary["status"], "review")
             self.assertEqual(summary["checks"][0]["status"], "not-run")
@@ -161,6 +183,26 @@ class PortfolioFeeDragTests(unittest.TestCase):
             first = catalog["artifacts"][0]
             self.assertEqual(set(first), {"path", "route", "bytes", "sha256", "producer_command", "role", "promotion_usefulness", "exists"})
             self.assertTrue(first["sha256"])
+
+    def test_docs_export_and_static_showcase_commands_export_public_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["docs-export", "--output", str(out)]), 0)
+            docs = json.loads((out / "docs_export.json").read_text())
+            self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
+            self.assertEqual(docs["version"], "0.6.0")
+            self.assertEqual([item["name"] for item in docs["commands"]], sorted(COMMANDS))
+            self.assertEqual(docs["input_schema"]["holdings_csv"]["columns"][0]["name"], "account")
+            self.assertTrue(any(item["path"] == "showcase.html" for item in docs["artifact_map"]))
+            self.assertIn("python -m unittest discover -s tests", docs["verification_commands"])
+            self.assertTrue(any("No live market data" in item for item in docs["finance_boundaries"]))
+
+            self.assertEqual(main(["static-showcase", "--output", str(out / "showcase.html")]), 0)
+            showcase = (out / "showcase.html").read_text()
+            self.assertIn("<title>Portfolio Fee Drag Public Showcase</title>", showcase)
+            self.assertIn("dashboard.html", showcase)
+            self.assertIn("docs_export.md", showcase)
+            self.assertNotIn("<script", showcase.lower())
 
     def test_release_audit_summary_can_pass_after_release_owner_checks(self):
         with tempfile.TemporaryDirectory() as tmp:

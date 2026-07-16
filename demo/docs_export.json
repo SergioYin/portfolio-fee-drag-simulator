@@ -1,0 +1,431 @@
+{
+  "artifact_map": [
+    {
+      "path": "fee_drag_packet.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
+      "role": "Human-readable packet for the bundled assumptions.",
+      "route": "file://demo/fee_drag_packet.md",
+      "user_value": "Useful for research-note review and public demo inspection."
+    },
+    {
+      "path": "fee_drag_packet.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
+      "role": "Machine-readable packet for the bundled assumptions.",
+      "route": "file://demo/fee_drag_packet.json",
+      "user_value": "Useful as the canonical deterministic packet input."
+    },
+    {
+      "path": "sensitivity_matrix.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md",
+      "role": "Fee and return sensitivity table.",
+      "route": "file://demo/sensitivity_matrix.md",
+      "user_value": "Useful for explaining how local assumptions change arithmetic outputs."
+    },
+    {
+      "path": "history_comparison.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator compare-history --output demo/history_comparison.md",
+      "role": "Static comparison of bundled historical scenario snapshots.",
+      "route": "file://demo/history_comparison.md",
+      "user_value": "Useful for showing deterministic before/after-style review."
+    },
+    {
+      "path": "review_ledger.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator review-ledger --output demo/review_ledger.md",
+      "role": "Holdings ledger review summary.",
+      "route": "file://demo/review_ledger.md",
+      "user_value": "Useful for fixture QA before sharing packet outputs."
+    },
+    {
+      "path": "dashboard.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html",
+      "role": "Standalone dashboard receipt for the bundled packet.",
+      "route": "file://demo/dashboard.html",
+      "user_value": "Useful for local visual review without a web service."
+    },
+    {
+      "path": "scenario_presets.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-presets --output demo/scenario_presets.json",
+      "role": "Bundled deterministic scenario preset export.",
+      "route": "file://demo/scenario_presets.json",
+      "user_value": "Useful for verifying scenario coverage and reproducibility."
+    },
+    {
+      "path": "case_gallery.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Markdown comparison gallery for bundled deterministic scenarios.",
+      "route": "file://demo/case_gallery.md",
+      "user_value": "Useful for reviewer-friendly scenario comparison."
+    },
+    {
+      "path": "case_gallery.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Machine-readable case gallery with complete packet payloads.",
+      "route": "file://demo/case_gallery.json",
+      "user_value": "Useful for downstream static review and prompt generation."
+    },
+    {
+      "path": "case_gallery.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "role": "Standalone HTML gallery for visual review.",
+      "route": "file://demo/case_gallery.html",
+      "user_value": "Useful for public demo inspection without runtime services."
+    },
+    {
+      "path": "visual_receipt.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "role": "Human-readable receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.md",
+      "user_value": "Useful for promotion review of visual demo assets."
+    },
+    {
+      "path": "visual_receipt.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "role": "Machine-readable receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.json",
+      "user_value": "Useful for release-owner checks that need hashes and byte counts."
+    },
+    {
+      "path": "visual_receipt.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "role": "Standalone HTML receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.html",
+      "user_value": "Useful for local visual artifact verification."
+    },
+    {
+      "path": "cold_start_walkthrough.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
+      "role": "First-run walkthrough in Markdown.",
+      "route": "file://demo/cold_start_walkthrough.md",
+      "user_value": "Useful for onboarding and public README validation."
+    },
+    {
+      "path": "cold_start_walkthrough.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
+      "role": "First-run walkthrough in JSON.",
+      "route": "file://demo/cold_start_walkthrough.json",
+      "user_value": "Useful for deterministic checklist review."
+    },
+    {
+      "path": "fixture_doctor.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator fixture-doctor --output demo",
+      "role": "Human-readable fixture validation report.",
+      "route": "file://demo/fixture_doctor.md",
+      "user_value": "Useful for release readiness review."
+    },
+    {
+      "path": "fixture_doctor.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator fixture-doctor --output demo",
+      "role": "Machine-readable fixture validation report.",
+      "route": "file://demo/fixture_doctor.json",
+      "user_value": "Useful for automated release-owner status checks."
+    },
+    {
+      "path": "package_audit.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator package-audit --root . --output demo",
+      "role": "Human-readable package audit report.",
+      "route": "file://demo/package_audit.md",
+      "user_value": "Useful for confirming zero-dependency and command coverage claims."
+    },
+    {
+      "path": "package_audit.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator package-audit --root . --output demo",
+      "role": "Machine-readable package audit report.",
+      "route": "file://demo/package_audit.json",
+      "user_value": "Useful for release-owner status checks."
+    },
+    {
+      "path": "selfcheck.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator selfcheck --output demo/selfcheck.json",
+      "role": "Machine-readable CLI and deterministic calculation selfcheck.",
+      "route": "file://demo/selfcheck.json",
+      "user_value": "Useful as a quick health signal before promotion."
+    },
+    {
+      "path": "public_scan.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+      "role": "Public-readiness scan output.",
+      "route": "file://demo/public_scan.json",
+      "user_value": "Useful for checking public-safe language and obvious secret markers."
+    },
+    {
+      "path": "release_manifest.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json",
+      "role": "Source and artifact hash manifest.",
+      "route": "file://demo/release_manifest.json",
+      "user_value": "Useful for release review and reproducibility checks."
+    },
+    {
+      "path": "release_audit_summary.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass",
+      "role": "Human-readable release-owner audit summary.",
+      "route": "file://demo/release_audit_summary.md",
+      "user_value": "Useful for promotion decisions after owner-run tests."
+    },
+    {
+      "path": "release_audit_summary.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass",
+      "role": "Machine-readable release-owner audit summary.",
+      "route": "file://demo/release_audit_summary.json",
+      "user_value": "Useful for deterministic release status review."
+    },
+    {
+      "path": "maturity_report.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator maturity-report --output demo/maturity_report.md",
+      "role": "Public-readiness checklist.",
+      "route": "file://demo/maturity_report.md",
+      "user_value": "Useful for explaining maturity scope and remaining boundaries."
+    },
+    {
+      "path": "decision_journal.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+      "role": "Research-note prompt journal in Markdown.",
+      "route": "file://demo/decision_journal.md",
+      "user_value": "Useful for human review of assumptions, verification needs, and boundaries."
+    },
+    {
+      "path": "decision_journal.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+      "role": "Research-note prompt journal in JSON.",
+      "route": "file://demo/decision_journal.json",
+      "user_value": "Useful for deterministic prompt handoff without live data."
+    },
+    {
+      "path": "docs_export.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator docs-export --output demo",
+      "role": "Deterministic public command, schema, artifact, verification, and boundary documentation.",
+      "route": "file://demo/docs_export.md",
+      "user_value": "Useful for first-screen project review and public showcase context."
+    },
+    {
+      "path": "docs_export.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator docs-export --output demo",
+      "role": "Machine-readable public documentation export.",
+      "route": "file://demo/docs_export.json",
+      "user_value": "Useful for checking command coverage and artifact map completeness."
+    },
+    {
+      "path": "showcase.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
+      "role": "No-JS public showcase index for generated review artifacts.",
+      "route": "file://demo/showcase.html",
+      "user_value": "Useful as the first local page to open when evaluating the demo."
+    }
+  ],
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "commands": [
+    {
+      "name": "artifact-catalog",
+      "summary": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness."
+    },
+    {
+      "name": "build-packet",
+      "summary": "Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON."
+    },
+    {
+      "name": "case-gallery",
+      "summary": "Render deterministic Markdown, JSON, and HTML gallery artifacts from bundled scenario presets."
+    },
+    {
+      "name": "cold-start-walkthrough",
+      "summary": "Write a 10-minute Markdown/JSON first-run guide with expected outputs and safety boundaries."
+    },
+    {
+      "name": "compare-history",
+      "summary": "Compare bundled or supplied historical scenario snapshots in a static Markdown table."
+    },
+    {
+      "name": "decision-journal",
+      "summary": "Generate deterministic Markdown/JSON research-note prompts for human review and no-advice boundaries."
+    },
+    {
+      "name": "docs-export",
+      "summary": "Create deterministic Markdown and JSON public documentation for commands, schemas, artifacts, verification, and finance boundaries."
+    },
+    {
+      "name": "fixture-doctor",
+      "summary": "Validate holdings, assumptions, and scenario preset fixtures with actionable warnings."
+    },
+    {
+      "name": "maturity-report",
+      "summary": "Write a public-readiness checklist for the current release scope."
+    },
+    {
+      "name": "package-audit",
+      "summary": "Inspect zero-dependency metadata, package-data readiness, script wiring, version alignment, and command coverage."
+    },
+    {
+      "name": "public-scan",
+      "summary": "Scan local release files for common secret markers and required finance boundary language."
+    },
+    {
+      "name": "quickstart-check",
+      "summary": "Run the full deterministic demo route and write public-safe demo artifacts."
+    },
+    {
+      "name": "release-audit-summary",
+      "summary": "Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status."
+    },
+    {
+      "name": "release-manifest",
+      "summary": "Hash source and demo files for release review."
+    },
+    {
+      "name": "review-ledger",
+      "summary": "Validate and summarize the holdings ledger."
+    },
+    {
+      "name": "scenario-presets",
+      "summary": "Write or print bundled deterministic scenario preset JSON."
+    },
+    {
+      "name": "selfcheck",
+      "summary": "Verify CLI wiring, bundled examples, and deterministic calculations."
+    },
+    {
+      "name": "sensitivity-matrix",
+      "summary": "Generate a static fee/return sensitivity table from a packet JSON file."
+    },
+    {
+      "name": "static-dashboard",
+      "summary": "Render a standalone no-service HTML dashboard from a packet JSON file."
+    },
+    {
+      "name": "static-showcase",
+      "summary": "Create a no-JS public showcase page linking key review artifacts with short user-value copy."
+    },
+    {
+      "name": "visual-receipt",
+      "summary": "Hash and summarize visual demo artifacts with local routes, bytes, roles, regeneration commands, and safety boundaries."
+    }
+  ],
+  "finance_boundaries": [
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Outputs are deterministic examples from local CSV/JSON inputs and are not suitability analysis for any person or account."
+  ],
+  "input_schema": {
+    "assumptions_json": {
+      "calculation_notes": [
+        "Weighted expense ratio is allocation-weighted across holdings.",
+        "Cash drag is cash-like allocation multiplied by max(gross_return - cash_return, 0).",
+        "Turnover/tax drag is turnover_rate * realized_gain_rate * tax_rate * taxable_allocation.",
+        "Rebalance drag is rebalance_cost multiplied by supported annual event count."
+      ],
+      "required_fields": [
+        {
+          "description": "Starting portfolio value.",
+          "name": "initial_value",
+          "type": "number"
+        },
+        {
+          "description": "Annual contribution used in compounding.",
+          "name": "annual_contribution",
+          "type": "number"
+        },
+        {
+          "description": "Number of annual compounding periods.",
+          "name": "years",
+          "type": "integer"
+        },
+        {
+          "description": "Local gross annual return assumption.",
+          "name": "gross_return",
+          "type": "number"
+        },
+        {
+          "description": "Local annual return assumption for cash-like holdings.",
+          "name": "cash_return",
+          "type": "number"
+        },
+        {
+          "description": "Local annual turnover assumption.",
+          "name": "turnover_rate",
+          "type": "number"
+        },
+        {
+          "description": "Share of turnover treated as realized gains.",
+          "name": "realized_gain_rate",
+          "type": "number"
+        },
+        {
+          "description": "Local tax-rate assumption for turnover drag arithmetic.",
+          "name": "tax_rate",
+          "type": "number"
+        },
+        {
+          "description": "Share of portfolio treated as taxable for turnover drag arithmetic.",
+          "name": "taxable_allocation",
+          "type": "number"
+        },
+        {
+          "description": "Supported rebalance frequency.",
+          "name": "rebalance_frequency",
+          "type": "enum",
+          "values": [
+            "none",
+            "annual",
+            "quarterly",
+            "monthly"
+          ]
+        },
+        {
+          "description": "Cost per rebalance event as a decimal.",
+          "name": "rebalance_cost",
+          "type": "number"
+        },
+        {
+          "description": "Whether annual contributions compound for the current year.",
+          "name": "contribution_timing",
+          "type": "enum",
+          "values": [
+            "beginning",
+            "end"
+          ]
+        }
+      ]
+    },
+    "holdings_csv": {
+      "columns": [
+        {
+          "description": "Account label used for review grouping.",
+          "name": "account",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Ticker or local proxy label; CASH marks cash-like holdings.",
+          "name": "ticker",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Human-readable holding name.",
+          "name": "name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "Portfolio allocation as a decimal; bundled examples sum to 1.0.",
+          "name": "allocation",
+          "required": true,
+          "type": "number"
+        },
+        {
+          "description": "Annual expense ratio as a decimal.",
+          "name": "expense_ratio",
+          "required": true,
+          "type": "number"
+        }
+      ],
+      "example": "account,ticker,name,allocation,expense_ratio"
+    }
+  },
+  "schema": "portfolio-fee-drag-docs-export-v1",
+  "verification_commands": [
+    "python -m unittest discover -s tests",
+    "python -m portfolio_fee_drag_simulator selfcheck",
+    "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
+    "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
+  ],
+  "version": "0.6.0"
+}

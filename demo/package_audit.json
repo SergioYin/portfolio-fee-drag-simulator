@@ -7,6 +7,7 @@
     "cold-start-walkthrough",
     "compare-history",
     "decision-journal",
+    "docs-export",
     "fixture-doctor",
     "maturity-report",
     "package-audit",
@@ -19,10 +20,11 @@
     "selfcheck",
     "sensitivity-matrix",
     "static-dashboard",
+    "static-showcase",
     "visual-receipt"
   ],
   "extra_commands": [],
-  "import_version": "0.5.0",
+  "import_version": "0.6.0",
   "installed_distribution_available": false,
   "installed_distribution_version": "source-tree-audit",
   "issues": [],
@@ -32,10 +34,10 @@
     "data/*.json"
   ],
   "project_name": "portfolio-fee-drag-simulator",
-  "project_version": "0.5.0",
+  "project_version": "0.6.0",
   "runtime_dependencies": [],
   "schema": "portfolio-fee-drag-package-audit-v1",
   "script_target": "portfolio_fee_drag_simulator.cli:main",
   "status": "pass",
-  "version": "0.5.0"
+  "version": "0.6.0"
 }

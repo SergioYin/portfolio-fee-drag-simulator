@@ -41,12 +41,51 @@ COMMANDS = (
     "package-audit",
     "decision-journal",
     "artifact-catalog",
+    "docs-export",
+    "static-showcase",
     "quickstart-check",
     "release-manifest",
     "release-audit-summary",
     "maturity-report",
     "selfcheck",
     "public-scan",
+)
+
+COMMAND_DOCS = {
+    "artifact-catalog": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness.",
+    "build-packet": "Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON.",
+    "case-gallery": "Render deterministic Markdown, JSON, and HTML gallery artifacts from bundled scenario presets.",
+    "cold-start-walkthrough": "Write a 10-minute Markdown/JSON first-run guide with expected outputs and safety boundaries.",
+    "compare-history": "Compare bundled or supplied historical scenario snapshots in a static Markdown table.",
+    "decision-journal": "Generate deterministic Markdown/JSON research-note prompts for human review and no-advice boundaries.",
+    "docs-export": "Create deterministic Markdown and JSON public documentation for commands, schemas, artifacts, verification, and finance boundaries.",
+    "fixture-doctor": "Validate holdings, assumptions, and scenario preset fixtures with actionable warnings.",
+    "maturity-report": "Write a public-readiness checklist for the current release scope.",
+    "package-audit": "Inspect zero-dependency metadata, package-data readiness, script wiring, version alignment, and command coverage.",
+    "public-scan": "Scan local release files for common secret markers and required finance boundary language.",
+    "quickstart-check": "Run the full deterministic demo route and write public-safe demo artifacts.",
+    "release-audit-summary": "Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status.",
+    "release-manifest": "Hash source and demo files for release review.",
+    "review-ledger": "Validate and summarize the holdings ledger.",
+    "scenario-presets": "Write or print bundled deterministic scenario preset JSON.",
+    "selfcheck": "Verify CLI wiring, bundled examples, and deterministic calculations.",
+    "sensitivity-matrix": "Generate a static fee/return sensitivity table from a packet JSON file.",
+    "static-dashboard": "Render a standalone no-service HTML dashboard from a packet JSON file.",
+    "static-showcase": "Create a no-JS public showcase page linking key review artifacts with short user-value copy.",
+    "visual-receipt": "Hash and summarize visual demo artifacts with local routes, bytes, roles, regeneration commands, and safety boundaries.",
+}
+
+VERIFICATION_COMMANDS = (
+    "python -m unittest discover -s tests",
+    "python -m portfolio_fee_drag_simulator selfcheck",
+    "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
+    "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+)
+
+FINANCE_BOUNDARIES = (
+    "Static local arithmetic scenario review only.",
+    "No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "Outputs are deterministic examples from local CSV/JSON inputs and are not suitability analysis for any person or account.",
 )
 
 
@@ -484,6 +523,9 @@ DEMO_ARTIFACT_SPECS = (
     ("maturity_report.md", "file://demo/maturity_report.md", "python -m portfolio_fee_drag_simulator maturity-report --output demo/maturity_report.md", "Public-readiness checklist.", "Useful for explaining maturity scope and remaining boundaries."),
     ("decision_journal.md", "file://demo/decision_journal.md", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in Markdown.", "Useful for human review of assumptions, verification needs, and boundaries."),
     ("decision_journal.json", "file://demo/decision_journal.json", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in JSON.", "Useful for deterministic prompt handoff without live data."),
+    ("docs_export.md", "file://demo/docs_export.md", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Deterministic public command, schema, artifact, verification, and boundary documentation.", "Useful for first-screen project review and public showcase context."),
+    ("docs_export.json", "file://demo/docs_export.json", "python -m portfolio_fee_drag_simulator docs-export --output demo", "Machine-readable public documentation export.", "Useful for checking command coverage and artifact map completeness."),
+    ("showcase.html", "file://demo/showcase.html", "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html", "No-JS public showcase index for generated review artifacts.", "Useful as the first local page to open when evaluating the demo."),
 )
 
 
@@ -633,11 +675,12 @@ def cold_start_payload() -> dict[str, Any]:
                 "minute": "5-7",
                 "title": "Open the visual artifacts",
                 "commands": [
+                    "open demo/showcase.html",
                     "open demo/dashboard.html",
                     "open demo/case_gallery.html",
                     "open demo/visual_receipt.html",
                 ],
-                "expected_output": "A static dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.",
+                "expected_output": "A static showcase, dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.",
             },
             {
                 "minute": "7-9",
@@ -655,9 +698,11 @@ def cold_start_payload() -> dict[str, Any]:
                 "commands": [
                     "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
                     "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+                    "python -m portfolio_fee_drag_simulator docs-export --output demo",
+                    "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
                     "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
                 ],
-                "expected_output": "Visual receipt, decision journal, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
+                "expected_output": "Visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
@@ -685,6 +730,9 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/release_audit_summary.json",
             "demo/artifact_catalog.md",
             "demo/artifact_catalog.json",
+            "demo/docs_export.md",
+            "demo/docs_export.json",
+            "demo/showcase.html",
         ],
         "safety_boundaries": [
             "Use only local CSV/JSON assumptions or bundled examples.",
@@ -899,7 +947,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.5 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.6 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -1193,6 +1241,183 @@ def cmd_artifact_catalog(args: argparse.Namespace) -> int:
     return 0 if payload["complete"] else 1
 
 
+def docs_export_payload() -> dict[str, Any]:
+    holdings_columns = [
+        {"name": "account", "type": "string", "required": True, "description": "Account label used for review grouping."},
+        {"name": "ticker", "type": "string", "required": True, "description": "Ticker or local proxy label; CASH marks cash-like holdings."},
+        {"name": "name", "type": "string", "required": True, "description": "Human-readable holding name."},
+        {"name": "allocation", "type": "number", "required": True, "description": "Portfolio allocation as a decimal; bundled examples sum to 1.0."},
+        {"name": "expense_ratio", "type": "number", "required": True, "description": "Annual expense ratio as a decimal."},
+    ]
+    assumptions_fields = [
+        {"name": "initial_value", "type": "number", "description": "Starting portfolio value."},
+        {"name": "annual_contribution", "type": "number", "description": "Annual contribution used in compounding."},
+        {"name": "years", "type": "integer", "description": "Number of annual compounding periods."},
+        {"name": "gross_return", "type": "number", "description": "Local gross annual return assumption."},
+        {"name": "cash_return", "type": "number", "description": "Local annual return assumption for cash-like holdings."},
+        {"name": "turnover_rate", "type": "number", "description": "Local annual turnover assumption."},
+        {"name": "realized_gain_rate", "type": "number", "description": "Share of turnover treated as realized gains."},
+        {"name": "tax_rate", "type": "number", "description": "Local tax-rate assumption for turnover drag arithmetic."},
+        {"name": "taxable_allocation", "type": "number", "description": "Share of portfolio treated as taxable for turnover drag arithmetic."},
+        {"name": "rebalance_frequency", "type": "enum", "values": ["none", "annual", "quarterly", "monthly"], "description": "Supported rebalance frequency."},
+        {"name": "rebalance_cost", "type": "number", "description": "Cost per rebalance event as a decimal."},
+        {"name": "contribution_timing", "type": "enum", "values": ["beginning", "end"], "description": "Whether annual contributions compound for the current year."},
+    ]
+    artifacts = [
+        {
+            "path": path_name,
+            "route": route,
+            "producer_command": producer,
+            "role": role,
+            "user_value": usefulness,
+        }
+        for path_name, route, producer, role, usefulness in DEMO_ARTIFACT_SPECS
+    ]
+    return {
+        "schema": "portfolio-fee-drag-docs-export-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "commands": [{"name": name, "summary": COMMAND_DOCS[name]} for name in sorted(COMMAND_DOCS)],
+        "input_schema": {
+            "holdings_csv": {
+                "columns": holdings_columns,
+                "example": "account,ticker,name,allocation,expense_ratio",
+            },
+            "assumptions_json": {
+                "required_fields": assumptions_fields,
+                "calculation_notes": [
+                    "Weighted expense ratio is allocation-weighted across holdings.",
+                    "Cash drag is cash-like allocation multiplied by max(gross_return - cash_return, 0).",
+                    "Turnover/tax drag is turnover_rate * realized_gain_rate * tax_rate * taxable_allocation.",
+                    "Rebalance drag is rebalance_cost multiplied by supported annual event count.",
+                ],
+            },
+        },
+        "artifact_map": artifacts,
+        "verification_commands": list(VERIFICATION_COMMANDS),
+        "finance_boundaries": list(FINANCE_BOUNDARIES),
+    }
+
+
+def docs_export_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Portfolio Fee Drag Docs Export",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "## Commands",
+        "",
+        "| Command | Summary |",
+        "| --- | --- |",
+    ]
+    for item in payload["commands"]:
+        lines.append(f"| `{item['name']}` | {item['summary']} |")
+    lines.extend(["", "## Input Schema", "", "### Holdings CSV", "", "| Column | Type | Required | Description |", "| --- | --- | --- | --- |"])
+    for column in payload["input_schema"]["holdings_csv"]["columns"]:
+        lines.append(f"| `{column['name']}` | {column['type']} | {column['required']} | {column['description']} |")
+    lines.extend(["", "### Assumptions JSON", "", "| Field | Type | Description |", "| --- | --- | --- |"])
+    for field in payload["input_schema"]["assumptions_json"]["required_fields"]:
+        type_label = field["type"]
+        if "values" in field:
+            type_label = f"{type_label}: {', '.join(field['values'])}"
+        lines.append(f"| `{field['name']}` | {type_label} | {field['description']} |")
+    lines.extend(["", "Calculation notes:", ""])
+    lines.extend(f"- {note}" for note in payload["input_schema"]["assumptions_json"]["calculation_notes"])
+    lines.extend(["", "## Artifact Map", "", "| Artifact | Route | Producer | User Value |", "| --- | --- | --- | --- |"])
+    for item in payload["artifact_map"]:
+        lines.append(f"| `{item['path']}` | `{item['route']}` | `{item['producer_command']}` | {item['user_value']} |")
+    lines.extend(["", "## Verification Commands", ""])
+    lines.extend(f"- `{command}`" for command in payload["verification_commands"])
+    lines.extend(["", "## Finance Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in payload["finance_boundaries"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_docs_export(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = docs_export_payload()
+    write_json(output / "docs_export.json", payload)
+    write_text(output / "docs_export.md", docs_export_markdown(payload))
+    print(f"wrote {output / 'docs_export.md'}")
+    print(f"wrote {output / 'docs_export.json'}")
+    return 0
+
+
+SHOWCASE_LINKS = (
+    ("Dashboard", "dashboard.html", "Review the bundled packet metrics and holdings in a single standalone page."),
+    ("Case Gallery", "case_gallery.html", "Compare three deterministic scenarios across expense, cash, turnover/tax, rebalance, and total drag."),
+    ("Visual Receipt", "visual_receipt.html", "Check local routes, byte counts, SHA-256 hashes, producer commands, and safety boundaries for visual artifacts."),
+    ("Cold-Start Walkthrough", "cold_start_walkthrough.md", "Follow a 10-minute install, run, evaluate, and boundary-review path for first-time users."),
+    ("Decision Journal", "decision_journal.md", "Use deterministic prompts for human assumption review, verification notes, and no-advice language."),
+    ("Artifact Catalog", "artifact_catalog.md", "Inventory generated demo files with hashes, producer commands, roles, and promotion usefulness."),
+    ("Release Audit", "release_audit_summary.md", "Review release-owner status across tests, selfcheck, public scan, manifests, fixtures, package audit, and visual receipt."),
+    ("Package Audit", "package_audit.md", "Confirm zero runtime dependencies, package data, script wiring, versions, and command coverage."),
+    ("Docs Export", "docs_export.md", "Read deterministic public docs for commands, input schema, artifact map, verification commands, and finance boundaries."),
+)
+
+
+def static_showcase_html() -> str:
+    cards = "\n".join(
+        """<article>
+      <h2><a href="{href}">{title}</a></h2>
+      <p>{copy}</p>
+    </article>""".format(
+            href=html.escape(href),
+            title=html.escape(title),
+            copy=html.escape(copy),
+        )
+        for title, href, copy in SHOWCASE_LINKS
+    )
+    boundaries = "\n".join(f"<li>{html.escape(item)}</li>" for item in FINANCE_BOUNDARIES)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Fee Drag Public Showcase</title>
+  <style>
+    body {{ font-family: system-ui, sans-serif; margin: 0; color: #172033; background: #f8fafc; }}
+    main {{ max-width: 1100px; margin: 0 auto; padding: 2rem; }}
+    header {{ border-bottom: 1px solid #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem; }}
+    h1 {{ font-size: 2rem; margin: 0 0 0.75rem; }}
+    p {{ line-height: 1.5; }}
+    .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }}
+    article {{ background: #ffffff; border: 1px solid #d7dde7; border-radius: 8px; padding: 1rem; }}
+    article h2 {{ font-size: 1.05rem; margin: 0 0 0.5rem; }}
+    article p {{ margin: 0; color: #475569; }}
+    a {{ color: #0f766e; font-weight: 700; }}
+    .boundary {{ margin-top: 1.75rem; border-top: 1px solid #cbd5e1; padding-top: 1rem; }}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Portfolio Fee Drag Public Showcase</h1>
+    <p>Open the generated local artifacts from one no-JS page: visual review, audit evidence, first-run help, and deterministic public docs.</p>
+  </header>
+  <section class="grid" aria-label="Showcase links">
+    {cards}
+  </section>
+  <section class="boundary">
+    <h2>Finance Boundaries</h2>
+    <ul>{boundaries}</ul>
+  </section>
+</main>
+</body>
+</html>
+"""
+
+
+def cmd_static_showcase(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    write_text(output, static_showcase_html())
+    print(f"wrote {output}")
+    return 0
+
+
 def read_json_file(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
@@ -1353,6 +1578,8 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
             output=output,
         )
     )
+    cmd_docs_export(argparse.Namespace(output=output))
+    cmd_static_showcase(argparse.Namespace(output=output / "showcase.html"))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
     cmd_release_audit_summary(
@@ -1419,6 +1646,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Package audit Markdown/JSON route included", "pass"),
         ("Decision journal Markdown/JSON prompt route included", "pass"),
         ("Artifact catalog Markdown/JSON route included", "pass"),
+        ("Docs export Markdown/JSON route included", "pass"),
+        ("Static showcase HTML route included", "pass"),
         ("Release audit summary Markdown/JSON route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
@@ -1476,6 +1705,12 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     catalog = artifact_catalog_payload(Path("demo"))
     if catalog["schema"] != "portfolio-fee-drag-artifact-catalog-v1":
         errors.append("artifact catalog payload generation failed")
+    docs = docs_export_payload()
+    if docs["schema"] != "portfolio-fee-drag-docs-export-v1" or len(docs["commands"]) != len(COMMANDS):
+        errors.append("docs export generation failed")
+    showcase = static_showcase_html()
+    if "<script" in showcase.lower() or "docs_export.md" not in showcase:
+        errors.append("static showcase generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -1605,6 +1840,14 @@ def build_parser() -> argparse.ArgumentParser:
     catalog.add_argument("--artifact-root", default="demo")
     catalog.add_argument("--output", default="demo")
     catalog.set_defaults(func=cmd_artifact_catalog)
+
+    docs = sub.add_parser("docs-export", help="Write deterministic Markdown and JSON public documentation.")
+    docs.add_argument("--output", default="demo")
+    docs.set_defaults(func=cmd_docs_export)
+
+    showcase = sub.add_parser("static-showcase", help="Render no-JS public showcase HTML.")
+    showcase.add_argument("--output", default="demo/showcase.html")
+    showcase.set_defaults(func=cmd_static_showcase)
 
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")

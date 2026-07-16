@@ -36,11 +36,12 @@ Expected output: The command prints wrote lines and ends with quickstart check c
 
 Commands:
 
+- `open demo/showcase.html`
 - `open demo/dashboard.html`
 - `open demo/case_gallery.html`
 - `open demo/visual_receipt.html`
 
-Expected output: A static dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.
+Expected output: A static showcase, dashboard, case gallery, and receipt open from local files. On Linux, use xdg-open instead of open.
 
 ## 7-9: Evaluate project health
 
@@ -58,9 +59,11 @@ Commands:
 
 - `python -m portfolio_fee_drag_simulator visual-receipt --output demo`
 - `python -m portfolio_fee_drag_simulator decision-journal --output demo`
+- `python -m portfolio_fee_drag_simulator docs-export --output demo`
+- `python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html`
 - `python -m portfolio_fee_drag_simulator artifact-catalog --output demo`
 
-Expected output: Visual receipt, decision journal, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.
+Expected output: Visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.
 
 ## Expected Artifacts
 
@@ -88,6 +91,9 @@ Expected output: Visual receipt, decision journal, and artifact catalog files li
 - `demo/release_audit_summary.json`
 - `demo/artifact_catalog.md`
 - `demo/artifact_catalog.json`
+- `demo/docs_export.md`
+- `demo/docs_export.json`
+- `demo/showcase.html`
 
 ## Boundaries
 

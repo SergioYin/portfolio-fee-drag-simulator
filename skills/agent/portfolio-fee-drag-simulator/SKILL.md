@@ -22,6 +22,8 @@ python -m portfolio_fee_drag_simulator case-gallery --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator decision-journal --output demo
+python -m portfolio_fee_drag_simulator docs-export --output demo
+python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html
 python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 ```
 
@@ -37,5 +39,7 @@ python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 - Package audit outputs should include Markdown and JSON covering zero runtime dependencies, package-data declarations, script wiring, import/project versions, and command coverage.
 - Decision journal outputs should include deterministic Markdown and JSON prompts for assumptions changed, human verification needs, no-advice boundary, and a blank next review date field.
 - Artifact catalog outputs should include deterministic Markdown and JSON inventory rows with route, bytes, SHA-256, producer command, role, and promotion usefulness.
+- Docs export outputs should include deterministic Markdown and JSON covering command summaries, input schema, artifact map, verification commands, and finance boundaries.
+- Static showcase output should be no-JS HTML linking dashboard, case gallery, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export with short user-value copy.
 - Release audit summary outputs should include Markdown and JSON combining tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. Do not mark tests as pass unless the test command actually ran.
 - Do not add GitHub Actions workflows.
