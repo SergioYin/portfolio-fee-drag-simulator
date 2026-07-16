@@ -5,6 +5,8 @@ import hashlib
 import html
 import json
 import os
+import tomllib
+from importlib import metadata
 from pathlib import Path
 from importlib import resources
 from typing import Any
@@ -35,8 +37,11 @@ COMMANDS = (
     "case-gallery",
     "visual-receipt",
     "cold-start-walkthrough",
+    "fixture-doctor",
+    "package-audit",
     "quickstart-check",
     "release-manifest",
+    "release-audit-summary",
     "maturity-report",
     "selfcheck",
     "public-scan",
@@ -630,6 +635,15 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/visual_receipt.html",
             "demo/cold_start_walkthrough.md",
             "demo/cold_start_walkthrough.json",
+            "demo/fixture_doctor.md",
+            "demo/fixture_doctor.json",
+            "demo/package_audit.md",
+            "demo/package_audit.json",
+            "demo/selfcheck.json",
+            "demo/public_scan.json",
+            "demo/release_manifest.json",
+            "demo/release_audit_summary.md",
+            "demo/release_audit_summary.json",
         ],
         "safety_boundaries": [
             "Use only local CSV/JSON assumptions or bundled examples.",
@@ -671,6 +685,387 @@ def cmd_cold_start_walkthrough(args: argparse.Namespace) -> int:
     return 0
 
 
+def audit_issue(area: str, severity: str, message: str, action: str) -> dict[str, str]:
+    return {"area": area, "severity": severity, "message": message, "action": action}
+
+
+def display_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def fixture_doctor_payload(holdings_path: Path, assumptions_path: Path, presets_path: Path) -> dict[str, Any]:
+    issues: list[dict[str, str]] = []
+    sections: list[dict[str, Any]] = []
+
+    try:
+        holdings = load_holdings(holdings_path)
+        holding_warnings = validate_holdings(holdings)
+        sections.append(
+            {
+                "name": "holdings",
+                "path": display_path(holdings_path),
+                "status": "pass" if not holding_warnings else "review",
+                "rows": len(holdings),
+                "warnings": holding_warnings,
+            }
+        )
+        for warning in holding_warnings:
+            issues.append(audit_issue("holdings", "warning", warning, "Edit allocation, ticker, or expense_ratio in the holdings CSV."))
+    except Exception as exc:
+        sections.append({"name": "holdings", "path": display_path(holdings_path), "status": "fail", "warnings": [str(exc)]})
+        issues.append(audit_issue("holdings", "error", str(exc), "Fix the holdings CSV shape and numeric fields."))
+
+    try:
+        assumptions = load_assumptions(assumptions_path)
+        assumption_warnings = []
+        sections.append(
+            {
+                "name": "assumptions",
+                "path": display_path(assumptions_path),
+                "status": "pass",
+                "years": assumptions.years,
+                "warnings": assumption_warnings,
+            }
+        )
+    except Exception as exc:
+        sections.append({"name": "assumptions", "path": display_path(assumptions_path), "status": "fail", "warnings": [str(exc)]})
+        issues.append(audit_issue("assumptions", "error", str(exc), "Fix required JSON fields and supported rate/frequency values."))
+
+    try:
+        bundle = load_preset_bundle(presets_path)
+        preset_warnings: list[str] = []
+        slugs: list[str] = []
+        for preset in sorted(bundle["scenarios"], key=lambda item: item.get("slug", "")):
+            slug = str(preset.get("slug", ""))
+            slugs.append(slug)
+            try:
+                packet = packet_for_preset(preset)
+                for warning in packet["warnings"]:
+                    preset_warnings.append(f"{slug}: {warning}")
+            except Exception as exc:
+                preset_warnings.append(f"{slug or '(blank slug)'}: {exc}")
+        if len(slugs) != len(set(slugs)):
+            preset_warnings.append("scenario slugs must be unique")
+        if bundle.get("version") != __version__:
+            preset_warnings.append(f"scenario preset version is {bundle.get('version')}, expected {__version__}")
+        sections.append(
+            {
+                "name": "scenario_presets",
+                "path": display_path(presets_path),
+                "status": "pass" if not preset_warnings else "review",
+                "scenarios": len(bundle["scenarios"]),
+                "slugs": sorted(slugs),
+                "warnings": preset_warnings,
+            }
+        )
+        for warning in preset_warnings:
+            issues.append(audit_issue("scenario_presets", "warning", warning, "Update the preset JSON so each scenario parses and has a unique slug."))
+    except Exception as exc:
+        sections.append({"name": "scenario_presets", "path": display_path(presets_path), "status": "fail", "warnings": [str(exc)]})
+        issues.append(audit_issue("scenario_presets", "error", str(exc), "Fix the scenario preset bundle schema and scenario payloads."))
+
+    status = "pass"
+    if any(item["severity"] == "error" for item in issues):
+        status = "fail"
+    elif issues:
+        status = "review"
+    return {
+        "schema": "portfolio-fee-drag-fixture-doctor-v1",
+        "version": __version__,
+        "status": status,
+        "boundary": SAFETY_BOUNDARY,
+        "sections": sections,
+        "issues": issues,
+    }
+
+
+def fixture_doctor_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Fixture Doctor",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Fixture | Status | Path | Notes |",
+        "| --- | --- | --- | --- |",
+    ]
+    for section in payload["sections"]:
+        notes = "; ".join(section.get("warnings", [])) or "No warnings."
+        lines.append(f"| {section['name']} | {section['status']} | `{section['path']}` | {notes} |")
+    lines.extend(["", "## Actions", ""])
+    if payload["issues"]:
+        lines.extend(f"- {item['area']}: {item['message']} Action: {item['action']}" for item in payload["issues"])
+    else:
+        lines.append("- No fixture actions required.")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_fixture_doctor(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = fixture_doctor_payload(Path(args.holdings), Path(args.assumptions), Path(args.presets))
+    write_json(output / "fixture_doctor.json", payload)
+    write_text(output / "fixture_doctor.md", fixture_doctor_markdown(payload))
+    print(f"wrote {output / 'fixture_doctor.md'}")
+    print(f"wrote {output / 'fixture_doctor.json'}")
+    return 0 if payload["status"] in {"pass", "review"} else 1
+
+
+def pyproject_payload(root: Path) -> dict[str, Any]:
+    with (root / "pyproject.toml").open("rb") as fh:
+        return tomllib.load(fh)
+
+
+def package_audit_payload(root: Path) -> dict[str, Any]:
+    issues: list[dict[str, str]] = []
+    pyproject_exists = (root / "pyproject.toml").exists()
+    pyproject: dict[str, Any] = {}
+    project: dict[str, Any] = {}
+
+    dist_version = None
+    dist_available = True
+    dist_entry_point = None
+    try:
+        dist = metadata.distribution("portfolio-fee-drag-simulator")
+        dist_version = dist.version
+        for entry_point in dist.entry_points:
+            if entry_point.group == "console_scripts" and entry_point.name == "portfolio-fee-drag":
+                dist_entry_point = entry_point.value
+                break
+    except metadata.PackageNotFoundError:
+        dist_available = False
+
+    if pyproject_exists:
+        try:
+            pyproject = pyproject_payload(root)
+            project = pyproject["project"]
+        except Exception as exc:
+            issues.append(audit_issue("pyproject", "error", str(exc), "Restore a valid pyproject.toml with project metadata."))
+    elif not dist_available:
+        issues.append(
+            audit_issue(
+                "package_metadata",
+                "error",
+                "no pyproject.toml in audit root and installed distribution metadata is unavailable",
+                "Run package-audit from the source root or install the wheel before auditing from an empty directory.",
+            )
+        )
+
+    dependencies = project.get("dependencies", [])
+    if pyproject_exists and dependencies:
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.4 changed scope."))
+
+    scripts = project.get("scripts", {})
+    script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
+    if script_target != "portfolio_fee_drag_simulator.cli:main":
+        issues.append(audit_issue("entry_points", "error", "portfolio-fee-drag script target is missing or unexpected", "Set the script to portfolio_fee_drag_simulator.cli:main."))
+
+    setuptools_data = pyproject.get("tool", {}).get("setuptools", {}).get("package-data", {})
+    package_data = setuptools_data.get("portfolio_fee_drag_simulator", [])
+    expected_data = {"data/*.csv", "data/*.json"}
+    if pyproject_exists and not expected_data.issubset(set(package_data)):
+        issues.append(audit_issue("package_data", "error", "data/*.csv and data/*.json are not both declared as package data", "Keep bundled CSV and JSON fixtures in setuptools package-data."))
+
+    missing_fixtures = [
+        name
+        for name in ("example_holdings.csv", "example_assumptions.json", "example_history.json", "scenario_presets.json")
+        if not data_path(name).exists()
+    ]
+    for name in missing_fixtures:
+        issues.append(audit_issue("package_data", "error", f"missing packaged fixture {name}", "Restore the fixture under portfolio_fee_drag_simulator/data/."))
+    if not pyproject_exists and not missing_fixtures:
+        package_data = ["installed:data/*.csv", "installed:data/*.json"]
+
+    parser_choices = set(build_parser()._subparsers._group_actions[0].choices)
+    missing_commands = sorted(set(COMMANDS) - parser_choices)
+    extra_commands = sorted(parser_choices - set(COMMANDS))
+    for name in missing_commands:
+        issues.append(audit_issue("commands", "error", f"{name} is listed but not registered", "Register the command in build_parser."))
+    for name in extra_commands:
+        issues.append(audit_issue("commands", "warning", f"{name} is registered but not listed in COMMANDS", "Add the command to COMMANDS or remove the parser entry."))
+
+    project_version = project.get("version") or dist_version
+    if project_version != __version__:
+        issues.append(audit_issue("version", "error", f"metadata version is {project_version}, import version is {__version__}", "Keep pyproject.toml, installed metadata, and __init__.py versions aligned."))
+
+    status = "pass"
+    if any(item["severity"] == "error" for item in issues):
+        status = "fail"
+    elif issues:
+        status = "review"
+    return {
+        "schema": "portfolio-fee-drag-package-audit-v1",
+        "version": __version__,
+        "status": status,
+        "boundary": SAFETY_BOUNDARY,
+        "project_name": project.get("name"),
+        "project_version": project_version,
+        "import_version": __version__,
+        "installed_distribution_available": dist_available,
+        "installed_distribution_version": dist_version,
+        "runtime_dependencies": dependencies,
+        "script_target": script_target,
+        "package_data": package_data,
+        "commands": sorted(parser_choices),
+        "missing_commands": missing_commands,
+        "extra_commands": extra_commands,
+        "issues": issues,
+    }
+
+
+def package_audit_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Package Audit",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Check | Value |",
+        "| --- | --- |",
+        f"| Project | `{payload['project_name']}` |",
+        f"| pyproject version | `{payload['project_version']}` |",
+        f"| import version | `{payload['import_version']}` |",
+        f"| installed distribution available | `{payload['installed_distribution_available']}` |",
+        f"| installed distribution version | `{payload['installed_distribution_version']}` |",
+        f"| runtime dependencies | `{len(payload['runtime_dependencies'])}` |",
+        f"| command count | `{len(payload['commands'])}` |",
+        "",
+        "## Issues",
+        "",
+    ]
+    if payload["issues"]:
+        lines.extend(f"- {item['severity']}: {item['message']} Action: {item['action']}" for item in payload["issues"])
+    else:
+        lines.append("- No package audit actions required.")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_package_audit(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = package_audit_payload(Path(args.root))
+    write_json(output / "package_audit.json", payload)
+    write_text(output / "package_audit.md", package_audit_markdown(payload))
+    print(f"wrote {output / 'package_audit.md'}")
+    print(f"wrote {output / 'package_audit.json'}")
+    return 0 if payload["status"] == "pass" else 1
+
+
+def read_json_file(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    with path.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def release_audit_summary_payload(args: argparse.Namespace) -> dict[str, Any]:
+    selfcheck = read_json_file(Path(args.selfcheck))
+    public_scan = read_json_file(Path(args.public_scan))
+    manifest = read_json_file(Path(args.manifest))
+    visual_receipt = read_json_file(Path(args.visual_receipt))
+    fixture_doctor = read_json_file(Path(args.fixture_doctor))
+    package_audit = read_json_file(Path(args.package_audit))
+
+    checks = [
+        {
+            "name": "tests",
+            "status": args.tests_status,
+            "source": args.tests_source,
+            "detail": "Release owner supplied test status.",
+        },
+        {
+            "name": "selfcheck",
+            "status": selfcheck.get("status", "missing") if selfcheck else "missing",
+            "source": Path(args.selfcheck).as_posix(),
+            "detail": "CLI wiring and bundled deterministic calculations.",
+        },
+        {
+            "name": "public_scan",
+            "status": public_scan.get("status", "missing") if public_scan else "missing",
+            "source": Path(args.public_scan).as_posix(),
+            "detail": "Public wording, secret marker, and finance boundary scan.",
+        },
+        {
+            "name": "release_manifest",
+            "status": "pass" if manifest and manifest.get("files") else "missing",
+            "source": Path(args.manifest).as_posix(),
+            "detail": "Source artifact hash manifest.",
+        },
+        {
+            "name": "visual_receipt",
+            "status": "pass" if visual_receipt and visual_receipt.get("complete") else "missing",
+            "source": Path(args.visual_receipt).as_posix(),
+            "detail": "Dashboard and gallery artifact receipt.",
+        },
+        {
+            "name": "fixture_doctor",
+            "status": fixture_doctor.get("status", "missing") if fixture_doctor else "missing",
+            "source": Path(args.fixture_doctor).as_posix(),
+            "detail": "Holdings, assumptions, and scenario preset validation.",
+        },
+        {
+            "name": "package_audit",
+            "status": package_audit.get("status", "missing") if package_audit else "missing",
+            "source": Path(args.package_audit).as_posix(),
+            "detail": "Package metadata, data files, dependencies, and command coverage.",
+        },
+    ]
+    blocking = {"fail", "missing", "review", "not-run"}
+    status = "pass" if all(item["status"] not in blocking for item in checks) else "review"
+    return {
+        "schema": "portfolio-fee-drag-release-audit-summary-v1",
+        "version": __version__,
+        "status": status,
+        "boundary": SAFETY_BOUNDARY,
+        "checks": checks,
+        "release_owner_actions": [
+            f"{item['name']}: resolve status {item['status']} from {item['source']}"
+            for item in checks
+            if item["status"] in blocking
+        ],
+    }
+
+
+def release_audit_summary_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Release Audit Summary",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        "| Check | Status | Source | Detail |",
+        "| --- | --- | --- | --- |",
+    ]
+    for item in payload["checks"]:
+        lines.append(f"| {item['name']} | {item['status']} | `{item['source']}` | {item['detail']} |")
+    lines.extend(["", "## Release Owner Actions", ""])
+    if payload["release_owner_actions"]:
+        lines.extend(f"- {action}" for action in payload["release_owner_actions"])
+    else:
+        lines.append("- No release-owner actions required.")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_release_audit_summary(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = release_audit_summary_payload(args)
+    write_json(output / "release_audit_summary.json", payload)
+    write_text(output / "release_audit_summary.md", release_audit_summary_markdown(payload))
+    print(f"wrote {output / 'release_audit_summary.md'}")
+    print(f"wrote {output / 'release_audit_summary.json'}")
+    return 0 if payload["status"] == "pass" else 1
+
+
 def cmd_quickstart_check(args: argparse.Namespace) -> int:
     output = Path(args.output)
     cmd_build_packet(
@@ -697,8 +1092,31 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_maturity_report(argparse.Namespace(output=output / "maturity_report.md"))
     cmd_visual_receipt(argparse.Namespace(artifact_root=output, output=output))
     cmd_cold_start_walkthrough(argparse.Namespace(output=output))
+    cmd_fixture_doctor(
+        argparse.Namespace(
+            holdings=data_path("example_holdings.csv"),
+            assumptions=data_path("example_assumptions.json"),
+            presets=data_path("scenario_presets.json"),
+            output=output,
+        )
+    )
+    cmd_package_audit(argparse.Namespace(root=Path("."), output=output))
+    cmd_selfcheck(argparse.Namespace(output=output / "selfcheck.json"))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
+    cmd_release_audit_summary(
+        argparse.Namespace(
+            output=output,
+            tests_status="not-run",
+            tests_source="python -m unittest discover -s tests",
+            selfcheck=output / "selfcheck.json",
+            public_scan=output / "public_scan.json",
+            manifest=output / "release_manifest.json",
+            visual_receipt=output / "visual_receipt.json",
+            fixture_doctor=output / "fixture_doctor.json",
+            package_audit=output / "package_audit.json",
+        )
+    )
     print("quickstart check complete")
     return 0
 
@@ -710,7 +1128,7 @@ def iter_release_files(root: Path) -> list[Path]:
         if not path.is_file():
             continue
         rel = path.relative_to(root)
-        if rel.as_posix().endswith("release_manifest.json"):
+        if rel.name in {"release_manifest.json", "release_audit_summary.json", "release_audit_summary.md"}:
             continue
         if any(part in excluded_parts or part.endswith(".egg-info") for part in rel.parts):
             continue
@@ -745,6 +1163,9 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Case gallery Markdown/JSON/HTML route included", "pass"),
         ("Visual receipt Markdown/JSON/HTML route included", "pass"),
         ("Cold-start walkthrough Markdown/JSON route included", "pass"),
+        ("Fixture doctor Markdown/JSON route included", "pass"),
+        ("Package audit Markdown/JSON route included", "pass"),
+        ("Release audit summary Markdown/JSON route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
     lines.extend(f"| {name} | {status} |" for name, status in checks)
@@ -779,6 +1200,16 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     walkthrough = cold_start_payload()
     if len(walkthrough["steps"]) != 6 or walkthrough["timebox_minutes"] != 10:
         errors.append("cold-start walkthrough generation failed")
+    doctor = fixture_doctor_payload(
+        data_path("example_holdings.csv"),
+        data_path("example_assumptions.json"),
+        data_path("scenario_presets.json"),
+    )
+    if doctor["status"] != "pass":
+        errors.append(f"fixture doctor status {doctor['status']}")
+    package = package_audit_payload(Path("."))
+    if package["status"] != "pass":
+        errors.append(f"package audit status {package['status']}")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -882,6 +1313,18 @@ def build_parser() -> argparse.ArgumentParser:
     cold.add_argument("--output", default="demo")
     cold.set_defaults(func=cmd_cold_start_walkthrough)
 
+    doctor = sub.add_parser("fixture-doctor", help="Validate bundled holdings, assumptions, and scenario preset fixtures.")
+    doctor.add_argument("--holdings", default=data_path("example_holdings.csv"))
+    doctor.add_argument("--assumptions", default=data_path("example_assumptions.json"))
+    doctor.add_argument("--presets", default=data_path("scenario_presets.json"))
+    doctor.add_argument("--output", default="demo")
+    doctor.set_defaults(func=cmd_fixture_doctor)
+
+    package = sub.add_parser("package-audit", help="Inspect package metadata, data readiness, and command coverage.")
+    package.add_argument("--root", default=".")
+    package.add_argument("--output", default="demo")
+    package.set_defaults(func=cmd_package_audit)
+
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")
     quick.set_defaults(func=cmd_quickstart_check)
@@ -890,6 +1333,18 @@ def build_parser() -> argparse.ArgumentParser:
     manifest.add_argument("--root", default=".")
     manifest.add_argument("--output", default="demo/release_manifest.json")
     manifest.set_defaults(func=cmd_release_manifest)
+
+    summary = sub.add_parser("release-audit-summary", help="Combine release-owner audit statuses into Markdown and JSON.")
+    summary.add_argument("--output", default="demo")
+    summary.add_argument("--tests-status", choices=("pass", "fail", "not-run"), default="not-run")
+    summary.add_argument("--tests-source", default="python -m unittest discover -s tests")
+    summary.add_argument("--selfcheck", default="demo/selfcheck.json")
+    summary.add_argument("--public-scan", default="demo/public_scan.json")
+    summary.add_argument("--manifest", default="demo/release_manifest.json")
+    summary.add_argument("--visual-receipt", default="demo/visual_receipt.json")
+    summary.add_argument("--fixture-doctor", default="demo/fixture_doctor.json")
+    summary.add_argument("--package-audit", default="demo/package_audit.json")
+    summary.set_defaults(func=cmd_release_audit_summary)
 
     maturity = sub.add_parser("maturity-report", help="Write public readiness report.")
     maturity.add_argument("--output", default="demo/maturity_report.md")

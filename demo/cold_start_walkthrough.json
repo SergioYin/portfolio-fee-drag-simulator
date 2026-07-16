@@ -12,7 +12,16 @@
     "demo/visual_receipt.json",
     "demo/visual_receipt.html",
     "demo/cold_start_walkthrough.md",
-    "demo/cold_start_walkthrough.json"
+    "demo/cold_start_walkthrough.json",
+    "demo/fixture_doctor.md",
+    "demo/fixture_doctor.json",
+    "demo/package_audit.md",
+    "demo/package_audit.json",
+    "demo/selfcheck.json",
+    "demo/public_scan.json",
+    "demo/release_manifest.json",
+    "demo/release_audit_summary.md",
+    "demo/release_audit_summary.json"
   ],
   "safety_boundaries": [
     "Use only local CSV/JSON assumptions or bundled examples.",
@@ -78,5 +87,5 @@
     }
   ],
   "timebox_minutes": 10,
-  "version": "0.3.0"
+  "version": "0.4.0"
 }

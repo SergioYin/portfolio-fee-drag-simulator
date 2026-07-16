@@ -1,0 +1,51 @@
+{
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "checks": [
+    {
+      "detail": "Release owner supplied test status.",
+      "name": "tests",
+      "source": "python -m unittest discover -s tests",
+      "status": "pass"
+    },
+    {
+      "detail": "CLI wiring and bundled deterministic calculations.",
+      "name": "selfcheck",
+      "source": "demo/selfcheck.json",
+      "status": "pass"
+    },
+    {
+      "detail": "Public wording, secret marker, and finance boundary scan.",
+      "name": "public_scan",
+      "source": "demo/public_scan.json",
+      "status": "pass"
+    },
+    {
+      "detail": "Source artifact hash manifest.",
+      "name": "release_manifest",
+      "source": "demo/release_manifest.json",
+      "status": "pass"
+    },
+    {
+      "detail": "Dashboard and gallery artifact receipt.",
+      "name": "visual_receipt",
+      "source": "demo/visual_receipt.json",
+      "status": "pass"
+    },
+    {
+      "detail": "Holdings, assumptions, and scenario preset validation.",
+      "name": "fixture_doctor",
+      "source": "demo/fixture_doctor.json",
+      "status": "pass"
+    },
+    {
+      "detail": "Package metadata, data files, dependencies, and command coverage.",
+      "name": "package_audit",
+      "source": "demo/package_audit.json",
+      "status": "pass"
+    }
+  ],
+  "release_owner_actions": [],
+  "schema": "portfolio-fee-drag-release-audit-summary-v1",
+  "status": "pass",
+  "version": "0.4.0"
+}

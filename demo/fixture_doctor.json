@@ -1,0 +1,35 @@
+{
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "issues": [],
+  "schema": "portfolio-fee-drag-fixture-doctor-v1",
+  "sections": [
+    {
+      "name": "holdings",
+      "path": "portfolio_fee_drag_simulator/data/example_holdings.csv",
+      "rows": 4,
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "name": "assumptions",
+      "path": "portfolio_fee_drag_simulator/data/example_assumptions.json",
+      "status": "pass",
+      "warnings": [],
+      "years": 20
+    },
+    {
+      "name": "scenario_presets",
+      "path": "portfolio_fee_drag_simulator/data/scenario_presets.json",
+      "scenarios": 3,
+      "slugs": [
+        "cash-heavy-waitlist",
+        "high-turnover-taxable-fund",
+        "low-cost-etf"
+      ],
+      "status": "pass",
+      "warnings": []
+    }
+  ],
+  "status": "pass",
+  "version": "0.4.0"
+}

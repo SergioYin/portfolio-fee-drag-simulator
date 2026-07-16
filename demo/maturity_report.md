@@ -16,3 +16,6 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Case gallery Markdown/JSON/HTML route included | pass |
 | Visual receipt Markdown/JSON/HTML route included | pass |
 | Cold-start walkthrough Markdown/JSON route included | pass |
+| Fixture doctor Markdown/JSON route included | pass |
+| Package audit Markdown/JSON route included | pass |
+| Release audit summary Markdown/JSON route included | pass |

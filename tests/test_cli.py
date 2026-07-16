@@ -43,6 +43,13 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "visual_receipt.html").exists())
             self.assertTrue((out / "cold_start_walkthrough.md").exists())
             self.assertTrue((out / "cold_start_walkthrough.json").exists())
+            self.assertTrue((out / "fixture_doctor.md").exists())
+            self.assertTrue((out / "fixture_doctor.json").exists())
+            self.assertTrue((out / "package_audit.md").exists())
+            self.assertTrue((out / "package_audit.json").exists())
+            self.assertTrue((out / "selfcheck.json").exists())
+            self.assertTrue((out / "release_audit_summary.md").exists())
+            self.assertTrue((out / "release_audit_summary.json").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
             self.assertIn("turnover_tax_drag_rate", packet["summary"])
@@ -70,6 +77,13 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(len(walkthrough["steps"]), 6)
             scan = json.loads((out / "public_scan.json").read_text())
             self.assertEqual(scan["status"], "pass")
+            doctor = json.loads((out / "fixture_doctor.json").read_text())
+            self.assertEqual(doctor["status"], "pass")
+            package = json.loads((out / "package_audit.json").read_text())
+            self.assertEqual(package["status"], "pass")
+            summary = json.loads((out / "release_audit_summary.json").read_text())
+            self.assertEqual(summary["status"], "review")
+            self.assertEqual(summary["checks"][0]["status"], "not-run")
 
     def test_scenario_presets_command_exports_bundle(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -97,6 +111,53 @@ class PortfolioFeeDragTests(unittest.TestCase):
             payload = json.loads((out / "cold_start_walkthrough.json").read_text())
             self.assertEqual(payload["schema"], "portfolio-fee-drag-cold-start-walkthrough-v1")
             self.assertIn("First-time GitHub user", payload["audience"])
+
+    def test_fixture_doctor_and_package_audit_pass_for_bundled_release_inputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["fixture-doctor", "--output", str(out)]), 0)
+            doctor = json.loads((out / "fixture_doctor.json").read_text())
+            self.assertEqual(doctor["schema"], "portfolio-fee-drag-fixture-doctor-v1")
+            self.assertEqual(doctor["status"], "pass")
+            self.assertEqual(doctor["issues"], [])
+
+            self.assertEqual(main(["package-audit", "--root", ".", "--output", str(out)]), 0)
+            package = json.loads((out / "package_audit.json").read_text())
+            self.assertEqual(package["schema"], "portfolio-fee-drag-package-audit-v1")
+            self.assertEqual(package["status"], "pass")
+            self.assertEqual(package["runtime_dependencies"], [])
+            self.assertEqual(set(package["commands"]), set(COMMANDS))
+
+    def test_release_audit_summary_can_pass_after_release_owner_checks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["quickstart-check", "--output", str(out)]), 0)
+            code = main(
+                [
+                    "release-audit-summary",
+                    "--output",
+                    str(out),
+                    "--tests-status",
+                    "pass",
+                    "--selfcheck",
+                    str(out / "selfcheck.json"),
+                    "--public-scan",
+                    str(out / "public_scan.json"),
+                    "--manifest",
+                    str(out / "release_manifest.json"),
+                    "--visual-receipt",
+                    str(out / "visual_receipt.json"),
+                    "--fixture-doctor",
+                    str(out / "fixture_doctor.json"),
+                    "--package-audit",
+                    str(out / "package_audit.json"),
+                ]
+            )
+            self.assertEqual(code, 0)
+            payload = json.loads((out / "release_audit_summary.json").read_text())
+            self.assertEqual(payload["schema"], "portfolio-fee-drag-release-audit-summary-v1")
+            self.assertEqual(payload["status"], "pass")
+            self.assertEqual(payload["release_owner_actions"], [])
 
     def test_module_selfcheck(self):
         result = subprocess.run(

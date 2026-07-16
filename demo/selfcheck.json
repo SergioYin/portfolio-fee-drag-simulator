@@ -1,0 +1,6 @@
+{
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "errors": [],
+  "status": "pass",
+  "version": "0.4.0"
+}

@@ -30,7 +30,14 @@ The quickstart writes deterministic demo artifacts:
 - `demo/visual_receipt.html`
 - `demo/cold_start_walkthrough.md`
 - `demo/cold_start_walkthrough.json`
+- `demo/fixture_doctor.md`
+- `demo/fixture_doctor.json`
+- `demo/package_audit.md`
+- `demo/package_audit.json`
+- `demo/selfcheck.json`
 - `demo/release_manifest.json`
+- `demo/release_audit_summary.md`
+- `demo/release_audit_summary.json`
 - `demo/maturity_report.md`
 - `demo/public_scan.json`
 
@@ -45,8 +52,11 @@ The quickstart writes deterministic demo artifacts:
 - `case-gallery`: render deterministic Markdown, JSON, and HTML gallery artifacts from scenario presets.
 - `visual-receipt`: hash and summarize dashboard and case gallery artifacts with local routes, byte counts, SHA-256 hashes, roles, regeneration commands, and safety boundaries.
 - `cold-start-walkthrough`: write a deterministic 10-minute Markdown/JSON guide for a first-time GitHub user to install, run, evaluate, and understand boundaries.
+- `fixture-doctor`: validate holdings, assumptions, and scenario preset fixtures with actionable warnings.
+- `package-audit`: inspect zero-dependency metadata, package-data readiness, script wiring, and command coverage.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
+- `release-audit-summary`: combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status into Markdown and JSON for release owners.
 - `maturity-report`: print a public-readiness checklist.
 - `selfcheck`: verify CLI wiring, bundled examples, and deterministic calculations.
 - `public-scan`: scan local files for common secret markers and required finance boundaries.
@@ -90,7 +100,7 @@ It compares annual compounding at the gross return against compounding at `gross
 
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.3 bundles three deterministic scenario presets:
+Version 0.4 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -126,6 +136,28 @@ portfolio-fee-drag cold-start-walkthrough --output demo
 
 The walkthrough emits `cold_start_walkthrough.md` and `cold_start_walkthrough.json` with a 10-minute GitHub install/run/evaluate path, expected outputs, and explicit boundaries.
 
+## Release-Owner Audit
+
+Validate bundled fixtures:
+
+```bash
+portfolio-fee-drag fixture-doctor --output demo
+```
+
+Inspect package readiness:
+
+```bash
+portfolio-fee-drag package-audit --root . --output demo
+```
+
+After running tests, selfcheck, public scan, manifest generation, and visual receipt generation, write the release-owner summary:
+
+```bash
+portfolio-fee-drag release-audit-summary --output demo --tests-status pass
+```
+
+The summary emits `release_audit_summary.md` and `release_audit_summary.json`. `quickstart-check` also emits these files, but records tests as `not-run` because quickstart does not execute the unit test suite.
+
 ## Safety Boundaries
 
 This project is for static local scenario review only. It intentionally has no live data and excludes broker APIs, order execution, predictions, portfolio optimization, tax advice, legal advice, investment advice, and buy/sell/hold recommendations.
@@ -136,9 +168,13 @@ This project is for static local scenario review only. It intentionally has no l
 python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
 python -m portfolio_fee_drag_simulator quickstart-check --output demo
+python -m portfolio_fee_drag_simulator fixture-doctor --output demo
+python -m portfolio_fee_drag_simulator package-audit --root . --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
+python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json
+python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass
 ```
 
 No GitHub Actions workflows are included.

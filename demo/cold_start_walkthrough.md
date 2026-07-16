@@ -73,6 +73,15 @@ Expected output: visual_receipt.md, visual_receipt.json, and visual_receipt.html
 - `demo/visual_receipt.html`
 - `demo/cold_start_walkthrough.md`
 - `demo/cold_start_walkthrough.json`
+- `demo/fixture_doctor.md`
+- `demo/fixture_doctor.json`
+- `demo/package_audit.md`
+- `demo/package_audit.json`
+- `demo/selfcheck.json`
+- `demo/public_scan.json`
+- `demo/release_manifest.json`
+- `demo/release_audit_summary.md`
+- `demo/release_audit_summary.json`
 
 ## Boundaries
 
