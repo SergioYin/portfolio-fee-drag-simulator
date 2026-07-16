@@ -37,6 +37,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "input_templates" / "holdings_template.csv").exists())
             self.assertTrue((out / "input_templates" / "assumptions_template.json").exists())
             self.assertTrue((out / "input_templates" / "local_inputs_README.md").exists())
+            self.assertTrue((out / "assumption_diff.md").exists())
+            self.assertTrue((out / "assumption_diff.json").exists())
+            self.assertTrue((out / "risk_flags.md").exists())
+            self.assertTrue((out / "risk_flags.json").exists())
             self.assertTrue((out / "scenario_presets.json").exists())
             self.assertTrue((out / "case_gallery.md").exists())
             self.assertTrue((out / "case_gallery.json").exists())
@@ -80,6 +84,16 @@ class PortfolioFeeDragTests(unittest.TestCase):
             template_readme = (out / "input_templates" / "local_inputs_README.md").read_text()
             self.assertIn("without live data", template_readme)
             self.assertIn("not tax, legal, investment, or buy/sell/hold advice", template_readme)
+            diff = json.loads((out / "assumption_diff.json").read_text())
+            self.assertEqual(diff["schema"], "portfolio-fee-drag-assumption-diff-v1")
+            self.assertGreater(diff["changed_fields"], 0)
+            self.assertTrue(any(item["field"] == "years" and item["direction"] == "higher" for item in diff["field_deltas"]))
+            self.assertIn("no tax, legal, investment, or buy/sell/hold advice", diff["review_note"])
+            flags = json.loads((out / "risk_flags.json").read_text())
+            self.assertEqual(flags["schema"], "portfolio-fee-drag-risk-flags-v1")
+            self.assertEqual(flags["status"], "review")
+            self.assertIn("long_horizon", {item["name"] for item in flags["flags"]})
+            self.assertIn("not recommendations", (out / "risk_flags.md").read_text())
             receipt = json.loads((out / "visual_receipt.json").read_text())
             self.assertEqual(receipt["schema"], "portfolio-fee-drag-visual-receipt-v1")
             self.assertTrue(receipt["complete"])
@@ -114,6 +128,10 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue(catalog["complete"])
             catalog_paths = [item["path"] for item in catalog["artifacts"]]
             self.assertIn("decision_journal.json", catalog_paths)
+            self.assertIn("assumption_diff.md", catalog_paths)
+            self.assertIn("assumption_diff.json", catalog_paths)
+            self.assertIn("risk_flags.md", catalog_paths)
+            self.assertIn("risk_flags.json", catalog_paths)
             self.assertIn("docs_export.md", catalog_paths)
             self.assertIn("docs_export.json", catalog_paths)
             self.assertIn("showcase.html", catalog_paths)
@@ -137,6 +155,8 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("package_audit.md", showcase)
             self.assertIn("docs_export.md", showcase)
             self.assertIn("input_templates/local_inputs_README.md", showcase)
+            self.assertIn("assumption_diff.md", showcase)
+            self.assertIn("risk_flags.md", showcase)
             self.assertIn("batch_compare.md", showcase)
             self.assertNotIn("<script", showcase.lower())
             summary = json.loads((out / "release_audit_summary.json").read_text())
@@ -207,10 +227,12 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(main(["docs-export", "--output", str(out)]), 0)
             docs = json.loads((out / "docs_export.json").read_text())
             self.assertEqual(docs["schema"], "portfolio-fee-drag-docs-export-v1")
-            self.assertEqual(docs["version"], "0.7.0")
+            self.assertEqual(docs["version"], "0.8.0")
             self.assertEqual([item["name"] for item in docs["commands"]], sorted(COMMANDS))
             self.assertEqual(docs["input_schema"]["holdings_csv"]["columns"][0]["name"], "account")
             self.assertTrue(any(item["path"] == "showcase.html" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "assumption_diff.md" for item in docs["artifact_map"]))
+            self.assertTrue(any(item["path"] == "risk_flags.md" for item in docs["artifact_map"]))
             self.assertTrue(any(item["path"] == "batch_compare.md" for item in docs["artifact_map"]))
             self.assertIn("python -m unittest discover -s tests", docs["verification_commands"])
             self.assertTrue(any("No live market data" in item for item in docs["finance_boundaries"]))
@@ -220,8 +242,44 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertIn("<title>Portfolio Fee Drag Public Showcase</title>", showcase)
             self.assertIn("dashboard.html", showcase)
             self.assertIn("docs_export.md", showcase)
+            self.assertIn("assumption_diff.md", showcase)
+            self.assertIn("risk_flags.md", showcase)
             self.assertIn("batch_compare.md", showcase)
             self.assertNotIn("<script", showcase.lower())
+
+    def test_assumption_diff_and_risk_flags_commands_export_review_prompts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["assumption-diff", "--output", str(out)]), 0)
+            diff = json.loads((out / "assumption_diff.json").read_text())
+            self.assertEqual(diff["schema"], "portfolio-fee-drag-assumption-diff-v1")
+            fields = {item["field"]: item for item in diff["field_deltas"]}
+            self.assertEqual(fields["years"]["direction"], "higher")
+            self.assertIn("Review", (out / "assumption_diff.md").read_text())
+
+            holdings = Path(tmp) / "holdings.csv"
+            holdings.write_text(
+                "account,ticker,name,allocation,expense_ratio\n"
+                "Taxable,CASH,Treasury Money Market,0.30,0.001\n"
+                "Taxable,ACTIVE,Active Fund,0.50,0.012\n"
+                "Taxable,CORE,Core Fund,0.25,0.002\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(main(["risk-flags", "--holdings", str(holdings), "--output", str(out)]), 0)
+            flags = json.loads((out / "risk_flags.json").read_text())
+            self.assertEqual(flags["schema"], "portfolio-fee-drag-risk-flags-v1")
+            names = {item["name"] for item in flags["flags"]}
+            self.assertTrue(
+                {
+                    "high_cash_allocation",
+                    "high_expense_ratio",
+                    "high_turnover_tax_drag",
+                    "allocation_mismatch",
+                    "long_horizon",
+                    "frequent_rebalancing",
+                }.issubset(names)
+            )
+            self.assertIn("not recommendations", flags["review_note"])
 
     def test_input_template_and_batch_compare_commands_export_public_safe_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -29,6 +29,8 @@ from .model import (
 
 COMMANDS = (
     "input-template",
+    "assumption-diff",
+    "risk-flags",
     "build-packet",
     "batch-compare",
     "compare-history",
@@ -54,6 +56,7 @@ COMMANDS = (
 )
 
 COMMAND_DOCS = {
+    "assumption-diff": "Compare two local assumptions JSON files and emit Markdown/JSON field deltas, observed direction, and review impact without advice.",
     "artifact-catalog": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness.",
     "batch-compare": "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions instead of recommendations.",
     "build-packet": "Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON.",
@@ -71,6 +74,7 @@ COMMAND_DOCS = {
     "release-audit-summary": "Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status.",
     "release-manifest": "Hash source and demo files for release review.",
     "review-ledger": "Validate and summarize the holdings ledger.",
+    "risk-flags": "Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations.",
     "scenario-presets": "Write or print bundled deterministic scenario preset JSON.",
     "selfcheck": "Verify CLI wiring, bundled examples, and deterministic calculations.",
     "sensitivity-matrix": "Generate a static fee/return sensitivity table from a packet JSON file.",
@@ -116,6 +120,120 @@ def load_preset_bundle(path: str | Path) -> dict[str, Any]:
     if bundle.get("schema") != "portfolio-fee-drag-scenario-presets-v1":
         raise ValueError("unsupported scenario preset schema")
     return bundle
+
+
+def load_json_object(path: str | Path) -> dict[str, Any]:
+    with Path(path).open(encoding="utf-8") as fh:
+        payload = json.load(fh)
+    if not isinstance(payload, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return payload
+
+
+def numeric_delta(before: Any, after: Any) -> float | None:
+    if isinstance(before, bool) or isinstance(after, bool):
+        return None
+    if isinstance(before, (int, float)) and isinstance(after, (int, float)):
+        return round(float(after) - float(before), 10)
+    return None
+
+
+def delta_direction(before: Any, after: Any) -> str:
+    if before is None and after is not None:
+        return "added"
+    if before is not None and after is None:
+        return "removed"
+    delta = numeric_delta(before, after)
+    if delta is None:
+        return "changed" if before != after else "unchanged"
+    if delta > 0:
+        return "higher"
+    if delta < 0:
+        return "lower"
+    return "unchanged"
+
+
+ASSUMPTION_REVIEW_IMPACTS = {
+    "initial_value": "Changes the starting value used in compounding and dollar drag arithmetic.",
+    "annual_contribution": "Changes contribution cash flows used in future-value arithmetic.",
+    "years": "Changes the compounding horizon and duration over which drag accumulates.",
+    "gross_return": "Changes the gross return baseline and cash drag spread.",
+    "cash_return": "Changes the cash drag spread against the gross return assumption.",
+    "turnover_rate": "Changes turnover/tax drag arithmetic.",
+    "realized_gain_rate": "Changes the realized-gain portion of turnover/tax drag arithmetic.",
+    "tax_rate": "Changes turnover/tax drag arithmetic.",
+    "taxable_allocation": "Changes the taxable share used in turnover/tax drag arithmetic.",
+    "rebalance_frequency": "Changes the annual rebalance event count used in rebalance drag.",
+    "rebalance_cost": "Changes cost per rebalance event used in rebalance drag.",
+    "contribution_timing": "Changes whether annual contributions compound for the current year.",
+}
+
+
+def assumption_diff_payload(before_path: Path, after_path: Path) -> dict[str, Any]:
+    before = load_json_object(before_path)
+    after = load_json_object(after_path)
+    fields = []
+    for key in sorted(set(before) | set(after)):
+        before_value = before.get(key)
+        after_value = after.get(key)
+        if before_value == after_value:
+            continue
+        fields.append(
+            {
+                "field": key,
+                "before": before_value,
+                "after": after_value,
+                "delta": numeric_delta(before_value, after_value),
+                "direction": delta_direction(before_value, after_value),
+                "review_impact": ASSUMPTION_REVIEW_IMPACTS.get(key, "Changes a local assumption field that a human reviewer may need to identify."),
+            }
+        )
+    return {
+        "schema": "portfolio-fee-drag-assumption-diff-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "before_source": display_path(before_path),
+        "after_source": display_path(after_path),
+        "changed_fields": len(fields),
+        "field_deltas": fields,
+        "review_note": "Field deltas are review prompts only; this output contains no tax, legal, investment, or buy/sell/hold advice.",
+    }
+
+
+def assumption_diff_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Assumption Diff",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        f"Before: `{payload['before_source']}`",
+        f"After: `{payload['after_source']}`",
+        f"Changed fields: {payload['changed_fields']}",
+        "",
+        "| Field | Before | After | Delta | Direction | Review Impact |",
+        "| --- | --- | --- | ---: | --- | --- |",
+    ]
+    for item in payload["field_deltas"]:
+        delta = "" if item["delta"] is None else item["delta"]
+        lines.append(
+            f"| `{item['field']}` | `{item['before']}` | `{item['after']}` | `{delta}` | {item['direction']} | {item['review_impact']} |"
+        )
+    if not payload["field_deltas"]:
+        lines.append("| No changed fields |  |  |  | unchanged | No assumption field delta observed. |")
+    lines.extend(["", payload["review_note"], ""])
+    return "\n".join(lines)
+
+
+def cmd_assumption_diff(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = assumption_diff_payload(Path(args.before), Path(args.after))
+    write_json(output / "assumption_diff.json", payload)
+    write_text(output / "assumption_diff.md", assumption_diff_markdown(payload))
+    print(f"wrote {output / 'assumption_diff.md'}")
+    print(f"wrote {output / 'assumption_diff.json'}")
+    return 0
 
 
 def packet_for_preset(preset: dict[str, Any]) -> dict[str, Any]:
@@ -328,6 +446,157 @@ def cmd_build_packet(args: argparse.Namespace) -> int:
     write_json(output / "fee_drag_packet.json", packet)
     print(f"wrote {output / 'fee_drag_packet.md'}")
     print(f"wrote {output / 'fee_drag_packet.json'}")
+    return 0
+
+
+def review_flag(name: str, metric: str, value: Any, threshold: Any, prompt: str) -> dict[str, Any]:
+    return {
+        "name": name,
+        "metric": metric,
+        "value": value,
+        "threshold": threshold,
+        "review_prompt": prompt,
+    }
+
+
+def risk_flags_payload(holdings_path: Path, assumptions_path: Path) -> dict[str, Any]:
+    holdings = load_holdings(holdings_path)
+    assumptions = load_assumptions(assumptions_path)
+    packet = compute_packet(holdings, assumptions)
+    summary = packet["summary"]
+    allocation_sum = round(sum(item.allocation for item in holdings), 8)
+    max_expense = max((item.expense_ratio for item in holdings), default=0.0)
+    flags: list[dict[str, Any]] = []
+
+    if summary["cash_allocation"] >= 0.20:
+        flags.append(
+            review_flag(
+                "high_cash_allocation",
+                "cash_allocation",
+                summary["cash_allocation"],
+                ">= 0.20",
+                "Ask a human reviewer to confirm whether cash-like holdings and cash return assumptions match the static review case.",
+            )
+        )
+    if summary["weighted_expense_ratio"] >= 0.005 or max_expense >= 0.01:
+        flags.append(
+            review_flag(
+                "high_expense_ratio",
+                "weighted_expense_ratio",
+                summary["weighted_expense_ratio"],
+                "weighted >= 0.005 or holding >= 0.01",
+                "Ask a human reviewer to confirm expense ratios and whether the ledger labels match the intended local inputs.",
+            )
+        )
+    if summary["turnover_tax_drag_rate"] >= 0.005 or assumptions.turnover_rate >= 0.50:
+        flags.append(
+            review_flag(
+                "high_turnover_tax_drag",
+                "turnover_tax_drag_rate",
+                summary["turnover_tax_drag_rate"],
+                "drag >= 0.005 or turnover_rate >= 0.50",
+                "Ask a human reviewer to confirm turnover, realized gain, tax rate, and taxable allocation assumptions before sharing.",
+            )
+        )
+    if abs(allocation_sum - 1.0) > 0.0001:
+        flags.append(
+            review_flag(
+                "allocation_mismatch",
+                "allocation_sum",
+                allocation_sum,
+                "outside 1.0 +/- 0.0001",
+                "Ask a human reviewer to reconcile the holdings allocation sum against the source ledger.",
+            )
+        )
+    if assumptions.years >= 30:
+        flags.append(
+            review_flag(
+                "long_horizon",
+                "years",
+                assumptions.years,
+                ">= 30",
+                "Ask a human reviewer to confirm that the horizon is intentional for this static scenario review.",
+            )
+        )
+    if assumptions.rebalance_frequency in {"quarterly", "monthly"}:
+        flags.append(
+            review_flag(
+                "frequent_rebalancing",
+                "rebalance_frequency",
+                assumptions.rebalance_frequency,
+                "quarterly or monthly",
+                "Ask a human reviewer to confirm rebalance frequency and cost-per-event assumptions.",
+            )
+        )
+
+    return {
+        "schema": "portfolio-fee-drag-risk-flags-v1",
+        "version": __version__,
+        "status": "review" if flags else "pass",
+        "boundary": SAFETY_BOUNDARY,
+        "holdings_source": display_path(holdings_path),
+        "assumptions_source": display_path(assumptions_path),
+        "thresholds": {
+            "high_cash_allocation": "cash_allocation >= 0.20",
+            "high_expense_ratio": "weighted_expense_ratio >= 0.005 or any holding expense_ratio >= 0.01",
+            "high_turnover_tax_drag": "turnover_tax_drag_rate >= 0.005 or turnover_rate >= 0.50",
+            "allocation_mismatch": "allocation_sum outside 1.0 +/- 0.0001",
+            "long_horizon": "years >= 30",
+            "frequent_rebalancing": "rebalance_frequency is quarterly or monthly",
+        },
+        "metrics": {
+            "allocation_sum": allocation_sum,
+            "cash_allocation": summary["cash_allocation"],
+            "weighted_expense_ratio": summary["weighted_expense_ratio"],
+            "max_holding_expense_ratio": max_expense,
+            "turnover_rate": assumptions.turnover_rate,
+            "turnover_tax_drag_rate": summary["turnover_tax_drag_rate"],
+            "years": assumptions.years,
+            "rebalance_frequency": assumptions.rebalance_frequency,
+            "rebalance_drag_rate": summary["rebalance_drag_rate"],
+        },
+        "flags": flags,
+        "review_note": "Flags are prompts for human review only and are not recommendations, suitability analysis, or tax/legal/investment advice.",
+    }
+
+
+def risk_flags_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Risk Flags",
+        "",
+        f"Version: {payload['version']}",
+        f"Status: {payload['status']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        f"Holdings: `{payload['holdings_source']}`",
+        f"Assumptions: `{payload['assumptions_source']}`",
+        "",
+        "## Metrics",
+        "",
+        "| Metric | Value |",
+        "| --- | ---: |",
+    ]
+    for key, value in payload["metrics"].items():
+        lines.append(f"| `{key}` | `{value}` |")
+    lines.extend(["", "## Review Flags", "", "| Flag | Metric | Value | Threshold | Review Prompt |", "| --- | --- | ---: | --- | --- |"])
+    for item in payload["flags"]:
+        lines.append(
+            f"| `{item['name']}` | `{item['metric']}` | `{item['value']}` | {item['threshold']} | {item['review_prompt']} |"
+        )
+    if not payload["flags"]:
+        lines.append("| No flags |  |  | configured thresholds | No configured risk flag threshold was crossed. |")
+    lines.extend(["", payload["review_note"], ""])
+    return "\n".join(lines)
+
+
+def cmd_risk_flags(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = risk_flags_payload(Path(args.holdings), Path(args.assumptions))
+    write_json(output / "risk_flags.json", payload)
+    write_text(output / "risk_flags.md", risk_flags_markdown(payload))
+    print(f"wrote {output / 'risk_flags.md'}")
+    print(f"wrote {output / 'risk_flags.json'}")
     return 0
 
 
@@ -666,6 +935,10 @@ DEMO_ARTIFACT_SPECS = (
     ("input_templates/holdings_template.csv", "file://demo/input_templates/holdings_template.csv", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "Starter holdings CSV template copied from bundled examples.", "Useful for adapting local CSV inputs without live data."),
     ("input_templates/assumptions_template.json", "file://demo/input_templates/assumptions_template.json", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "Starter assumptions JSON template with a local-only note.", "Useful for adapting local JSON assumptions without live data."),
     ("input_templates/local_inputs_README.md", "file://demo/input_templates/local_inputs_README.md", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "README fragment for adapting local CSV/JSON inputs.", "Useful for public-safe onboarding to offline inputs."),
+    ("assumption_diff.md", "file://demo/assumption_diff.md", "python -m portfolio_fee_drag_simulator assumption-diff --output demo", "Markdown comparison of bundled base and review assumptions.", "Useful for reviewing local assumption field deltas without advice."),
+    ("assumption_diff.json", "file://demo/assumption_diff.json", "python -m portfolio_fee_drag_simulator assumption-diff --output demo", "Machine-readable assumption field deltas.", "Useful for deterministic review workflow handoff without recommendations."),
+    ("risk_flags.md", "file://demo/risk_flags.md", "python -m portfolio_fee_drag_simulator risk-flags --output demo", "Markdown review prompts for configured risk flag thresholds.", "Useful for prompting human review of cash, expense, turnover/tax, allocation, horizon, and rebalancing inputs."),
+    ("risk_flags.json", "file://demo/risk_flags.json", "python -m portfolio_fee_drag_simulator risk-flags --output demo", "Machine-readable review prompts for configured risk flag thresholds.", "Useful for deterministic advanced review workflow checks."),
     ("fee_drag_packet.md", "file://demo/fee_drag_packet.md", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Human-readable packet for the bundled assumptions.", "Useful for research-note review and public demo inspection."),
     ("fee_drag_packet.json", "file://demo/fee_drag_packet.json", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Machine-readable packet for the bundled assumptions.", "Useful as the canonical deterministic packet input."),
     ("sensitivity_matrix.md", "file://demo/sensitivity_matrix.md", "python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md", "Fee and return sensitivity table.", "Useful for explaining how local assumptions change arithmetic outputs."),
@@ -869,6 +1142,8 @@ def cold_start_payload() -> dict[str, Any]:
                 "title": "Know the boundary before sharing",
                 "commands": [
                     "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+                    "python -m portfolio_fee_drag_simulator assumption-diff --output demo",
+                    "python -m portfolio_fee_drag_simulator risk-flags --output demo",
                     "python -m portfolio_fee_drag_simulator batch-compare --output demo",
                     "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
                     "python -m portfolio_fee_drag_simulator decision-journal --output demo",
@@ -876,7 +1151,7 @@ def cold_start_payload() -> dict[str, Any]:
                     "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
                     "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
                 ],
-                "expected_output": "Input templates, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
+                "expected_output": "Input templates, assumption diff, risk flags, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
@@ -885,6 +1160,10 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/input_templates/holdings_template.csv",
             "demo/input_templates/assumptions_template.json",
             "demo/input_templates/local_inputs_README.md",
+            "demo/assumption_diff.md",
+            "demo/assumption_diff.json",
+            "demo/risk_flags.md",
+            "demo/risk_flags.json",
             "demo/dashboard.html",
             "demo/case_gallery.md",
             "demo/case_gallery.json",
@@ -1126,7 +1405,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.7 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.8 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -1141,7 +1420,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     missing_fixtures = [
         name
-        for name in ("example_holdings.csv", "example_assumptions.json", "example_history.json", "scenario_presets.json")
+        for name in ("example_holdings.csv", "example_assumptions.json", "example_assumptions_review.json", "example_history.json", "scenario_presets.json")
         if not data_path(name).exists()
     ]
     for name in missing_fixtures:
@@ -1527,6 +1806,8 @@ def cmd_docs_export(args: argparse.Namespace) -> int:
 
 SHOWCASE_LINKS = (
     ("Input Templates", "input_templates/local_inputs_README.md", "Adapt local CSV and JSON inputs from offline starter files without live data."),
+    ("Assumption Diff", "assumption_diff.md", "Compare bundled base and review assumptions by field delta, direction, and review impact without advice."),
+    ("Risk Flags", "risk_flags.md", "Review configured cash, expense, turnover/tax, allocation, horizon, and rebalancing prompts without recommendations."),
     ("Dashboard", "dashboard.html", "Review the bundled packet metrics and holdings in a single standalone page."),
     ("Case Gallery", "case_gallery.html", "Compare three deterministic scenarios across expense, cash, turnover/tax, rebalance, and total drag."),
     ("Batch Compare", "batch_compare.md", "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions."),
@@ -1710,6 +1991,20 @@ def cmd_release_audit_summary(args: argparse.Namespace) -> int:
 def cmd_quickstart_check(args: argparse.Namespace) -> int:
     output = Path(args.output)
     cmd_input_template(argparse.Namespace(output=output / "input_templates"))
+    cmd_assumption_diff(
+        argparse.Namespace(
+            before=data_path("example_assumptions.json"),
+            after=data_path("example_assumptions_review.json"),
+            output=output,
+        )
+    )
+    cmd_risk_flags(
+        argparse.Namespace(
+            holdings=data_path("example_holdings.csv"),
+            assumptions=data_path("example_assumptions_review.json"),
+            output=output,
+        )
+    )
     cmd_build_packet(
         argparse.Namespace(
             holdings=data_path("example_holdings.csv"),
@@ -1833,6 +2128,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Static showcase HTML route included", "pass"),
         ("Release audit summary Markdown/JSON route included", "pass"),
         ("Input template command for offline CSV/JSON adaptation included", "pass"),
+        ("Assumption diff Markdown/JSON route included", "pass"),
+        ("Risk flags Markdown/JSON review prompt route included", "pass"),
         ("Batch compare Markdown/JSON ranking route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
@@ -1846,7 +2143,7 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
 
 def cmd_selfcheck(args: argparse.Namespace) -> int:
     errors: list[str] = []
-    for name in ("example_holdings.csv", "example_assumptions.json", "example_history.json", "scenario_presets.json"):
+    for name in ("example_holdings.csv", "example_assumptions.json", "example_assumptions_review.json", "example_history.json", "scenario_presets.json"):
         if not data_path(name).exists():
             errors.append(f"missing fixture {name}")
     packet = compute_packet(load_holdings(data_path("example_holdings.csv")), load_assumptions(data_path("example_assumptions.json")))
@@ -1865,6 +2162,12 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     template_fragment = local_input_readme_fragment()
     if "holdings_template.csv" not in template_fragment or "no live data" not in template_fragment.lower():
         errors.append("input template fragment generation failed")
+    diff = assumption_diff_payload(data_path("example_assumptions.json"), data_path("example_assumptions_review.json"))
+    if diff["schema"] != "portfolio-fee-drag-assumption-diff-v1" or diff["changed_fields"] < 1:
+        errors.append("assumption diff generation failed")
+    flags = risk_flags_payload(data_path("example_holdings.csv"), data_path("example_assumptions_review.json"))
+    if flags["schema"] != "portfolio-fee-drag-risk-flags-v1" or not flags["flags"]:
+        errors.append("risk flags generation failed")
     batch = batch_compare_payload(bundle)
     if batch["schema"] != "portfolio-fee-drag-batch-compare-v1" or set(batch["rankings"]) != {"total_annual_drag", "total_dollar_drag", "cash_drag", "turnover_tax_drag", "fee_drag"}:
         errors.append("batch compare generation failed")
@@ -1900,7 +2203,7 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     if docs["schema"] != "portfolio-fee-drag-docs-export-v1" or len(docs["commands"]) != len(COMMANDS):
         errors.append("docs export generation failed")
     showcase = static_showcase_html()
-    if "<script" in showcase.lower() or "docs_export.md" not in showcase:
+    if "<script" in showcase.lower() or "docs_export.md" not in showcase or "risk_flags.md" not in showcase:
         errors.append("static showcase generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
@@ -1967,6 +2270,18 @@ def build_parser() -> argparse.ArgumentParser:
     template = sub.add_parser("input-template", help="Write local CSV/JSON input templates and README fragment.")
     template.add_argument("--output", default="demo/input_templates")
     template.set_defaults(func=cmd_input_template)
+
+    diff = sub.add_parser("assumption-diff", help="Compare two assumptions JSON files.")
+    diff.add_argument("--before", default=data_path("example_assumptions.json"))
+    diff.add_argument("--after", default=data_path("example_assumptions_review.json"))
+    diff.add_argument("--output", default="demo")
+    diff.set_defaults(func=cmd_assumption_diff)
+
+    flags = sub.add_parser("risk-flags", help="Emit review prompts for configured risk flags.")
+    flags.add_argument("--holdings", default=data_path("example_holdings.csv"))
+    flags.add_argument("--assumptions", default=data_path("example_assumptions_review.json"))
+    flags.add_argument("--output", default="demo")
+    flags.set_defaults(func=cmd_risk_flags)
 
     batch = sub.add_parser("batch-compare", help="Rank scenario presets by drag dimensions.")
     batch.add_argument("--presets", default=data_path("scenario_presets.json"))

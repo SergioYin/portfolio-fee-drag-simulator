@@ -1,6 +1,6 @@
 # Portfolio Fee Drag Docs Export
 
-Version: 0.7.0
+Version: 0.8.0
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
@@ -9,6 +9,7 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Command | Summary |
 | --- | --- |
 | `artifact-catalog` | Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness. |
+| `assumption-diff` | Compare two local assumptions JSON files and emit Markdown/JSON field deltas, observed direction, and review impact without advice. |
 | `batch-compare` | Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions instead of recommendations. |
 | `build-packet` | Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON. |
 | `case-gallery` | Render deterministic Markdown, JSON, and HTML gallery artifacts from bundled scenario presets. |
@@ -25,6 +26,7 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | `release-audit-summary` | Combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. |
 | `release-manifest` | Hash source and demo files for release review. |
 | `review-ledger` | Validate and summarize the holdings ledger. |
+| `risk-flags` | Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations. |
 | `scenario-presets` | Write or print bundled deterministic scenario preset JSON. |
 | `selfcheck` | Verify CLI wiring, bundled examples, and deterministic calculations. |
 | `sensitivity-matrix` | Generate a static fee/return sensitivity table from a packet JSON file. |
@@ -75,6 +77,10 @@ Calculation notes:
 | `input_templates/holdings_template.csv` | `file://demo/input_templates/holdings_template.csv` | `python -m portfolio_fee_drag_simulator input-template --output demo/input_templates` | Useful for adapting local CSV inputs without live data. |
 | `input_templates/assumptions_template.json` | `file://demo/input_templates/assumptions_template.json` | `python -m portfolio_fee_drag_simulator input-template --output demo/input_templates` | Useful for adapting local JSON assumptions without live data. |
 | `input_templates/local_inputs_README.md` | `file://demo/input_templates/local_inputs_README.md` | `python -m portfolio_fee_drag_simulator input-template --output demo/input_templates` | Useful for public-safe onboarding to offline inputs. |
+| `assumption_diff.md` | `file://demo/assumption_diff.md` | `python -m portfolio_fee_drag_simulator assumption-diff --output demo` | Useful for reviewing local assumption field deltas without advice. |
+| `assumption_diff.json` | `file://demo/assumption_diff.json` | `python -m portfolio_fee_drag_simulator assumption-diff --output demo` | Useful for deterministic review workflow handoff without recommendations. |
+| `risk_flags.md` | `file://demo/risk_flags.md` | `python -m portfolio_fee_drag_simulator risk-flags --output demo` | Useful for prompting human review of cash, expense, turnover/tax, allocation, horizon, and rebalancing inputs. |
+| `risk_flags.json` | `file://demo/risk_flags.json` | `python -m portfolio_fee_drag_simulator risk-flags --output demo` | Useful for deterministic advanced review workflow checks. |
 | `fee_drag_packet.md` | `file://demo/fee_drag_packet.md` | `python -m portfolio_fee_drag_simulator build-packet --output demo` | Useful for research-note review and public demo inspection. |
 | `fee_drag_packet.json` | `file://demo/fee_drag_packet.json` | `python -m portfolio_fee_drag_simulator build-packet --output demo` | Useful as the canonical deterministic packet input. |
 | `sensitivity_matrix.md` | `file://demo/sensitivity_matrix.md` | `python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md` | Useful for explaining how local assumptions change arithmetic outputs. |

@@ -2,6 +2,7 @@
   "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
   "commands": [
     "artifact-catalog",
+    "assumption-diff",
     "batch-compare",
     "build-packet",
     "case-gallery",
@@ -18,6 +19,7 @@
     "release-audit-summary",
     "release-manifest",
     "review-ledger",
+    "risk-flags",
     "scenario-presets",
     "selfcheck",
     "sensitivity-matrix",
@@ -26,7 +28,7 @@
     "visual-receipt"
   ],
   "extra_commands": [],
-  "import_version": "0.7.0",
+  "import_version": "0.8.0",
   "installed_distribution_available": false,
   "installed_distribution_version": "source-tree-audit",
   "issues": [],
@@ -36,10 +38,10 @@
     "data/*.json"
   ],
   "project_name": "portfolio-fee-drag-simulator",
-  "project_version": "0.7.0",
+  "project_version": "0.8.0",
   "runtime_dependencies": [],
   "schema": "portfolio-fee-drag-package-audit-v1",
   "script_target": "portfolio_fee_drag_simulator.cli:main",
   "status": "pass",
-  "version": "0.7.0"
+  "version": "0.8.0"
 }

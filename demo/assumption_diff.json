@@ -1,0 +1,75 @@
+{
+  "after_source": "portfolio_fee_drag_simulator/data/example_assumptions_review.json",
+  "before_source": "portfolio_fee_drag_simulator/data/example_assumptions.json",
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "changed_fields": 8,
+  "field_deltas": [
+    {
+      "after": 0.018,
+      "before": 0.02,
+      "delta": -0.002,
+      "direction": "lower",
+      "field": "cash_return",
+      "review_impact": "Changes the cash drag spread against the gross return assumption."
+    },
+    {
+      "after": 0.45,
+      "before": 0.35,
+      "delta": 0.1,
+      "direction": "higher",
+      "field": "realized_gain_rate",
+      "review_impact": "Changes the realized-gain portion of turnover/tax drag arithmetic."
+    },
+    {
+      "after": 0.00035,
+      "before": 0.0002,
+      "delta": 0.00015,
+      "direction": "higher",
+      "field": "rebalance_cost",
+      "review_impact": "Changes cost per rebalance event used in rebalance drag."
+    },
+    {
+      "after": "monthly",
+      "before": "annual",
+      "delta": null,
+      "direction": "changed",
+      "field": "rebalance_frequency",
+      "review_impact": "Changes the annual rebalance event count used in rebalance drag."
+    },
+    {
+      "after": 0.2,
+      "before": 0.15,
+      "delta": 0.05,
+      "direction": "higher",
+      "field": "tax_rate",
+      "review_impact": "Changes turnover/tax drag arithmetic."
+    },
+    {
+      "after": 0.85,
+      "before": 0.7,
+      "delta": 0.15,
+      "direction": "higher",
+      "field": "taxable_allocation",
+      "review_impact": "Changes the taxable share used in turnover/tax drag arithmetic."
+    },
+    {
+      "after": 0.65,
+      "before": 0.12,
+      "delta": 0.53,
+      "direction": "higher",
+      "field": "turnover_rate",
+      "review_impact": "Changes turnover/tax drag arithmetic."
+    },
+    {
+      "after": 35,
+      "before": 20,
+      "delta": 15.0,
+      "direction": "higher",
+      "field": "years",
+      "review_impact": "Changes the compounding horizon and duration over which drag accumulates."
+    }
+  ],
+  "review_note": "Field deltas are review prompts only; this output contains no tax, legal, investment, or buy/sell/hold advice.",
+  "schema": "portfolio-fee-drag-assumption-diff-v1",
+  "version": "0.8.0"
+}

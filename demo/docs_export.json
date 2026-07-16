@@ -22,6 +22,34 @@
       "user_value": "Useful for public-safe onboarding to offline inputs."
     },
     {
+      "path": "assumption_diff.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator assumption-diff --output demo",
+      "role": "Markdown comparison of bundled base and review assumptions.",
+      "route": "file://demo/assumption_diff.md",
+      "user_value": "Useful for reviewing local assumption field deltas without advice."
+    },
+    {
+      "path": "assumption_diff.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator assumption-diff --output demo",
+      "role": "Machine-readable assumption field deltas.",
+      "route": "file://demo/assumption_diff.json",
+      "user_value": "Useful for deterministic review workflow handoff without recommendations."
+    },
+    {
+      "path": "risk_flags.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator risk-flags --output demo",
+      "role": "Markdown review prompts for configured risk flag thresholds.",
+      "route": "file://demo/risk_flags.md",
+      "user_value": "Useful for prompting human review of cash, expense, turnover/tax, allocation, horizon, and rebalancing inputs."
+    },
+    {
+      "path": "risk_flags.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator risk-flags --output demo",
+      "role": "Machine-readable review prompts for configured risk flag thresholds.",
+      "route": "file://demo/risk_flags.json",
+      "user_value": "Useful for deterministic advanced review workflow checks."
+    },
+    {
       "path": "fee_drag_packet.md",
       "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
       "role": "Human-readable packet for the bundled assumptions.",
@@ -253,6 +281,10 @@
       "summary": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness."
     },
     {
+      "name": "assumption-diff",
+      "summary": "Compare two local assumptions JSON files and emit Markdown/JSON field deltas, observed direction, and review impact without advice."
+    },
+    {
       "name": "batch-compare",
       "summary": "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions instead of recommendations."
     },
@@ -315,6 +347,10 @@
     {
       "name": "review-ledger",
       "summary": "Validate and summarize the holdings ledger."
+    },
+    {
+      "name": "risk-flags",
+      "summary": "Read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations."
     },
     {
       "name": "scenario-presets",
@@ -470,5 +506,5 @@
     "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "0.7.0"
+  "version": "0.8.0"
 }

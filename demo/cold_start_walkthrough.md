@@ -58,6 +58,8 @@ Expected output: Tests pass, selfcheck returns status pass, and public_scan.json
 Commands:
 
 - `python -m portfolio_fee_drag_simulator input-template --output demo/input_templates`
+- `python -m portfolio_fee_drag_simulator assumption-diff --output demo`
+- `python -m portfolio_fee_drag_simulator risk-flags --output demo`
 - `python -m portfolio_fee_drag_simulator batch-compare --output demo`
 - `python -m portfolio_fee_drag_simulator visual-receipt --output demo`
 - `python -m portfolio_fee_drag_simulator decision-journal --output demo`
@@ -65,7 +67,7 @@ Commands:
 - `python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html`
 - `python -m portfolio_fee_drag_simulator artifact-catalog --output demo`
 
-Expected output: Input templates, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.
+Expected output: Input templates, assumption diff, risk flags, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.
 
 ## Expected Artifacts
 
@@ -74,6 +76,10 @@ Expected output: Input templates, batch comparison, visual receipt, decision jou
 - `demo/input_templates/holdings_template.csv`
 - `demo/input_templates/assumptions_template.json`
 - `demo/input_templates/local_inputs_README.md`
+- `demo/assumption_diff.md`
+- `demo/assumption_diff.json`
+- `demo/risk_flags.md`
+- `demo/risk_flags.json`
 - `demo/dashboard.html`
 - `demo/case_gallery.md`
 - `demo/case_gallery.json`

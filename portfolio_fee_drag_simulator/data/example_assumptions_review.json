@@ -1,0 +1,14 @@
+{
+  "initial_value": 100000,
+  "annual_contribution": 6000,
+  "years": 35,
+  "gross_return": 0.05,
+  "cash_return": 0.018,
+  "turnover_rate": 0.65,
+  "realized_gain_rate": 0.45,
+  "tax_rate": 0.2,
+  "taxable_allocation": 0.85,
+  "rebalance_frequency": "monthly",
+  "rebalance_cost": 0.00035,
+  "contribution_timing": "beginning"
+}

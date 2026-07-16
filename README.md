@@ -13,7 +13,7 @@ pip install -e .
 portfolio-fee-drag quickstart-check --output demo
 ```
 
-First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, dashboard, case gallery, batch comparison, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
+First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, assumption diff, risk flags, dashboard, case gallery, batch comparison, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
 
 The quickstart writes deterministic demo artifacts:
 
@@ -22,6 +22,10 @@ The quickstart writes deterministic demo artifacts:
 - `demo/input_templates/holdings_template.csv`
 - `demo/input_templates/assumptions_template.json`
 - `demo/input_templates/local_inputs_README.md`
+- `demo/assumption_diff.md`
+- `demo/assumption_diff.json`
+- `demo/risk_flags.md`
+- `demo/risk_flags.json`
 - `demo/sensitivity_matrix.md`
 - `demo/history_comparison.md`
 - `demo/review_ledger.md`
@@ -58,6 +62,8 @@ The quickstart writes deterministic demo artifacts:
 ## Commands
 
 - `input-template`: write example holdings/assumptions templates and a README fragment for adapting local CSV/JSON without live data.
+- `assumption-diff`: compare two local assumptions JSON files and emit Markdown/JSON field deltas, observed direction, and review impact without advice.
+- `risk-flags`: read holdings and assumptions and emit Markdown/JSON review prompts for cash, expense, turnover/tax, allocation, horizon, and rebalancing risk flags without recommendations.
 - `build-packet`: create Markdown and JSON packet artifacts from holdings and assumptions.
 - `batch-compare`: rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag, with next-action review questions instead of recommendations.
 - `compare-history`: compare bundled or supplied historical scenario snapshots.
@@ -128,9 +134,22 @@ portfolio-fee-drag input-template --output demo/input_templates
 
 The command emits `holdings_template.csv`, `assumptions_template.json`, and `local_inputs_README.md`. Adapt them from human-reviewed local records only; do not add live data exports, broker credentials, account numbers, secrets, or personally identifying details to public demo inputs.
 
+## Advanced Review Workflow
+
+Version 0.8 adds deterministic review artifacts for comparing assumption sets and surfacing threshold prompts:
+
+```bash
+portfolio-fee-drag assumption-diff --output demo
+portfolio-fee-drag risk-flags --output demo
+```
+
+`assumption-diff` compares `example_assumptions.json` with `example_assumptions_review.json` by default and emits `assumption_diff.md` and `assumption_diff.json`. It reports changed fields, before/after values, numeric deltas when available, observed direction, and review impact. It does not provide advice.
+
+`risk-flags` emits `risk_flags.md` and `risk_flags.json`. It checks high cash allocation, high expense ratio, high turnover/tax drag, allocation mismatch, long horizon, and frequent rebalancing thresholds. Each flag is a prompt for human review, not a recommendation.
+
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.7 bundles three deterministic scenario presets:
+Version 0.8 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -197,7 +216,7 @@ portfolio-fee-drag docs-export --output demo
 portfolio-fee-drag static-showcase --output demo/showcase.html
 ```
 
-The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated dashboard, gallery, receipt, walkthrough, decision journal, audits, catalog, and docs export.
+The docs export emits `docs_export.md` and `docs_export.json` with command summaries, the holdings/assumptions input schema, artifact map, verification commands, and finance boundaries. The showcase emits `showcase.html`, a no-JS local page for public review of the generated assumption diff, risk flags, dashboard, gallery, receipt, walkthrough, decision journal, audits, catalog, and docs export.
 
 ## Release-Owner Audit
 
@@ -232,6 +251,8 @@ python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
 python -m portfolio_fee_drag_simulator quickstart-check --output demo
 python -m portfolio_fee_drag_simulator input-template --output demo/input_templates
+python -m portfolio_fee_drag_simulator assumption-diff --output demo
+python -m portfolio_fee_drag_simulator risk-flags --output demo
 python -m portfolio_fee_drag_simulator batch-compare --output demo
 python -m portfolio_fee_drag_simulator fixture-doctor --output demo
 python -m portfolio_fee_drag_simulator package-audit --root . --output demo
