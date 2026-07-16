@@ -1,0 +1,235 @@
+{
+  "schema": "portfolio-fee-drag-public-release-notes-evidence-v1",
+  "package": "portfolio-fee-drag-simulator",
+  "version": "1.0.1",
+  "review_date": "2026-07-17",
+  "python_requires": ">=3.11",
+  "runtime_dependencies": [],
+  "runtime_behavior_changed": false,
+  "p0_p1_found": false,
+  "release_status": "release-ready-with-follow-ups",
+  "source_evidence_read": [
+    "README.md",
+    "demo/release_manifest.json",
+    "demo/selfcheck.json",
+    "demo/public_scan.json",
+    "demo/release_audit_summary.json",
+    "docs/release_readiness_review.md",
+    "docs/release_readiness_review.json",
+    "docs/cold_start_user_journey_review.md",
+    "docs/cold_start_user_journey_review.json"
+  ],
+  "repository": {
+    "origin": "https://github.com/SergioYin/portfolio-fee-drag-simulator.git",
+    "head_short": "4e3500d",
+    "remote_v1_0_1_tag_target": "b5f58b7d05602990515c1cdf7d478a47a2d663f0"
+  },
+  "release_url": {
+    "derived_url": "https://github.com/SergioYin/portfolio-fee-drag-simulator/releases/tag/v1.0.1",
+    "verification_status": "confirmed_public_release",
+    "verification_attempts": [
+      {
+        "command": "git remote -v",
+        "status": "pass",
+        "evidence": "origin https://github.com/SergioYin/portfolio-fee-drag-simulator.git"
+      },
+      {
+        "command": "git tag --list 'v1.0.1'",
+        "status": "not_applicable",
+        "evidence": "local tag presence was not required; remote tag and release were verified instead"
+      },
+      {
+        "command": "git ls-remote --tags origin v1.0.1",
+        "status": "pass",
+        "evidence": "b5f58b7d05602990515c1cdf7d478a47a2d663f0 refs/tags/v1.0.1"
+      },
+      {
+        "command": "gh release view v1.0.1 --repo SergioYin/portfolio-fee-drag-simulator --json url,tagName,isDraft,isPrerelease,name,assets",
+        "status": "pass",
+        "evidence": "url https://github.com/SergioYin/portfolio-fee-drag-simulator/releases/tag/v1.0.1; tagName v1.0.1; draft false; prerelease false; wheel and sdist uploaded with matching SHA-256 digests"
+      },
+      {
+        "command": "urllib request to https://api.github.com/repos/SergioYin/portfolio-fee-drag-simulator/releases/tags/v1.0.1",
+        "status": "superseded",
+        "evidence": "gh release view and git ls-remote succeeded outside the Codex sandbox"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "kind": "wheel",
+      "name": "portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+      "path": "dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+      "bytes": 46097,
+      "sha256": "389c8ca7463610f40259e818cbb0519f70c230195a740d5a80b5b9ea341f4f9c",
+      "expected_release_asset_url": "https://github.com/SergioYin/portfolio-fee-drag-simulator/releases/download/v1.0.1/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl"
+    },
+    {
+      "kind": "sdist",
+      "name": "portfolio_fee_drag_simulator-1.0.1.tar.gz",
+      "path": "dist/portfolio_fee_drag_simulator-1.0.1.tar.gz",
+      "bytes": 50676,
+      "sha256": "13c37f2941d99b88e198e9e503246a19e55ec97d3dc480de30a745c0df01eb09",
+      "expected_release_asset_url": "https://github.com/SergioYin/portfolio-fee-drag-simulator/releases/download/v1.0.1/portfolio_fee_drag_simulator-1.0.1.tar.gz"
+    }
+  ],
+  "install_choices": [
+    {
+      "name": "github_release_wheel",
+      "recommended_for_public_users": true,
+      "commands": [
+        "python -m venv .venv",
+        ". .venv/bin/activate",
+        "python -m pip install --no-deps https://github.com/SergioYin/portfolio-fee-drag-simulator/releases/download/v1.0.1/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl"
+      ],
+      "note": "Use after the v1.0.1 release assets are attached and the URL is publicly reachable."
+    },
+    {
+      "name": "local_wheel_asset",
+      "recommended_for_public_users": true,
+      "commands": [
+        "python -m pip install --no-deps dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl"
+      ]
+    },
+    {
+      "name": "source_checkout_editable",
+      "recommended_for_public_users": false,
+      "commands": [
+        "git clone https://github.com/SergioYin/portfolio-fee-drag-simulator.git",
+        "cd portfolio-fee-drag-simulator",
+        "python -m venv .venv",
+        ". .venv/bin/activate",
+        "python -m pip install -e . --no-deps"
+      ],
+      "note": "This matches the README quickstart and works from a repository clone."
+    },
+    {
+      "name": "source_distribution",
+      "recommended_for_public_users": false,
+      "commands": [
+        "python -m pip install --no-deps dist/portfolio_fee_drag_simulator-1.0.1.tar.gz"
+      ],
+      "note": "Known P3 follow-up: smoke the sdist independently in a clean venv before publishing beyond GitHub assets."
+    }
+  ],
+  "concise_user_path": [
+    "Install with Python >=3.11, preferably from the v1.0.1 wheel.",
+    "Run portfolio-fee-drag --version.",
+    "Run portfolio-fee-drag selfcheck.",
+    "Run portfolio-fee-drag quickstart-check --output demo.",
+    "Open demo/showcase.html.",
+    "Review demo/docs_export.md, demo/security_boundary_report.md, demo/reproducibility_pack.md, and demo/promotion_checklist.md before sharing outputs.",
+    "Adapt only local CSV/JSON inputs from human-reviewed records; do not add broker credentials, account numbers, secrets, or private personal data to public examples."
+  ],
+  "safety_boundaries": {
+    "summary": "Static local scenario review only. No live market data, broker connection, order execution, prediction, portfolio optimization, tax advice, legal advice, investment advice, or buy/sell/hold recommendation.",
+    "exact_generated_boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+    "promotion_constraints": [
+      "Do not imply personalized suitability analysis.",
+      "Do not imply portfolio optimization.",
+      "Do not imply tax-aware advice.",
+      "Do not imply buy/sell/hold recommendations.",
+      "Describe rankings, estimates, and risk flags as deterministic prompts from bundled or user-supplied assumptions."
+    ]
+  },
+  "verification_commands": [
+    {
+      "name": "unit_tests",
+      "command": "python -m unittest discover -s tests",
+      "status": "pass",
+      "evidence": "Ran 15 tests; OK"
+    },
+    {
+      "name": "selfcheck",
+      "command": "python -m portfolio_fee_drag_simulator selfcheck",
+      "status": "pass",
+      "evidence": "JSON status pass, version 1.0.1, no errors"
+    },
+    {
+      "name": "quickstart_check",
+      "command": "python -m portfolio_fee_drag_simulator quickstart-check --output /tmp/pfds_v1_0_1_public_release_notes/quickstart",
+      "status": "pass",
+      "evidence": "quickstart check complete; 49 files generated"
+    },
+    {
+      "name": "public_scan",
+      "command": "python -m portfolio_fee_drag_simulator public-scan --root . --output /tmp/pfds_v1_0_1_public_release_notes/public_scan.json",
+      "status": "pass",
+      "evidence": "65 files scanned; no secret marker findings; finance boundary present"
+    },
+    {
+      "name": "asset_hashes",
+      "command": "sha256sum dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl dist/portfolio_fee_drag_simulator-1.0.1.tar.gz",
+      "status": "pass",
+      "evidence": "hashes recorded in assets"
+    }
+  ],
+  "known_follow_ups": [
+    {
+      "id": "RR-004",
+      "severity": "P2",
+      "area": "finance boundaries",
+      "action": "Preserve no-live-data, no-broker, no-advice, and no-recommendation language in release notes, screenshots, and promotion copy."
+    },
+    {
+      "id": "RR-005",
+      "severity": "P2",
+      "area": "no-network/security",
+      "action": "Run an external secret scanner such as gitleaks or trufflehog, including git history if private data may ever have been committed."
+    },
+    {
+      "id": "RR-007",
+      "severity": "P2",
+      "area": "promotion risks",
+      "action": "Attach manual wheel smoke evidence to the public release."
+    },
+    {
+      "id": "CS-001",
+      "severity": "P2",
+      "area": "wheel onboarding",
+      "action": "State clearly that wheel installation requires attached release assets or a package index, while source checkout uses pip install -e ."
+    },
+    {
+      "id": "CS-002",
+      "severity": "P2",
+      "area": "release evidence consistency",
+      "action": "Use only the final local wheel hash recorded in this note for v1.0.1 evidence."
+    },
+    {
+      "id": "RR-001",
+      "severity": "P3",
+      "area": "reproducibility",
+      "action": "Regenerate demo/release_manifest.json after the final commit if release owners want the new docs artifacts included."
+    },
+    {
+      "id": "RR-002",
+      "severity": "P3",
+      "area": "package install",
+      "action": "Smoke the sdist in a clean venv before publishing beyond GitHub assets."
+    },
+    {
+      "id": "RR-003",
+      "severity": "P3",
+      "area": "CLI discoverability",
+      "action": "Consider future docs-only grouping for first-run, analysis, and release-owner commands."
+    },
+    {
+      "id": "RR-006",
+      "severity": "P3",
+      "area": "demo artifact integrity",
+      "action": "Treat demo/release_manifest.json as broad hash inventory and demo/visual_receipt.json as selected visual evidence only."
+    },
+    {
+      "id": "CS-004",
+      "severity": "P3",
+      "area": "showcase opening evidence",
+      "action": "Add a manual browser screenshot if promotion requires rendered showcase proof."
+    },
+    {
+      "id": "CS-005",
+      "severity": "P3",
+      "area": "public scan depth",
+      "action": "Document that built-in public-scan is intentionally simple and does not replace entropy or git-history secret scanning."
+    }
+  ]
+}
