@@ -4,10 +4,15 @@
   "expected_artifacts": [
     "demo/fee_drag_packet.md",
     "demo/fee_drag_packet.json",
+    "demo/input_templates/holdings_template.csv",
+    "demo/input_templates/assumptions_template.json",
+    "demo/input_templates/local_inputs_README.md",
     "demo/dashboard.html",
     "demo/case_gallery.md",
     "demo/case_gallery.json",
     "demo/case_gallery.html",
+    "demo/batch_compare.md",
+    "demo/batch_compare.json",
     "demo/visual_receipt.md",
     "demo/visual_receipt.json",
     "demo/visual_receipt.html",
@@ -87,17 +92,19 @@
     },
     {
       "commands": [
+        "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+        "python -m portfolio_fee_drag_simulator batch-compare --output demo",
         "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
         "python -m portfolio_fee_drag_simulator decision-journal --output demo",
         "python -m portfolio_fee_drag_simulator docs-export --output demo",
         "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
         "python -m portfolio_fee_drag_simulator artifact-catalog --output demo"
       ],
-      "expected_output": "Visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
+      "expected_output": "Input templates, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
       "minute": "9-10",
       "title": "Know the boundary before sharing"
     }
   ],
   "timebox_minutes": 10,
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

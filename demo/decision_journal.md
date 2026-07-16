@@ -1,6 +1,6 @@
 # Decision Journal Prompts
 
-Version: 0.6.0
+Version: 0.7.0
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 

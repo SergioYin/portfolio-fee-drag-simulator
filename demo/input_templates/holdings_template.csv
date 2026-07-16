@@ -1,0 +1,6 @@
+account,ticker,name,allocation,expense_ratio
+Taxable,VTI,Total US Market,0.45,0.0003
+Taxable,VXUS,Total International Market,0.25,0.0007
+Retirement,BND,Total Bond Market,0.20,0.0003
+Retirement,CASH,Treasury Money Market,0.10,0.0010
+

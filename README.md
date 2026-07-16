@@ -13,12 +13,15 @@ pip install -e .
 portfolio-fee-drag quickstart-check --output demo
 ```
 
-First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking the dashboard, case gallery, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
+First screen to open after quickstart: `demo/showcase.html`. It is a no-JS static showcase linking input templates, dashboard, case gallery, batch comparison, visual receipt, cold-start walkthrough, decision journal, artifact catalog, release audit, package audit, and docs export.
 
 The quickstart writes deterministic demo artifacts:
 
 - `demo/fee_drag_packet.md`
 - `demo/fee_drag_packet.json`
+- `demo/input_templates/holdings_template.csv`
+- `demo/input_templates/assumptions_template.json`
+- `demo/input_templates/local_inputs_README.md`
 - `demo/sensitivity_matrix.md`
 - `demo/history_comparison.md`
 - `demo/review_ledger.md`
@@ -27,6 +30,8 @@ The quickstart writes deterministic demo artifacts:
 - `demo/case_gallery.md`
 - `demo/case_gallery.json`
 - `demo/case_gallery.html`
+- `demo/batch_compare.md`
+- `demo/batch_compare.json`
 - `demo/visual_receipt.md`
 - `demo/visual_receipt.json`
 - `demo/visual_receipt.html`
@@ -52,7 +57,9 @@ The quickstart writes deterministic demo artifacts:
 
 ## Commands
 
+- `input-template`: write example holdings/assumptions templates and a README fragment for adapting local CSV/JSON without live data.
 - `build-packet`: create Markdown and JSON packet artifacts from holdings and assumptions.
+- `batch-compare`: rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag, with next-action review questions instead of recommendations.
 - `compare-history`: compare bundled or supplied historical scenario snapshots.
 - `sensitivity-matrix`: generate a static fee/return sensitivity table.
 - `review-ledger`: validate and summarize a holdings ledger.
@@ -111,9 +118,19 @@ The simulator computes a weighted expense ratio plus explicit local assumptions 
 
 It compares annual compounding at the gross return against compounding at `gross_return - total_annual_drag_rate`. All fields are deterministic local scenario inputs, not recommendations or estimates from live data.
 
+## Local Input Templates
+
+Write offline starter files:
+
+```bash
+portfolio-fee-drag input-template --output demo/input_templates
+```
+
+The command emits `holdings_template.csv`, `assumptions_template.json`, and `local_inputs_README.md`. Adapt them from human-reviewed local records only; do not add live data exports, broker credentials, account numbers, secrets, or personally identifying details to public demo inputs.
+
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.6 bundles three deterministic scenario presets:
+Version 0.7 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -133,6 +150,14 @@ portfolio-fee-drag case-gallery --output demo
 
 The gallery emits `case_gallery.md`, `case_gallery.json`, and `case_gallery.html`. It uses the same static arithmetic model and safety boundary as `build-packet`.
 
+Rank the scenario presets across review dimensions:
+
+```bash
+portfolio-fee-drag batch-compare --output demo
+```
+
+The batch comparison emits `batch_compare.md` and `batch_compare.json`. It ranks cases by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag. It includes next-action review questions for human reviewers, not recommendations.
+
 Build the visual receipt after dashboard and gallery artifacts exist:
 
 ```bash
@@ -149,7 +174,7 @@ portfolio-fee-drag cold-start-walkthrough --output demo
 
 The walkthrough emits `cold_start_walkthrough.md` and `cold_start_walkthrough.json` with a 10-minute GitHub install/run/evaluate path, expected outputs, and explicit boundaries.
 
-Build the investor workflow prompts:
+Build the investor review prompts:
 
 ```bash
 portfolio-fee-drag decision-journal --output demo
@@ -206,6 +231,8 @@ This project is for static local scenario review only. It intentionally has no l
 python -m unittest discover -s tests
 python -m portfolio_fee_drag_simulator selfcheck
 python -m portfolio_fee_drag_simulator quickstart-check --output demo
+python -m portfolio_fee_drag_simulator input-template --output demo/input_templates
+python -m portfolio_fee_drag_simulator batch-compare --output demo
 python -m portfolio_fee_drag_simulator fixture-doctor --output demo
 python -m portfolio_fee_drag_simulator package-audit --root . --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo

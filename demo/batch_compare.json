@@ -1,0 +1,167 @@
+{
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "cases": [
+    {
+      "cash_drag_dollars": 278426.37,
+      "cash_drag_rate": 0.01665,
+      "description": "A staged-deployment scenario with high cash allocation and conservative turnover assumptions.",
+      "fee_drag_dollars": 11454.78,
+      "rebalance_drag_dollars": 0.0,
+      "rebalance_drag_rate": 0.0,
+      "slug": "cash-heavy-waitlist",
+      "title": "Cash-Heavy Waitlist",
+      "total_annual_drag_rate": 0.01777375,
+      "total_dollar_drag": 297218.06,
+      "turnover_tax_drag_dollars": 7336.91,
+      "turnover_tax_drag_rate": 0.00043875,
+      "warnings": [],
+      "weighted_expense_ratio": 0.000685
+    },
+    {
+      "cash_drag_dollars": 18971.85,
+      "cash_drag_rate": 0.00175,
+      "description": "A taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.",
+      "fee_drag_dollars": 88625.62,
+      "rebalance_drag_dollars": 10841.05,
+      "rebalance_drag_rate": 0.001,
+      "slug": "high-turnover-taxable-fund",
+      "title": "High-Turnover Taxable Fund",
+      "total_annual_drag_rate": 0.071675,
+      "total_dollar_drag": 777032.57,
+      "turnover_tax_drag_dollars": 658594.05,
+      "turnover_tax_drag_rate": 0.06075,
+      "warnings": [],
+      "weighted_expense_ratio": 0.008175
+    },
+    {
+      "cash_drag_dollars": 30317.45,
+      "cash_drag_rate": 0.0015,
+      "description": "A diversified low-expense ETF-style allocation with modest turnover and limited cash drag.",
+      "fee_drag_dollars": 9196.29,
+      "rebalance_drag_dollars": 2021.16,
+      "rebalance_drag_rate": 0.0001,
+      "slug": "low-cost-etf",
+      "title": "Low-Cost ETF",
+      "total_annual_drag_rate": 0.002715,
+      "total_dollar_drag": 54874.59,
+      "turnover_tax_drag_dollars": 13339.68,
+      "turnover_tax_drag_rate": 0.00066,
+      "warnings": [],
+      "weighted_expense_ratio": 0.000455
+    }
+  ],
+  "component_dollar_note": "Component dollar drag is allocated from total dollar drag in proportion to each annual drag-rate component.",
+  "next_action_review_questions": [
+    "Which input fields changed between local cases, and who verified those fields?",
+    "Do allocations sum to 1.0 and do cash-like rows match the intended local classification?",
+    "Are expense ratios, cash return, gross return, turnover, realized gain, tax rate, taxable allocation, rebalance frequency, rebalance cost, and contribution timing current for this static review?",
+    "Which cases require a human note explaining why the assumptions differ?",
+    "What next review date should a human reviewer enter after validating the local inputs?"
+  ],
+  "rankings": {
+    "cash_drag": [
+      {
+        "rank": 1,
+        "slug": "cash-heavy-waitlist",
+        "title": "Cash-Heavy Waitlist",
+        "value": 278426.37
+      },
+      {
+        "rank": 2,
+        "slug": "low-cost-etf",
+        "title": "Low-Cost ETF",
+        "value": 30317.45
+      },
+      {
+        "rank": 3,
+        "slug": "high-turnover-taxable-fund",
+        "title": "High-Turnover Taxable Fund",
+        "value": 18971.85
+      }
+    ],
+    "fee_drag": [
+      {
+        "rank": 1,
+        "slug": "high-turnover-taxable-fund",
+        "title": "High-Turnover Taxable Fund",
+        "value": 88625.62
+      },
+      {
+        "rank": 2,
+        "slug": "cash-heavy-waitlist",
+        "title": "Cash-Heavy Waitlist",
+        "value": 11454.78
+      },
+      {
+        "rank": 3,
+        "slug": "low-cost-etf",
+        "title": "Low-Cost ETF",
+        "value": 9196.29
+      }
+    ],
+    "total_annual_drag": [
+      {
+        "rank": 1,
+        "slug": "high-turnover-taxable-fund",
+        "title": "High-Turnover Taxable Fund",
+        "value": 0.071675
+      },
+      {
+        "rank": 2,
+        "slug": "cash-heavy-waitlist",
+        "title": "Cash-Heavy Waitlist",
+        "value": 0.01777375
+      },
+      {
+        "rank": 3,
+        "slug": "low-cost-etf",
+        "title": "Low-Cost ETF",
+        "value": 0.002715
+      }
+    ],
+    "total_dollar_drag": [
+      {
+        "rank": 1,
+        "slug": "high-turnover-taxable-fund",
+        "title": "High-Turnover Taxable Fund",
+        "value": 777032.57
+      },
+      {
+        "rank": 2,
+        "slug": "cash-heavy-waitlist",
+        "title": "Cash-Heavy Waitlist",
+        "value": 297218.06
+      },
+      {
+        "rank": 3,
+        "slug": "low-cost-etf",
+        "title": "Low-Cost ETF",
+        "value": 54874.59
+      }
+    ],
+    "turnover_tax_drag": [
+      {
+        "rank": 1,
+        "slug": "high-turnover-taxable-fund",
+        "title": "High-Turnover Taxable Fund",
+        "value": 658594.05
+      },
+      {
+        "rank": 2,
+        "slug": "low-cost-etf",
+        "title": "Low-Cost ETF",
+        "value": 13339.68
+      },
+      {
+        "rank": 3,
+        "slug": "cash-heavy-waitlist",
+        "title": "Cash-Heavy Waitlist",
+        "value": 7336.91
+      }
+    ]
+  },
+  "schema": "portfolio-fee-drag-batch-compare-v1",
+  "source_schema": "portfolio-fee-drag-scenario-presets-v1",
+  "source_version": "0.7.0",
+  "version": "0.7.0"
+}

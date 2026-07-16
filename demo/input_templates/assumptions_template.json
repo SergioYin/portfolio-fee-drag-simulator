@@ -1,0 +1,15 @@
+{
+  "annual_contribution": 6000,
+  "cash_return": 0.02,
+  "contribution_timing": "beginning",
+  "gross_return": 0.05,
+  "initial_value": 100000,
+  "realized_gain_rate": 0.35,
+  "rebalance_cost": 0.0002,
+  "rebalance_frequency": "annual",
+  "tax_rate": 0.15,
+  "taxable_allocation": 0.7,
+  "template_note": "Replace these static example values with human-reviewed local assumptions. No live data is fetched.",
+  "turnover_rate": 0.12,
+  "years": 20
+}

@@ -25,7 +25,7 @@
       "regenerate": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
       "role": "Machine-readable case gallery with complete packet payloads.",
       "route": "file://demo/case_gallery.json",
-      "sha256": "d19e640f373a876f129060de52cd8a3fb3d2b001ff5aaa02014f80871be1fbe9"
+      "sha256": "4915d42ab7c83a1138b55523f6d04dd5a6729d5fa158f4e4cf7848349755acf6"
     },
     {
       "bytes": 2854,
@@ -45,5 +45,5 @@
     "Hashes identify local artifact bytes; they are not an attestation that assumptions are appropriate for any person or account."
   ],
   "schema": "portfolio-fee-drag-visual-receipt-v1",
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

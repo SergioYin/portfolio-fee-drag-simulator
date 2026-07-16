@@ -1,6 +1,27 @@
 {
   "artifact_map": [
     {
+      "path": "input_templates/holdings_template.csv",
+      "producer_command": "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+      "role": "Starter holdings CSV template copied from bundled examples.",
+      "route": "file://demo/input_templates/holdings_template.csv",
+      "user_value": "Useful for adapting local CSV inputs without live data."
+    },
+    {
+      "path": "input_templates/assumptions_template.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+      "role": "Starter assumptions JSON template with a local-only note.",
+      "route": "file://demo/input_templates/assumptions_template.json",
+      "user_value": "Useful for adapting local JSON assumptions without live data."
+    },
+    {
+      "path": "input_templates/local_inputs_README.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+      "role": "README fragment for adapting local CSV/JSON inputs.",
+      "route": "file://demo/input_templates/local_inputs_README.md",
+      "user_value": "Useful for public-safe onboarding to offline inputs."
+    },
+    {
       "path": "fee_drag_packet.md",
       "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
       "role": "Human-readable packet for the bundled assumptions.",
@@ -69,6 +90,20 @@
       "role": "Standalone HTML gallery for visual review.",
       "route": "file://demo/case_gallery.html",
       "user_value": "Useful for public demo inspection without runtime services."
+    },
+    {
+      "path": "batch_compare.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator batch-compare --output demo",
+      "role": "Markdown ranking of scenario presets by drag dimensions.",
+      "route": "file://demo/batch_compare.md",
+      "user_value": "Useful for comparing cases with review questions instead of recommendations."
+    },
+    {
+      "path": "batch_compare.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator batch-compare --output demo",
+      "role": "Machine-readable ranking of scenario presets by drag dimensions.",
+      "route": "file://demo/batch_compare.json",
+      "user_value": "Useful for deterministic case sorting across local review dimensions."
     },
     {
       "path": "visual_receipt.md",
@@ -218,6 +253,10 @@
       "summary": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness."
     },
     {
+      "name": "batch-compare",
+      "summary": "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions instead of recommendations."
+    },
+    {
       "name": "build-packet",
       "summary": "Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON."
     },
@@ -244,6 +283,10 @@
     {
       "name": "fixture-doctor",
       "summary": "Validate holdings, assumptions, and scenario preset fixtures with actionable warnings."
+    },
+    {
+      "name": "input-template",
+      "summary": "Write example holdings and assumptions templates plus a README fragment for adapting local CSV/JSON without live data."
     },
     {
       "name": "maturity-report",
@@ -427,5 +470,5 @@
     "python -m portfolio_fee_drag_simulator quickstart-check --output demo",
     "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json"
   ],
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

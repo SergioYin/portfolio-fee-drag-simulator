@@ -1,6 +1,6 @@
 {
   "schema": "portfolio-fee-drag-scenario-presets-v1",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
   "scenarios": [
     {

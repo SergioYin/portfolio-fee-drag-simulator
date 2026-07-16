@@ -23,3 +23,5 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Docs export Markdown/JSON route included | pass |
 | Static showcase HTML route included | pass |
 | Release audit summary Markdown/JSON route included | pass |
+| Input template command for offline CSV/JSON adaptation included | pass |
+| Batch compare Markdown/JSON ranking route included | pass |

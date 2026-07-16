@@ -28,7 +28,9 @@ from .model import (
 
 
 COMMANDS = (
+    "input-template",
     "build-packet",
+    "batch-compare",
     "compare-history",
     "sensitivity-matrix",
     "review-ledger",
@@ -53,6 +55,7 @@ COMMANDS = (
 
 COMMAND_DOCS = {
     "artifact-catalog": "Inventory deterministic demo artifacts with routes, byte counts, SHA-256 hashes, producer commands, roles, and promotion usefulness.",
+    "batch-compare": "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions instead of recommendations.",
     "build-packet": "Create Markdown and JSON fee-drag packet artifacts from holdings CSV and assumptions JSON.",
     "case-gallery": "Render deterministic Markdown, JSON, and HTML gallery artifacts from bundled scenario presets.",
     "cold-start-walkthrough": "Write a 10-minute Markdown/JSON first-run guide with expected outputs and safety boundaries.",
@@ -60,6 +63,7 @@ COMMAND_DOCS = {
     "decision-journal": "Generate deterministic Markdown/JSON research-note prompts for human review and no-advice boundaries.",
     "docs-export": "Create deterministic Markdown and JSON public documentation for commands, schemas, artifacts, verification, and finance boundaries.",
     "fixture-doctor": "Validate holdings, assumptions, and scenario preset fixtures with actionable warnings.",
+    "input-template": "Write example holdings and assumptions templates plus a README fragment for adapting local CSV/JSON without live data.",
     "maturity-report": "Write a public-readiness checklist for the current release scope.",
     "package-audit": "Inspect zero-dependency metadata, package-data readiness, script wiring, version alignment, and command coverage.",
     "public-scan": "Scan local release files for common secret markers and required finance boundary language.",
@@ -124,6 +128,169 @@ def packet_for_preset(preset: dict[str, Any]) -> dict[str, Any]:
         "description": preset["description"],
     }
     return packet
+
+
+def local_input_readme_fragment() -> str:
+    return "\n".join(
+        [
+            "# Local Input Template Fragment",
+            "",
+            f"Boundary: {SAFETY_BOUNDARY}",
+            "",
+            "Use `holdings_template.csv` and `assumptions_template.json` as offline starter files without live data. Replace the sample labels, allocations, expense ratios, and assumptions with values a human reviewer has approved from local records.",
+            "",
+            "Adaptation checklist:",
+            "",
+            "- Keep holdings columns exactly as `account,ticker,name,allocation,expense_ratio`.",
+            "- Enter allocations as decimals and check that they sum to `1.0` before sharing outputs.",
+            "- Use `CASH` as the ticker, or include cash-like wording in the holding name, when the row should be counted in cash drag arithmetic.",
+            "- Enter expense ratios, returns, turnover, tax, rebalance cost, and taxable allocation as decimals.",
+            "- Keep `rebalance_frequency` to one of `none`, `annual`, `quarterly`, or `monthly`.",
+            "- Keep `contribution_timing` to `beginning` or `end`.",
+            "- Do not paste secrets, account numbers, live data exports, broker credentials, or personally identifying details into templates intended for public demos.",
+            "- Treat generated outputs as deterministic local scenario review, not tax, legal, investment, or buy/sell/hold advice.",
+            "",
+            "Example build command after editing local files:",
+            "",
+            "```bash",
+            "portfolio-fee-drag build-packet --holdings holdings_template.csv --assumptions assumptions_template.json --output demo/local_packet",
+            "```",
+            "",
+        ]
+    )
+
+
+def cmd_input_template(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    holdings = data_path("example_holdings.csv").read_text(encoding="utf-8")
+    assumptions_payload = json.loads(data_path("example_assumptions.json").read_text(encoding="utf-8"))
+    assumptions_payload["template_note"] = "Replace these static example values with human-reviewed local assumptions. No live data is fetched."
+    write_text(output / "holdings_template.csv", holdings)
+    write_json(output / "assumptions_template.json", assumptions_payload)
+    write_text(output / "local_inputs_README.md", local_input_readme_fragment())
+    print(f"wrote {output / 'holdings_template.csv'}")
+    print(f"wrote {output / 'assumptions_template.json'}")
+    print(f"wrote {output / 'local_inputs_README.md'}")
+    return 0
+
+
+def batch_compare_rows(bundle: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in case_rows(bundle):
+        summary = row["packet"]["summary"]
+        total_rate = summary["total_annual_drag_rate"]
+
+        def component_dollars(rate: float) -> float:
+            if total_rate <= 0:
+                return 0.0
+            return round(summary["total_drag"] * rate / total_rate, 2)
+
+        rows.append(
+            {
+                "slug": row["slug"],
+                "title": row["title"],
+                "description": row["description"],
+                "weighted_expense_ratio": summary["weighted_expense_ratio"],
+                "cash_drag_rate": summary["cash_drag_rate"],
+                "turnover_tax_drag_rate": summary["turnover_tax_drag_rate"],
+                "rebalance_drag_rate": summary["rebalance_drag_rate"],
+                "total_annual_drag_rate": summary["total_annual_drag_rate"],
+                "total_dollar_drag": summary["total_drag"],
+                "fee_drag_dollars": component_dollars(summary["weighted_expense_ratio"]),
+                "cash_drag_dollars": component_dollars(summary["cash_drag_rate"]),
+                "turnover_tax_drag_dollars": component_dollars(summary["turnover_tax_drag_rate"]),
+                "rebalance_drag_dollars": component_dollars(summary["rebalance_drag_rate"]),
+                "warnings": row["warnings"],
+            }
+        )
+    return rows
+
+
+def ranking(rows: list[dict[str, Any]], key: str) -> list[dict[str, Any]]:
+    ordered = sorted(rows, key=lambda item: (-float(item[key]), item["slug"]))
+    return [
+        {
+            "rank": index,
+            "slug": item["slug"],
+            "title": item["title"],
+            "value": item[key],
+        }
+        for index, item in enumerate(ordered, start=1)
+    ]
+
+
+def batch_compare_payload(bundle: dict[str, Any]) -> dict[str, Any]:
+    rows = batch_compare_rows(bundle)
+    return {
+        "schema": "portfolio-fee-drag-batch-compare-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "source_schema": bundle["schema"],
+        "source_version": bundle.get("version"),
+        "component_dollar_note": "Component dollar drag is allocated from total dollar drag in proportion to each annual drag-rate component.",
+        "cases": rows,
+        "rankings": {
+            "total_annual_drag": ranking(rows, "total_annual_drag_rate"),
+            "total_dollar_drag": ranking(rows, "total_dollar_drag"),
+            "cash_drag": ranking(rows, "cash_drag_dollars"),
+            "turnover_tax_drag": ranking(rows, "turnover_tax_drag_dollars"),
+            "fee_drag": ranking(rows, "fee_drag_dollars"),
+        },
+        "next_action_review_questions": [
+            "Which input fields changed between local cases, and who verified those fields?",
+            "Do allocations sum to 1.0 and do cash-like rows match the intended local classification?",
+            "Are expense ratios, cash return, gross return, turnover, realized gain, tax rate, taxable allocation, rebalance frequency, rebalance cost, and contribution timing current for this static review?",
+            "Which cases require a human note explaining why the assumptions differ?",
+            "What next review date should a human reviewer enter after validating the local inputs?",
+        ],
+    }
+
+
+def batch_compare_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Batch Scenario Comparison",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        payload["component_dollar_note"],
+        "",
+        "| Case | Total Annual Drag | Total Dollar Drag | Cash Drag | Turnover/Tax Drag | Fee Drag |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for item in sorted(payload["cases"], key=lambda row: row["slug"]):
+        lines.append(
+            f"| {item['title']} | {pct(item['total_annual_drag_rate'])} | {money(item['total_dollar_drag'])} | "
+            f"{money(item['cash_drag_dollars'])} | {money(item['turnover_tax_drag_dollars'])} | {money(item['fee_drag_dollars'])} |"
+        )
+    ranking_titles = {
+        "total_annual_drag": "Total Annual Drag",
+        "total_dollar_drag": "Total Dollar Drag",
+        "cash_drag": "Cash Drag",
+        "turnover_tax_drag": "Turnover Tax Drag",
+        "fee_drag": "Fee Drag",
+    }
+    for name, title in ranking_titles.items():
+        lines.extend(["", f"## Ranking: {title}", "", "| Rank | Case | Value |", "| ---: | --- | ---: |"])
+        for item in payload["rankings"][name]:
+            value = pct(item["value"]) if name == "total_annual_drag" else money(item["value"])
+            lines.append(f"| {item['rank']} | {item['title']} | {value} |")
+    lines.extend(["", "## Next-Action Review Questions", ""])
+    lines.extend(f"- {question}" for question in payload["next_action_review_questions"])
+    lines.extend(["", "These questions are for human review only and are not recommendations.", ""])
+    return "\n".join(lines)
+
+
+def cmd_batch_compare(args: argparse.Namespace) -> int:
+    bundle = load_preset_bundle(args.presets)
+    payload = batch_compare_payload(bundle)
+    output = Path(args.output)
+    write_json(output / "batch_compare.json", payload)
+    write_text(output / "batch_compare.md", batch_compare_markdown(payload))
+    print(f"wrote {output / 'batch_compare.md'}")
+    print(f"wrote {output / 'batch_compare.json'}")
+    return 0
 
 
 def case_rows(bundle: dict[str, Any]) -> list[dict[str, Any]]:
@@ -496,6 +663,9 @@ VISUAL_RECEIPT_ARTIFACTS = (
 
 
 DEMO_ARTIFACT_SPECS = (
+    ("input_templates/holdings_template.csv", "file://demo/input_templates/holdings_template.csv", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "Starter holdings CSV template copied from bundled examples.", "Useful for adapting local CSV inputs without live data."),
+    ("input_templates/assumptions_template.json", "file://demo/input_templates/assumptions_template.json", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "Starter assumptions JSON template with a local-only note.", "Useful for adapting local JSON assumptions without live data."),
+    ("input_templates/local_inputs_README.md", "file://demo/input_templates/local_inputs_README.md", "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates", "README fragment for adapting local CSV/JSON inputs.", "Useful for public-safe onboarding to offline inputs."),
     ("fee_drag_packet.md", "file://demo/fee_drag_packet.md", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Human-readable packet for the bundled assumptions.", "Useful for research-note review and public demo inspection."),
     ("fee_drag_packet.json", "file://demo/fee_drag_packet.json", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Machine-readable packet for the bundled assumptions.", "Useful as the canonical deterministic packet input."),
     ("sensitivity_matrix.md", "file://demo/sensitivity_matrix.md", "python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md", "Fee and return sensitivity table.", "Useful for explaining how local assumptions change arithmetic outputs."),
@@ -506,6 +676,8 @@ DEMO_ARTIFACT_SPECS = (
     ("case_gallery.md", "file://demo/case_gallery.md", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Markdown comparison gallery for bundled deterministic scenarios.", "Useful for reviewer-friendly scenario comparison."),
     ("case_gallery.json", "file://demo/case_gallery.json", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Machine-readable case gallery with complete packet payloads.", "Useful for downstream static review and prompt generation."),
     ("case_gallery.html", "file://demo/case_gallery.html", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Standalone HTML gallery for visual review.", "Useful for public demo inspection without runtime services."),
+    ("batch_compare.md", "file://demo/batch_compare.md", "python -m portfolio_fee_drag_simulator batch-compare --output demo", "Markdown ranking of scenario presets by drag dimensions.", "Useful for comparing cases with review questions instead of recommendations."),
+    ("batch_compare.json", "file://demo/batch_compare.json", "python -m portfolio_fee_drag_simulator batch-compare --output demo", "Machine-readable ranking of scenario presets by drag dimensions.", "Useful for deterministic case sorting across local review dimensions."),
     ("visual_receipt.md", "file://demo/visual_receipt.md", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Human-readable receipt for dashboard and gallery artifacts.", "Useful for promotion review of visual demo assets."),
     ("visual_receipt.json", "file://demo/visual_receipt.json", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Machine-readable receipt for dashboard and gallery artifacts.", "Useful for release-owner checks that need hashes and byte counts."),
     ("visual_receipt.html", "file://demo/visual_receipt.html", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Standalone HTML receipt for dashboard and gallery artifacts.", "Useful for local visual artifact verification."),
@@ -696,22 +868,29 @@ def cold_start_payload() -> dict[str, Any]:
                 "minute": "9-10",
                 "title": "Know the boundary before sharing",
                 "commands": [
+                    "python -m portfolio_fee_drag_simulator input-template --output demo/input_templates",
+                    "python -m portfolio_fee_drag_simulator batch-compare --output demo",
                     "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
                     "python -m portfolio_fee_drag_simulator decision-journal --output demo",
                     "python -m portfolio_fee_drag_simulator docs-export --output demo",
                     "python -m portfolio_fee_drag_simulator static-showcase --output demo/showcase.html",
                     "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
                 ],
-                "expected_output": "Visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
+                "expected_output": "Input templates, batch comparison, visual receipt, decision journal, docs export, showcase, and artifact catalog files list local routes, prompts, hashes, regeneration commands, review questions, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
             "demo/fee_drag_packet.md",
             "demo/fee_drag_packet.json",
+            "demo/input_templates/holdings_template.csv",
+            "demo/input_templates/assumptions_template.json",
+            "demo/input_templates/local_inputs_README.md",
             "demo/dashboard.html",
             "demo/case_gallery.md",
             "demo/case_gallery.json",
             "demo/case_gallery.html",
+            "demo/batch_compare.md",
+            "demo/batch_compare.json",
             "demo/visual_receipt.md",
             "demo/visual_receipt.json",
             "demo/visual_receipt.html",
@@ -947,7 +1126,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.6 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.7 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -1347,8 +1526,10 @@ def cmd_docs_export(args: argparse.Namespace) -> int:
 
 
 SHOWCASE_LINKS = (
+    ("Input Templates", "input_templates/local_inputs_README.md", "Adapt local CSV and JSON inputs from offline starter files without live data."),
     ("Dashboard", "dashboard.html", "Review the bundled packet metrics and holdings in a single standalone page."),
     ("Case Gallery", "case_gallery.html", "Compare three deterministic scenarios across expense, cash, turnover/tax, rebalance, and total drag."),
+    ("Batch Compare", "batch_compare.md", "Rank scenario presets by total annual drag, total dollar drag, cash drag, turnover tax drag, and fee drag with review questions."),
     ("Visual Receipt", "visual_receipt.html", "Check local routes, byte counts, SHA-256 hashes, producer commands, and safety boundaries for visual artifacts."),
     ("Cold-Start Walkthrough", "cold_start_walkthrough.md", "Follow a 10-minute install, run, evaluate, and boundary-review path for first-time users."),
     ("Decision Journal", "decision_journal.md", "Use deterministic prompts for human assumption review, verification notes, and no-advice language."),
@@ -1528,6 +1709,7 @@ def cmd_release_audit_summary(args: argparse.Namespace) -> int:
 
 def cmd_quickstart_check(args: argparse.Namespace) -> int:
     output = Path(args.output)
+    cmd_input_template(argparse.Namespace(output=output / "input_templates"))
     cmd_build_packet(
         argparse.Namespace(
             holdings=data_path("example_holdings.csv"),
@@ -1549,6 +1731,7 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_static_dashboard(argparse.Namespace(packet=packet, output=output / "dashboard.html"))
     cmd_scenario_presets(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output / "scenario_presets.json"))
     cmd_case_gallery(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
+    cmd_batch_compare(argparse.Namespace(presets=data_path("scenario_presets.json"), output=output))
     cmd_maturity_report(argparse.Namespace(output=output / "maturity_report.md"))
     cmd_visual_receipt(argparse.Namespace(artifact_root=output, output=output))
     cmd_cold_start_walkthrough(argparse.Namespace(output=output))
@@ -1649,6 +1832,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Docs export Markdown/JSON route included", "pass"),
         ("Static showcase HTML route included", "pass"),
         ("Release audit summary Markdown/JSON route included", "pass"),
+        ("Input template command for offline CSV/JSON adaptation included", "pass"),
+        ("Batch compare Markdown/JSON ranking route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
     lines.extend(f"| {name} | {status} |" for name, status in checks)
@@ -1677,6 +1862,12 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
         errors.append(f"unexpected scenario presets {sorted(actual_slugs)}")
     if len(case_rows(bundle)) != 3:
         errors.append("case gallery row generation failed")
+    template_fragment = local_input_readme_fragment()
+    if "holdings_template.csv" not in template_fragment or "no live data" not in template_fragment.lower():
+        errors.append("input template fragment generation failed")
+    batch = batch_compare_payload(bundle)
+    if batch["schema"] != "portfolio-fee-drag-batch-compare-v1" or set(batch["rankings"]) != {"total_annual_drag", "total_dollar_drag", "cash_drag", "turnover_tax_drag", "fee_drag"}:
+        errors.append("batch compare generation failed")
     receipt = visual_receipt_payload(Path("demo"))
     if receipt["schema"] != "portfolio-fee-drag-visual-receipt-v1":
         errors.append("visual receipt payload generation failed")
@@ -1772,6 +1963,15 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("--assumptions", default=data_path("example_assumptions.json"))
     build.add_argument("--output", default="demo")
     build.set_defaults(func=cmd_build_packet)
+
+    template = sub.add_parser("input-template", help="Write local CSV/JSON input templates and README fragment.")
+    template.add_argument("--output", default="demo/input_templates")
+    template.set_defaults(func=cmd_input_template)
+
+    batch = sub.add_parser("batch-compare", help="Rank scenario presets by drag dimensions.")
+    batch.add_argument("--presets", default=data_path("scenario_presets.json"))
+    batch.add_argument("--output", default="demo")
+    batch.set_defaults(func=cmd_batch_compare)
 
     compare = sub.add_parser("compare-history", help="Compare scenario history snapshots.")
     compare.add_argument("--history", default=data_path("example_history.json"))
