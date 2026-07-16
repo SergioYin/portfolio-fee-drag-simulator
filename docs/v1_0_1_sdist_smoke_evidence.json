@@ -1,0 +1,368 @@
+{
+  "schema": "portfolio-fee-drag-v1-0-1-sdist-smoke-evidence-v1",
+  "version": "1.0.1",
+  "date": "2026-07-17",
+  "status": "pass",
+  "runtime_behavior_changed": false,
+  "p0_p1_install_issue_found": false,
+  "scope": "P3 package-install follow-up for the v1.0.1 source distribution",
+  "environment": {
+    "repo": "/home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator",
+    "strict_smoke_root": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict",
+    "empty_command_directory": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict",
+    "venv": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv",
+    "sdist": "dist/portfolio_fee_drag_simulator-1.0.1.tar.gz",
+    "python": "Python 3.11.15",
+    "network": "restricted"
+  },
+  "environment_constraints": [
+    {
+      "name": "plain_build_isolation_network_block",
+      "command": "/tmp/pfds_v1_0_1_sdist_smoke_20260717/venv/bin/python -m pip install /home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator/dist/portfolio_fee_drag_simulator-1.0.1.tar.gz --no-deps",
+      "status": "blocked",
+      "classification": "environment constraint, not package install failure",
+      "observed_output": "Installing build dependencies failed before package build because pip attempted to fetch setuptools from the network and the sandbox could not resolve the package index."
+    }
+  ],
+  "commands": [
+    {
+      "name": "empty_directory_precheck",
+      "command": "find /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict -mindepth 1 -maxdepth 1 -print | sort",
+      "expected_output": "",
+      "observed_output": "",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "create_clean_venv",
+      "command": "cd /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict && python -m venv /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv",
+      "expected_output": "",
+      "observed_output": "",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "install_sdist_no_deps",
+      "command": "cd /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict && /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv/bin/python -m pip install --no-index --find-links /home/xjyin/.local/share/uv/python/cpython-3.11.15-linux-x86_64-gnu/lib/python3.11/ensurepip/_bundled /home/xjyin/workspace/token-lab/20260717-portfolio-fee-drag-simulator/dist/portfolio_fee_drag_simulator-1.0.1.tar.gz --no-deps",
+      "expected_output": "Successfully built portfolio-fee-drag-simulator; Successfully installed portfolio-fee-drag-simulator-1.0.1",
+      "observed_output": "Successfully built portfolio-fee-drag-simulator; Successfully installed portfolio-fee-drag-simulator-1.0.1",
+      "exit_code": 0,
+      "status": "pass",
+      "transient_built_wheel": {
+        "filename": "portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+        "sha256": "f1b3992d57581ea440adde528d51142a3f1b4d6255749aca306596a53e0a2dee",
+        "note": "pip build output from the sdist smoke; not a release artifact"
+      }
+    },
+    {
+      "name": "version",
+      "command": "cd /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict && /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv/bin/portfolio-fee-drag --version",
+      "expected_output": "portfolio-fee-drag 1.0.1",
+      "observed_output": "portfolio-fee-drag 1.0.1",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "selfcheck",
+      "command": "cd /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict && /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv/bin/portfolio-fee-drag selfcheck --output /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/selfcheck.json",
+      "expected_output": {
+        "status": "pass",
+        "version": "1.0.1",
+        "errors": []
+      },
+      "observed_output": {
+        "status": "pass",
+        "version": "1.0.1",
+        "errors": []
+      },
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "quickstart_check",
+      "command": "cd /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict && /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/venv/bin/portfolio-fee-drag quickstart-check --output /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/quickstart_demo",
+      "expected_output": {
+        "terminal_tail": "quickstart check complete",
+        "generated_file_count": 49
+      },
+      "observed_output": {
+        "terminal_tail": "quickstart check complete",
+        "generated_file_count": 49,
+        "generated_public_scan_status": "review",
+        "generated_public_scan_note": "Expected in an empty command directory because quickstart public-scan scans '.' and no README boundary text exists there."
+      },
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "empty_directory_postcheck",
+      "command": "find /tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/empty_strict -mindepth 1 -maxdepth 1 -print | sort",
+      "expected_output": "",
+      "observed_output": "",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "unit_tests",
+      "command": "python -m unittest discover -s tests",
+      "expected_output": "Ran 15 tests; OK",
+      "observed_output": "Ran 15 tests; OK",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "name": "public_scan",
+      "command": "python -m portfolio_fee_drag_simulator public-scan --root . --output /tmp/pfds_v1_0_1_sdist_smoke_repo_public_scan.json",
+      "expected_output": {
+        "status": "pass",
+        "files_scanned": 67,
+        "secret_marker_findings": [],
+        "finance_boundary_present": true
+      },
+      "observed_output": {
+        "status": "pass",
+        "files_scanned": 67,
+        "secret_marker_findings": [],
+        "finance_boundary_present": true
+      },
+      "exit_code": 0,
+      "status": "pass"
+    }
+  ],
+  "hashes": {
+    "sdist": {
+      "path": "dist/portfolio_fee_drag_simulator-1.0.1.tar.gz",
+      "sha256": "13c37f2941d99b88e198e9e503246a19e55ec97d3dc480de30a745c0df01eb09"
+    },
+    "smoke_outputs": [
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/selfcheck.json",
+        "sha256": "3117212a19cbd4309b19ad48d5ec8741b85e6c1433c6ee72ca8cdde950a8ca3e"
+      },
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/quickstart_demo/fee_drag_packet.json",
+        "sha256": "4935b05dddbbf2bfc1c89565c1aa75dc6bbb669121f5161584b2835dad6d26e4"
+      },
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/quickstart_demo/public_scan.json",
+        "sha256": "cf2e91ad7012bb46870f7d29b4423116dae00b600cee6575dad3a6cf198b8274"
+      },
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/quickstart_demo/artifact_catalog.json",
+        "sha256": "30466cdfe5bf4b1c79d4e80cb5a16208046f6a439fc52229b8aee11c2fc104f1"
+      },
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_20260717_strict/quickstart_demo/showcase.html",
+        "sha256": "cee5e46fdba10a60f392872be29ea20ca7409be494708e1d730750c00132b5b7"
+      },
+      {
+        "path": "/tmp/pfds_v1_0_1_sdist_smoke_repo_public_scan.json",
+        "sha256": "85510dc5bacc2b4bc1a04c685bb908b061c7c992e620d5f3820dba85a7b20129"
+      }
+    ],
+    "quickstart_artifact_hashes": [
+      {
+        "path": "artifact_catalog.json",
+        "sha256": "30466cdfe5bf4b1c79d4e80cb5a16208046f6a439fc52229b8aee11c2fc104f1"
+      },
+      {
+        "path": "artifact_catalog.md",
+        "sha256": "bb1fa4d010aba90eb1c8854baeaa07f20d13c18b56fcb3c641308e8753d59d90"
+      },
+      {
+        "path": "assumption_diff.json",
+        "sha256": "08be6fe731a8ea98d2d19b168a52d1da088b49e7292ba5ac61525382d673b62d"
+      },
+      {
+        "path": "assumption_diff.md",
+        "sha256": "fc61e24f30c23ab7fdf840d638f5343fb5b3b5072e393864735828db36f004d9"
+      },
+      {
+        "path": "batch_compare.json",
+        "sha256": "68816a67d87cf7863f15d61bc68a4ad628135527b0da06c4850ad32b47a54edf"
+      },
+      {
+        "path": "batch_compare.md",
+        "sha256": "71196eed21c893cce5fb15dfb01188693ae62ad9a442c76a244b4cc4a5394828"
+      },
+      {
+        "path": "case_gallery.html",
+        "sha256": "f96b447afdeabc5b2ced578226d7b9a0366e76bbef18d04658734e5ee09edced"
+      },
+      {
+        "path": "case_gallery.json",
+        "sha256": "ff54fcf9b545a968fef50f73cdb19de1192433b68fab98466198bf08d49c97e1"
+      },
+      {
+        "path": "case_gallery.md",
+        "sha256": "4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e"
+      },
+      {
+        "path": "cold_start_walkthrough.json",
+        "sha256": "2c2f9715cd99021f2a074a2a46435eee7e2190d923bf69adf7112b6072617897"
+      },
+      {
+        "path": "cold_start_walkthrough.md",
+        "sha256": "d53f09e42dbae93d16dc3314d514ef94fb81b53a44378ce062233bf14553b04f"
+      },
+      {
+        "path": "dashboard.html",
+        "sha256": "966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381"
+      },
+      {
+        "path": "decision_journal.json",
+        "sha256": "0b0304866b02f174edddf171dfe828ed7262f96f755e9205aa70e2c3088173ce"
+      },
+      {
+        "path": "decision_journal.md",
+        "sha256": "a304066dc10259b9b86bbe185c1212a78ebdf3d49664bdeea577fdd74bcfb2c1"
+      },
+      {
+        "path": "docs_export.json",
+        "sha256": "17296c1b35772458c226c0876e07cd233d2a72b4b9095c1aadcdfa9b23f9eb63"
+      },
+      {
+        "path": "docs_export.md",
+        "sha256": "c3aa75015fe4ec130567029a7c1b0b3d206bbf07a1e8c1f20636f9b2a9e2c13f"
+      },
+      {
+        "path": "fee_drag_packet.json",
+        "sha256": "4935b05dddbbf2bfc1c89565c1aa75dc6bbb669121f5161584b2835dad6d26e4"
+      },
+      {
+        "path": "fee_drag_packet.md",
+        "sha256": "05d2a314c932096978e463b097a6db13c65a06cff3126014bff60161613b1201"
+      },
+      {
+        "path": "fixture_doctor.json",
+        "sha256": "838c21b85e9be6a00325f030ee7d7cda2d73974ab7da207e205d403c54531974"
+      },
+      {
+        "path": "fixture_doctor.md",
+        "sha256": "f41f522c40d1b81e871a698d045f6725754a4a53649fc3a259fcc9f6886be26c"
+      },
+      {
+        "path": "history_comparison.md",
+        "sha256": "726e1d20c2ccd31ba109d655eada3f26dc9965fd307980e2679fb40ad75ba44a"
+      },
+      {
+        "path": "input_templates/assumptions_template.json",
+        "sha256": "5fe130062915cc79fab74d5a77b4b38197e36f9e496a113ebd70011173d921e9"
+      },
+      {
+        "path": "input_templates/holdings_template.csv",
+        "sha256": "af5da85f54750994ce49ae227e3b75502273e67373dd01d23e8762e860f55505"
+      },
+      {
+        "path": "input_templates/local_inputs_README.md",
+        "sha256": "bb9a35951da36a98e0b8964746d069e774408be34ffdb36f2460c279af51caaa"
+      },
+      {
+        "path": "maturity_report.md",
+        "sha256": "db7df4cf73b045749bca99cc50f1c9f570ea31978b264bcd0094982bce228cf5"
+      },
+      {
+        "path": "package_audit.json",
+        "sha256": "3d21317c11effd70ebd4b5145c1edc618adc40a49ccb7ed575e5d3405aaf178f"
+      },
+      {
+        "path": "package_audit.md",
+        "sha256": "ac6c387edb3a26734ede7ee6f8e344d850e1b60b07d36e2ff5c363e445a0c999"
+      },
+      {
+        "path": "promotion_checklist.json",
+        "sha256": "0a4f779f3680e9a6c0497857398d7708fc5f608ea733ef249ef212d446a64b63"
+      },
+      {
+        "path": "promotion_checklist.md",
+        "sha256": "e65c0cdbec014d14da06fbf1bb36a62e77a147b8c61338f024ecfde236b55821"
+      },
+      {
+        "path": "public_scan.json",
+        "sha256": "cf2e91ad7012bb46870f7d29b4423116dae00b600cee6575dad3a6cf198b8274"
+      },
+      {
+        "path": "release_audit_summary.json",
+        "sha256": "a9562cae16acc5ffd49694bfc642809037b00dc1f1caf0a61dc505ed541f8982"
+      },
+      {
+        "path": "release_audit_summary.md",
+        "sha256": "0854aa181c2c7796f348182960bbb12c783a45a90889ce233ee5b0bcdd340c8b"
+      },
+      {
+        "path": "release_manifest.json",
+        "sha256": "f0314c04ff5de1f873f4c5b52dd957b41c2995c3b60df8aa2f900182b620d38c"
+      },
+      {
+        "path": "reproducibility_pack.json",
+        "sha256": "15f1b32041ca18c651c564ea9b38e9981d011aa301120ce512a8c02d57f208a5"
+      },
+      {
+        "path": "reproducibility_pack.md",
+        "sha256": "e4dcb347aad3259a1be1cfdcaef801bcb3eccaa9f8322fe37fc20724d1b447fa"
+      },
+      {
+        "path": "review_ledger.md",
+        "sha256": "217f56ffb2eda84d4c268ca19133aeddcd1db051dedd15b849a5a07c26362046"
+      },
+      {
+        "path": "risk_flags.json",
+        "sha256": "54f093fa7185648f0541bd1bea62c26f5bbaeb211dd3527fdf06c487088c3f39"
+      },
+      {
+        "path": "risk_flags.md",
+        "sha256": "3b61cbf9bddeae25f9695bf566e5b0d98a9090540a479e9bad1210551675c236"
+      },
+      {
+        "path": "scenario_narrative.json",
+        "sha256": "8f66664558e0d21933afc683c32bd86178dfbd801db65ba47c0546c1be3d0815"
+      },
+      {
+        "path": "scenario_narrative.md",
+        "sha256": "0b5f4e597e4782e24bc13c961fad01520e3547cdff77749c9e4ef5af72f5ec4f"
+      },
+      {
+        "path": "scenario_presets.json",
+        "sha256": "38c38825aeb0619e8afa028417358681219b089bcd09624425eb2c3e3ba4e8ea"
+      },
+      {
+        "path": "security_boundary_report.json",
+        "sha256": "0347dc6cbbd600770056d58066740ec53338cc6ad13817eef2ea923b6915588e"
+      },
+      {
+        "path": "security_boundary_report.md",
+        "sha256": "f641598cd718bd9214b3a8389f68a57883143d364ddaaa4ef758832fc6825cde"
+      },
+      {
+        "path": "selfcheck.json",
+        "sha256": "3117212a19cbd4309b19ad48d5ec8741b85e6c1433c6ee72ca8cdde950a8ca3e"
+      },
+      {
+        "path": "sensitivity_matrix.md",
+        "sha256": "8264514679ce3d7a08b227a8a3ea62d14d98940decd11222aed19e5df2db65bf"
+      },
+      {
+        "path": "showcase.html",
+        "sha256": "cee5e46fdba10a60f392872be29ea20ca7409be494708e1d730750c00132b5b7"
+      },
+      {
+        "path": "visual_receipt.html",
+        "sha256": "bebc6a74dabac46188a1615e209fbd45804123f6e95389e90e1c982371e81c8a"
+      },
+      {
+        "path": "visual_receipt.json",
+        "sha256": "b4c6926cc3bee4f17f7e39dd9970a1c612379308c0fd52c17b5e95c65ea01909"
+      },
+      {
+        "path": "visual_receipt.md",
+        "sha256": "fc7d755bd0a0c74a77cd2357cec011ea8a23c83738ad345613f5cb1b58f84d63"
+      }
+    ]
+  },
+  "installed_quickstart_generated_files": 49,
+  "notes": [
+    "No runtime code or package metadata was changed.",
+    "Installed quickstart-check wrote public_scan.json with status review because the command was intentionally run from an empty directory with no README boundary text; this was not classified as an install issue.",
+    "The pass path used --no-index and --find-links only to satisfy the declared build backend from local ensurepip files under restricted network. The sdist itself was installed with --no-deps."
+  ]
+}
