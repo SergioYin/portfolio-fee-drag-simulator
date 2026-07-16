@@ -1,0 +1,181 @@
+{
+  "schema": "portfolio-fee-drag-release-readiness-review-v1",
+  "version": "1.0.1",
+  "review_date": "2026-07-17",
+  "reviewer_stance": "skeptical public GitHub reviewer",
+  "source_behavior_changed": false,
+  "p0_p1_found": false,
+  "overall_status": "release-ready-with-follow-ups",
+  "executive_summary": "No P0 or P1 issue was found. Remaining items are P2/P3 promotion and assurance follow-ups around release proof, sdist smoke testing, CLI onboarding clarity, broader secret scanning, and finance-boundary preservation.",
+  "verification": [
+    {
+      "name": "unit_tests",
+      "command": "python -m unittest discover -s tests",
+      "status": "pass",
+      "evidence": "15 tests passed"
+    },
+    {
+      "name": "selfcheck",
+      "command": "python -m portfolio_fee_drag_simulator selfcheck",
+      "status": "pass",
+      "evidence": "status pass"
+    },
+    {
+      "name": "public_scan",
+      "command": "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+      "status": "pass",
+      "evidence": "demo/public_scan.json"
+    },
+    {
+      "name": "wheel_build",
+      "command": "python -m pip wheel . --no-deps --no-build-isolation --wheel-dir /tmp/pfds_review_dist",
+      "status": "pass",
+      "evidence": "/tmp/pfds_review_dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+      "sha256": "bf2cf391e8b99a5ee933a6f34a1bd16f561c635f163055ccb10992eb0f53f961"
+    },
+    {
+      "name": "wheel_smoke",
+      "command": "python -m venv /tmp/pfds_review_smoke && /tmp/pfds_review_smoke/bin/python -m pip install /tmp/pfds_review_dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl --no-deps && /tmp/pfds_review_smoke/bin/portfolio-fee-drag --version && /tmp/pfds_review_smoke/bin/python -m portfolio_fee_drag_simulator selfcheck",
+      "status": "pass",
+      "evidence": "portfolio-fee-drag 1.0.1 and selfcheck status pass"
+    }
+  ],
+  "findings": [
+    {
+      "id": "RR-001",
+      "title": "Reproducibility path is strong, but release proof is still local and transcript-based",
+      "severity": "P3",
+      "category": "reproducibility",
+      "status": "follow-up",
+      "evidence_paths": [
+        "demo/reproducibility_pack.json",
+        "README.md",
+        "demo/release_manifest.json"
+      ],
+      "risk": "Public reviewers can reproduce locally, but the tag should include a fresh human-readable transcript rather than relying only on generated JSON.",
+      "follow_up_items": [
+        "Regenerate demo/release_manifest.json after the final commit.",
+        "Attach a release transcript showing tests, selfcheck, quickstart, public scan, wheel build, and wheel smoke.",
+        "Keep the Python >=3.11 requirement visible in release notes."
+      ]
+    },
+    {
+      "id": "RR-002",
+      "title": "Package install looks good for wheel, but sdist was not independently smoked",
+      "severity": "P3",
+      "category": "package install",
+      "status": "follow-up",
+      "evidence_paths": [
+        "pyproject.toml",
+        "/tmp/pfds_review_dist/portfolio_fee_drag_simulator-1.0.1-py3-none-any.whl",
+        "/tmp/pfds_review_smoke"
+      ],
+      "risk": "Wheel installation passed, but source distributions exercise a different archive path.",
+      "follow_up_items": [
+        "Build and install an sdist in a clean venv before publishing.",
+        "Smoke both wheel and sdist with --no-deps."
+      ]
+    },
+    {
+      "id": "RR-003",
+      "title": "CLI discoverability is complete but dense",
+      "severity": "P3",
+      "category": "CLI discoverability",
+      "status": "follow-up",
+      "evidence_paths": [
+        "portfolio_fee_drag_simulator/cli.py",
+        "tests/test_cli.py",
+        "README.md",
+        "demo/showcase.html"
+      ],
+      "risk": "The CLI exposes 29 commands, which can make the public first-run path harder to see.",
+      "follow_up_items": [
+        "Lead release notes with install, quickstart-check, demo/showcase.html, tests, selfcheck, and public-scan.",
+        "Consider future docs-only grouping into first-run, analysis, and release-owner command sections."
+      ]
+    },
+    {
+      "id": "RR-004",
+      "title": "Finance boundaries are prominent, but promotion copy must not overstate the output",
+      "severity": "P2",
+      "category": "finance boundaries",
+      "status": "follow-up",
+      "evidence_paths": [
+        "README.md",
+        "portfolio_fee_drag_simulator/model.py",
+        "demo/risk_flags.json",
+        "demo/scenario_narrative.json",
+        "demo/promotion_checklist.json"
+      ],
+      "risk": "Dollar estimates, rankings, and risk-flag labels could look like personalized investment analysis if copied without the boundary.",
+      "follow_up_items": [
+        "Include no-live-data, no-broker, no-advice, and no-recommendation language in release notes and screenshots.",
+        "Avoid promotion phrases implying optimization, recommendations, or tax-aware advice.",
+        "Keep scenario wording tied to deterministic bundled or user-supplied assumptions."
+      ]
+    },
+    {
+      "id": "RR-005",
+      "title": "No-network/security posture passes current checks, but scanner depth is limited",
+      "severity": "P2",
+      "category": "no-network/security",
+      "status": "follow-up",
+      "evidence_paths": [
+        "demo/security_boundary_report.json",
+        "demo/public_scan.json",
+        "portfolio_fee_drag_simulator/cli.py"
+      ],
+      "risk": "Built-in scanning is intentionally simple and does not replace entropy or git-history secret scanning.",
+      "follow_up_items": [
+        "Run gitleaks or trufflehog before tagging.",
+        "Include git history scanning if private data may ever have been committed.",
+        "Consider future AST-based import scanning for security-boundary-report."
+      ]
+    },
+    {
+      "id": "RR-006",
+      "title": "Demo artifact integrity is good, with two scope limits to document",
+      "severity": "P3",
+      "category": "demo artifact integrity",
+      "status": "follow-up",
+      "evidence_paths": [
+        "demo/artifact_catalog.json",
+        "demo/visual_receipt.json",
+        "demo/release_manifest.json",
+        "demo/showcase.html"
+      ],
+      "risk": "The catalog and visual receipt are useful review artifacts, but they are not a cryptographic release attestation.",
+      "follow_up_items": [
+        "Use demo/release_manifest.json as the broad release hash inventory.",
+        "Use demo/visual_receipt.json as selected visual evidence only.",
+        "Regenerate quickstart artifacts after any docs or demo changes, then rerun public scan."
+      ]
+    },
+    {
+      "id": "RR-007",
+      "title": "Promotion readiness is pass-with-manual-proof",
+      "severity": "P2",
+      "category": "promotion risks",
+      "status": "follow-up",
+      "evidence_paths": [
+        "demo/promotion_checklist.json",
+        "/tmp/pfds_review_smoke"
+      ],
+      "risk": "Generated checklist output still depends on human release-owner judgment for manual wheel install proof.",
+      "follow_up_items": [
+        "Attach wheel smoke output or summarize it in release notes.",
+        "Do not set release-audit-summary tests-status pass unless tests were run after the final commit.",
+        "Keep source behavior unchanged for v1.0.1 unless a true P0/P1 appears."
+      ]
+    }
+  ],
+  "release_owner_follow_up_checklist": [
+    "Regenerate demo artifacts with python -m portfolio_fee_drag_simulator quickstart-check --output demo.",
+    "Rerun python -m unittest discover -s tests.",
+    "Rerun python -m portfolio_fee_drag_simulator selfcheck.",
+    "Rerun python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json.",
+    "Build wheel and sdist, then smoke both in clean venvs.",
+    "Run an external secret scanner before tagging.",
+    "Include no-advice/no-live-data boundaries in release notes and screenshots."
+  ]
+}
