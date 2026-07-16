@@ -1,0 +1,279 @@
+{
+  "artifacts": [
+    {
+      "bytes": 1242,
+      "exists": true,
+      "path": "fee_drag_packet.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
+      "promotion_usefulness": "Useful for research-note review and public demo inspection.",
+      "role": "Human-readable packet for the bundled assumptions.",
+      "route": "file://demo/fee_drag_packet.md",
+      "sha256": "05d2a314c932096978e463b097a6db13c65a06cff3126014bff60161613b1201"
+    },
+    {
+      "bytes": 1848,
+      "exists": true,
+      "path": "fee_drag_packet.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator build-packet --output demo",
+      "promotion_usefulness": "Useful as the canonical deterministic packet input.",
+      "role": "Machine-readable packet for the bundled assumptions.",
+      "route": "file://demo/fee_drag_packet.json",
+      "sha256": "4935b05dddbbf2bfc1c89565c1aa75dc6bbb669121f5161584b2835dad6d26e4"
+    },
+    {
+      "bytes": 944,
+      "exists": true,
+      "path": "sensitivity_matrix.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md",
+      "promotion_usefulness": "Useful for explaining how local assumptions change arithmetic outputs.",
+      "role": "Fee and return sensitivity table.",
+      "route": "file://demo/sensitivity_matrix.md",
+      "sha256": "8264514679ce3d7a08b227a8a3ea62d14d98940decd11222aed19e5df2db65bf"
+    },
+    {
+      "bytes": 511,
+      "exists": true,
+      "path": "history_comparison.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator compare-history --output demo/history_comparison.md",
+      "promotion_usefulness": "Useful for showing deterministic before/after-style review.",
+      "role": "Static comparison of bundled historical scenario snapshots.",
+      "route": "file://demo/history_comparison.md",
+      "sha256": "726e1d20c2ccd31ba109d655eada3f26dc9965fd307980e2679fb40ad75ba44a"
+    },
+    {
+      "bytes": 344,
+      "exists": true,
+      "path": "review_ledger.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator review-ledger --output demo/review_ledger.md",
+      "promotion_usefulness": "Useful for fixture QA before sharing packet outputs.",
+      "role": "Holdings ledger review summary.",
+      "route": "file://demo/review_ledger.md",
+      "sha256": "217f56ffb2eda84d4c268ca19133aeddcd1db051dedd15b849a5a07c26362046"
+    },
+    {
+      "bytes": 2808,
+      "exists": true,
+      "path": "dashboard.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html",
+      "promotion_usefulness": "Useful for local visual review without a web service.",
+      "role": "Standalone dashboard receipt for the bundled packet.",
+      "route": "file://demo/dashboard.html",
+      "sha256": "966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381"
+    },
+    {
+      "bytes": 4612,
+      "exists": true,
+      "path": "scenario_presets.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator scenario-presets --output demo/scenario_presets.json",
+      "promotion_usefulness": "Useful for verifying scenario coverage and reproducibility.",
+      "role": "Bundled deterministic scenario preset export.",
+      "route": "file://demo/scenario_presets.json",
+      "sha256": "7b73a4163dc14fc72e3b4e25ff212186619a6c6c69aed7a6c73cbe0af90a55e7"
+    },
+    {
+      "bytes": 2693,
+      "exists": true,
+      "path": "case_gallery.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "promotion_usefulness": "Useful for reviewer-friendly scenario comparison.",
+      "role": "Markdown comparison gallery for bundled deterministic scenarios.",
+      "route": "file://demo/case_gallery.md",
+      "sha256": "4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e"
+    },
+    {
+      "bytes": 9655,
+      "exists": true,
+      "path": "case_gallery.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "promotion_usefulness": "Useful for downstream static review and prompt generation.",
+      "role": "Machine-readable case gallery with complete packet payloads.",
+      "route": "file://demo/case_gallery.json",
+      "sha256": "66b8ec799ce4015637f461bda3b73f67054ff3941bbd2ae79ffab2bd61c30dfd"
+    },
+    {
+      "bytes": 2854,
+      "exists": true,
+      "path": "case_gallery.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator case-gallery --output demo",
+      "promotion_usefulness": "Useful for public demo inspection without runtime services.",
+      "role": "Standalone HTML gallery for visual review.",
+      "route": "file://demo/case_gallery.html",
+      "sha256": "f96b447afdeabc5b2ced578226d7b9a0366e76bbef18d04658734e5ee09edced"
+    },
+    {
+      "bytes": 1779,
+      "exists": true,
+      "path": "visual_receipt.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "promotion_usefulness": "Useful for promotion review of visual demo assets.",
+      "role": "Human-readable receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.md",
+      "sha256": "c63306118c60007799362f7eff22a8e66a65431b50aabd14e3f7560452dc43cc"
+    },
+    {
+      "bytes": 2261,
+      "exists": true,
+      "path": "visual_receipt.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "promotion_usefulness": "Useful for release-owner checks that need hashes and byte counts.",
+      "role": "Machine-readable receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.json",
+      "sha256": "fa16acdd3275c567817ba31d81bc77eba42eaa123a54b0928063a9339461e935"
+    },
+    {
+      "bytes": 2830,
+      "exists": true,
+      "path": "visual_receipt.html",
+      "producer_command": "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+      "promotion_usefulness": "Useful for local visual artifact verification.",
+      "role": "Standalone HTML receipt for dashboard and gallery artifacts.",
+      "route": "file://demo/visual_receipt.html",
+      "sha256": "38abfef9382387a3fd1cbe37429ca91aca917f16ebdb5f77cc5f8cb3f0ae634f"
+    },
+    {
+      "bytes": 2947,
+      "exists": true,
+      "path": "cold_start_walkthrough.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
+      "promotion_usefulness": "Useful for onboarding and public README validation.",
+      "role": "First-run walkthrough in Markdown.",
+      "route": "file://demo/cold_start_walkthrough.md",
+      "sha256": "cafc7b1db57c51b9a2b2c4ab4446ddaee61abec12a2697a75571e77a4e25186c"
+    },
+    {
+      "bytes": 3672,
+      "exists": true,
+      "path": "cold_start_walkthrough.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo",
+      "promotion_usefulness": "Useful for deterministic checklist review.",
+      "role": "First-run walkthrough in JSON.",
+      "route": "file://demo/cold_start_walkthrough.json",
+      "sha256": "eb6e094824a7c08cb9ec259d8df769703118ef1466d038c82e49be0015f409a0"
+    },
+    {
+      "bytes": 627,
+      "exists": true,
+      "path": "fixture_doctor.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator fixture-doctor --output demo",
+      "promotion_usefulness": "Useful for release readiness review.",
+      "role": "Human-readable fixture validation report.",
+      "route": "file://demo/fixture_doctor.md",
+      "sha256": "5eace055e65f0e4fbb317ad062879a8b60789930f19f5ecb31c0922b1052887f"
+    },
+    {
+      "bytes": 975,
+      "exists": true,
+      "path": "fixture_doctor.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator fixture-doctor --output demo",
+      "promotion_usefulness": "Useful for automated release-owner status checks.",
+      "role": "Machine-readable fixture validation report.",
+      "route": "file://demo/fixture_doctor.json",
+      "sha256": "aacf62a7785b01bf42975f44d9059bedc93c5f7aec8b698da292ee63cf7e8be8"
+    },
+    {
+      "bytes": 569,
+      "exists": true,
+      "path": "package_audit.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator package-audit --root . --output demo",
+      "promotion_usefulness": "Useful for confirming zero-dependency and command coverage claims.",
+      "role": "Human-readable package audit report.",
+      "route": "file://demo/package_audit.md",
+      "sha256": "42b45354a3548c6dc962c100e1e3ea9d0a8dda97dfbd4971865093fa913d91e6"
+    },
+    {
+      "bytes": 1163,
+      "exists": true,
+      "path": "package_audit.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator package-audit --root . --output demo",
+      "promotion_usefulness": "Useful for release-owner status checks.",
+      "role": "Machine-readable package audit report.",
+      "route": "file://demo/package_audit.json",
+      "sha256": "b6f78efdfe10c307491990e617e6c596c2b4c9119676a49c578b99be19c667a2"
+    },
+    {
+      "bytes": 243,
+      "exists": true,
+      "path": "selfcheck.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator selfcheck --output demo/selfcheck.json",
+      "promotion_usefulness": "Useful as a quick health signal before promotion.",
+      "role": "Machine-readable CLI and deterministic calculation selfcheck.",
+      "route": "file://demo/selfcheck.json",
+      "sha256": "4bc0b5ac3f5c2ebc45a97b1a43e860efa4fbe74fee344072df5ad6fac4daa431"
+    },
+    {
+      "bytes": 163,
+      "exists": true,
+      "path": "public_scan.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json",
+      "promotion_usefulness": "Useful for checking public-safe language and obvious secret markers.",
+      "role": "Public-readiness scan output.",
+      "route": "file://demo/public_scan.json",
+      "sha256": "c60500ab4d88dd09c6efc6f2fc8e3d831df5181b0ddfc545ae1542a1314c5bd6"
+    },
+    {
+      "bytes": 6556,
+      "exists": true,
+      "path": "release_manifest.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json",
+      "promotion_usefulness": "Useful for release review and reproducibility checks.",
+      "role": "Source and artifact hash manifest.",
+      "route": "file://demo/release_manifest.json",
+      "sha256": "db07393fe3bae5d2d96b34735d4519a56bf6bebfadf436b6f6c9b6bb58c6b600"
+    },
+    {
+      "bytes": 1124,
+      "exists": true,
+      "path": "release_audit_summary.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass",
+      "promotion_usefulness": "Useful for promotion decisions after owner-run tests.",
+      "role": "Human-readable release-owner audit summary.",
+      "route": "file://demo/release_audit_summary.md",
+      "sha256": "63489db596bfbf4ad651f373a95ca0eccfa3784797674bbacf1cf0ca6e552274"
+    },
+    {
+      "bytes": 1664,
+      "exists": true,
+      "path": "release_audit_summary.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass",
+      "promotion_usefulness": "Useful for deterministic release status review.",
+      "role": "Machine-readable release-owner audit summary.",
+      "route": "file://demo/release_audit_summary.json",
+      "sha256": "5f34d38ba42eb54126a7fc465710c68ac4becdc202c522a2c9a97678a9aef4ad"
+    },
+    {
+      "bytes": 1124,
+      "exists": true,
+      "path": "maturity_report.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator maturity-report --output demo/maturity_report.md",
+      "promotion_usefulness": "Useful for explaining maturity scope and remaining boundaries.",
+      "role": "Public-readiness checklist.",
+      "route": "file://demo/maturity_report.md",
+      "sha256": "6874575616d1c3e97cf7a4b78ad14944882aee3eed190c6a2b966f7b65e66865"
+    },
+    {
+      "bytes": 3212,
+      "exists": true,
+      "path": "decision_journal.md",
+      "producer_command": "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+      "promotion_usefulness": "Useful for human review of assumptions, verification needs, and boundaries.",
+      "role": "Research-note prompt journal in Markdown.",
+      "route": "file://demo/decision_journal.md",
+      "sha256": "96cfe09f1fe827ba244134edd7bb25e5cc3ba7f921e07cab24ae53c2b2829869"
+    },
+    {
+      "bytes": 3849,
+      "exists": true,
+      "path": "decision_journal.json",
+      "producer_command": "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+      "promotion_usefulness": "Useful for deterministic prompt handoff without live data.",
+      "role": "Research-note prompt journal in JSON.",
+      "route": "file://demo/decision_journal.json",
+      "sha256": "781961318b7ff4cc02ad1a1562a8f5f2655f683cf7e0a4874a35121a97505814"
+    }
+  ],
+  "boundary": "Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.",
+  "catalog_scope": "Inventories deterministic demo artifacts produced before artifact-catalog is run; the catalog does not hash itself.",
+  "complete": true,
+  "schema": "portfolio-fee-drag-artifact-catalog-v1",
+  "version": "0.5.0"
+}

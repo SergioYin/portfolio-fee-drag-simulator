@@ -17,11 +17,15 @@
     "demo/fixture_doctor.json",
     "demo/package_audit.md",
     "demo/package_audit.json",
+    "demo/decision_journal.md",
+    "demo/decision_journal.json",
     "demo/selfcheck.json",
     "demo/public_scan.json",
     "demo/release_manifest.json",
     "demo/release_audit_summary.md",
-    "demo/release_audit_summary.json"
+    "demo/release_audit_summary.json",
+    "demo/artifact_catalog.md",
+    "demo/artifact_catalog.json"
   ],
   "safety_boundaries": [
     "Use only local CSV/JSON assumptions or bundled examples.",
@@ -79,13 +83,15 @@
     },
     {
       "commands": [
-        "python -m portfolio_fee_drag_simulator visual-receipt --output demo"
+        "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+        "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+        "python -m portfolio_fee_drag_simulator artifact-catalog --output demo"
       ],
-      "expected_output": "visual_receipt.md, visual_receipt.json, and visual_receipt.html list local routes, bytes, hashes, regeneration commands, and safety boundaries.",
+      "expected_output": "Visual receipt, decision journal, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
       "minute": "9-10",
       "title": "Know the boundary before sharing"
     }
   ],
   "timebox_minutes": 10,
-  "version": "0.4.0"
+  "version": "0.5.0"
 }

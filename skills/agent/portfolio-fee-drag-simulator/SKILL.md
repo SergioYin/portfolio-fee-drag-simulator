@@ -21,6 +21,8 @@ python -m portfolio_fee_drag_simulator scenario-presets --output demo/scenario_p
 python -m portfolio_fee_drag_simulator case-gallery --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
+python -m portfolio_fee_drag_simulator decision-journal --output demo
+python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 ```
 
 ## Implementation Notes
@@ -33,5 +35,7 @@ python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
 - Cold-start walkthrough outputs should include Markdown and JSON, fit a 10-minute first-time GitHub user path, and include expected outputs plus boundaries.
 - Fixture doctor outputs should include Markdown and JSON with actionable warnings for holdings, assumptions, and scenario preset fixtures.
 - Package audit outputs should include Markdown and JSON covering zero runtime dependencies, package-data declarations, script wiring, import/project versions, and command coverage.
+- Decision journal outputs should include deterministic Markdown and JSON prompts for assumptions changed, human verification needs, no-advice boundary, and a blank next review date field.
+- Artifact catalog outputs should include deterministic Markdown and JSON inventory rows with route, bytes, SHA-256, producer command, role, and promotion usefulness.
 - Release audit summary outputs should include Markdown and JSON combining tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status. Do not mark tests as pass unless the test command actually ran.
 - Do not add GitHub Actions workflows.

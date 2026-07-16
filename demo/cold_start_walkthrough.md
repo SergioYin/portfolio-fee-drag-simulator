@@ -57,8 +57,10 @@ Expected output: Tests pass, selfcheck returns status pass, and public_scan.json
 Commands:
 
 - `python -m portfolio_fee_drag_simulator visual-receipt --output demo`
+- `python -m portfolio_fee_drag_simulator decision-journal --output demo`
+- `python -m portfolio_fee_drag_simulator artifact-catalog --output demo`
 
-Expected output: visual_receipt.md, visual_receipt.json, and visual_receipt.html list local routes, bytes, hashes, regeneration commands, and safety boundaries.
+Expected output: Visual receipt, decision journal, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.
 
 ## Expected Artifacts
 
@@ -77,11 +79,15 @@ Expected output: visual_receipt.md, visual_receipt.json, and visual_receipt.html
 - `demo/fixture_doctor.json`
 - `demo/package_audit.md`
 - `demo/package_audit.json`
+- `demo/decision_journal.md`
+- `demo/decision_journal.json`
 - `demo/selfcheck.json`
 - `demo/public_scan.json`
 - `demo/release_manifest.json`
 - `demo/release_audit_summary.md`
 - `demo/release_audit_summary.json`
+- `demo/artifact_catalog.md`
+- `demo/artifact_catalog.json`
 
 ## Boundaries
 

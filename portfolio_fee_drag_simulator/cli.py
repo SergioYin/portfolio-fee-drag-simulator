@@ -39,6 +39,8 @@ COMMANDS = (
     "cold-start-walkthrough",
     "fixture-doctor",
     "package-audit",
+    "decision-journal",
+    "artifact-catalog",
     "quickstart-check",
     "release-manifest",
     "release-audit-summary",
@@ -454,6 +456,37 @@ VISUAL_RECEIPT_ARTIFACTS = (
 )
 
 
+DEMO_ARTIFACT_SPECS = (
+    ("fee_drag_packet.md", "file://demo/fee_drag_packet.md", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Human-readable packet for the bundled assumptions.", "Useful for research-note review and public demo inspection."),
+    ("fee_drag_packet.json", "file://demo/fee_drag_packet.json", "python -m portfolio_fee_drag_simulator build-packet --output demo", "Machine-readable packet for the bundled assumptions.", "Useful as the canonical deterministic packet input."),
+    ("sensitivity_matrix.md", "file://demo/sensitivity_matrix.md", "python -m portfolio_fee_drag_simulator sensitivity-matrix --packet demo/fee_drag_packet.json --output demo/sensitivity_matrix.md", "Fee and return sensitivity table.", "Useful for explaining how local assumptions change arithmetic outputs."),
+    ("history_comparison.md", "file://demo/history_comparison.md", "python -m portfolio_fee_drag_simulator compare-history --output demo/history_comparison.md", "Static comparison of bundled historical scenario snapshots.", "Useful for showing deterministic before/after-style review."),
+    ("review_ledger.md", "file://demo/review_ledger.md", "python -m portfolio_fee_drag_simulator review-ledger --output demo/review_ledger.md", "Holdings ledger review summary.", "Useful for fixture QA before sharing packet outputs."),
+    ("dashboard.html", "file://demo/dashboard.html", "python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html", "Standalone dashboard receipt for the bundled packet.", "Useful for local visual review without a web service."),
+    ("scenario_presets.json", "file://demo/scenario_presets.json", "python -m portfolio_fee_drag_simulator scenario-presets --output demo/scenario_presets.json", "Bundled deterministic scenario preset export.", "Useful for verifying scenario coverage and reproducibility."),
+    ("case_gallery.md", "file://demo/case_gallery.md", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Markdown comparison gallery for bundled deterministic scenarios.", "Useful for reviewer-friendly scenario comparison."),
+    ("case_gallery.json", "file://demo/case_gallery.json", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Machine-readable case gallery with complete packet payloads.", "Useful for downstream static review and prompt generation."),
+    ("case_gallery.html", "file://demo/case_gallery.html", "python -m portfolio_fee_drag_simulator case-gallery --output demo", "Standalone HTML gallery for visual review.", "Useful for public demo inspection without runtime services."),
+    ("visual_receipt.md", "file://demo/visual_receipt.md", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Human-readable receipt for dashboard and gallery artifacts.", "Useful for promotion review of visual demo assets."),
+    ("visual_receipt.json", "file://demo/visual_receipt.json", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Machine-readable receipt for dashboard and gallery artifacts.", "Useful for release-owner checks that need hashes and byte counts."),
+    ("visual_receipt.html", "file://demo/visual_receipt.html", "python -m portfolio_fee_drag_simulator visual-receipt --output demo", "Standalone HTML receipt for dashboard and gallery artifacts.", "Useful for local visual artifact verification."),
+    ("cold_start_walkthrough.md", "file://demo/cold_start_walkthrough.md", "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo", "First-run walkthrough in Markdown.", "Useful for onboarding and public README validation."),
+    ("cold_start_walkthrough.json", "file://demo/cold_start_walkthrough.json", "python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo", "First-run walkthrough in JSON.", "Useful for deterministic checklist review."),
+    ("fixture_doctor.md", "file://demo/fixture_doctor.md", "python -m portfolio_fee_drag_simulator fixture-doctor --output demo", "Human-readable fixture validation report.", "Useful for release readiness review."),
+    ("fixture_doctor.json", "file://demo/fixture_doctor.json", "python -m portfolio_fee_drag_simulator fixture-doctor --output demo", "Machine-readable fixture validation report.", "Useful for automated release-owner status checks."),
+    ("package_audit.md", "file://demo/package_audit.md", "python -m portfolio_fee_drag_simulator package-audit --root . --output demo", "Human-readable package audit report.", "Useful for confirming zero-dependency and command coverage claims."),
+    ("package_audit.json", "file://demo/package_audit.json", "python -m portfolio_fee_drag_simulator package-audit --root . --output demo", "Machine-readable package audit report.", "Useful for release-owner status checks."),
+    ("selfcheck.json", "file://demo/selfcheck.json", "python -m portfolio_fee_drag_simulator selfcheck --output demo/selfcheck.json", "Machine-readable CLI and deterministic calculation selfcheck.", "Useful as a quick health signal before promotion."),
+    ("public_scan.json", "file://demo/public_scan.json", "python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json", "Public-readiness scan output.", "Useful for checking public-safe language and obvious secret markers."),
+    ("release_manifest.json", "file://demo/release_manifest.json", "python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json", "Source and artifact hash manifest.", "Useful for release review and reproducibility checks."),
+    ("release_audit_summary.md", "file://demo/release_audit_summary.md", "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass", "Human-readable release-owner audit summary.", "Useful for promotion decisions after owner-run tests."),
+    ("release_audit_summary.json", "file://demo/release_audit_summary.json", "python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass", "Machine-readable release-owner audit summary.", "Useful for deterministic release status review."),
+    ("maturity_report.md", "file://demo/maturity_report.md", "python -m portfolio_fee_drag_simulator maturity-report --output demo/maturity_report.md", "Public-readiness checklist.", "Useful for explaining maturity scope and remaining boundaries."),
+    ("decision_journal.md", "file://demo/decision_journal.md", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in Markdown.", "Useful for human review of assumptions, verification needs, and boundaries."),
+    ("decision_journal.json", "file://demo/decision_journal.json", "python -m portfolio_fee_drag_simulator decision-journal --output demo", "Research-note prompt journal in JSON.", "Useful for deterministic prompt handoff without live data."),
+)
+
+
 def visual_receipt_payload(root: Path) -> dict[str, Any]:
     artifacts = []
     for spec in VISUAL_RECEIPT_ARTIFACTS:
@@ -619,8 +652,12 @@ def cold_start_payload() -> dict[str, Any]:
             {
                 "minute": "9-10",
                 "title": "Know the boundary before sharing",
-                "commands": ["python -m portfolio_fee_drag_simulator visual-receipt --output demo"],
-                "expected_output": "visual_receipt.md, visual_receipt.json, and visual_receipt.html list local routes, bytes, hashes, regeneration commands, and safety boundaries.",
+                "commands": [
+                    "python -m portfolio_fee_drag_simulator visual-receipt --output demo",
+                    "python -m portfolio_fee_drag_simulator decision-journal --output demo",
+                    "python -m portfolio_fee_drag_simulator artifact-catalog --output demo",
+                ],
+                "expected_output": "Visual receipt, decision journal, and artifact catalog files list local routes, prompts, hashes, regeneration commands, and safety boundaries.",
             },
         ],
         "expected_artifacts": [
@@ -639,11 +676,15 @@ def cold_start_payload() -> dict[str, Any]:
             "demo/fixture_doctor.json",
             "demo/package_audit.md",
             "demo/package_audit.json",
+            "demo/decision_journal.md",
+            "demo/decision_journal.json",
             "demo/selfcheck.json",
             "demo/public_scan.json",
             "demo/release_manifest.json",
             "demo/release_audit_summary.md",
             "demo/release_audit_summary.json",
+            "demo/artifact_catalog.md",
+            "demo/artifact_catalog.json",
         ],
         "safety_boundaries": [
             "Use only local CSV/JSON assumptions or bundled examples.",
@@ -858,7 +899,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
 
     dependencies = project.get("dependencies", [])
     if pyproject_exists and dependencies:
-        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.4 changed scope."))
+        issues.append(audit_issue("dependencies", "error", "runtime dependencies are not empty", "Remove runtime dependencies or document why v0.5 changed scope."))
 
     scripts = project.get("scripts", {})
     script_target = scripts.get("portfolio-fee-drag") or dist_entry_point
@@ -890,6 +931,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
         issues.append(audit_issue("commands", "warning", f"{name} is registered but not listed in COMMANDS", "Add the command to COMMANDS or remove the parser entry."))
 
     project_version = project.get("version") or dist_version
+    reported_dist_version = "source-tree-audit" if pyproject_exists else dist_version
     if project_version != __version__:
         issues.append(audit_issue("version", "error", f"metadata version is {project_version}, import version is {__version__}", "Keep pyproject.toml, installed metadata, and __init__.py versions aligned."))
 
@@ -907,7 +949,7 @@ def package_audit_payload(root: Path) -> dict[str, Any]:
         "project_version": project_version,
         "import_version": __version__,
         "installed_distribution_available": dist_available,
-        "installed_distribution_version": dist_version,
+        "installed_distribution_version": reported_dist_version,
         "runtime_dependencies": dependencies,
         "script_target": script_target,
         "package_data": package_data,
@@ -956,6 +998,199 @@ def cmd_package_audit(args: argparse.Namespace) -> int:
     print(f"wrote {output / 'package_audit.md'}")
     print(f"wrote {output / 'package_audit.json'}")
     return 0 if payload["status"] == "pass" else 1
+
+
+def audit_status_rows(paths: list[Path]) -> list[dict[str, Any]]:
+    rows = []
+    for path in paths:
+        payload = read_json_file(path)
+        rows.append(
+            {
+                "path": path.as_posix(),
+                "schema": payload.get("schema", "unknown") if payload else "missing",
+                "status": payload.get("status", "present") if payload else "missing",
+            }
+        )
+    return rows
+
+
+def decision_journal_payload(args: argparse.Namespace) -> dict[str, Any]:
+    packet_path = Path(args.packet)
+    gallery_path = Path(args.gallery)
+    audit_paths = [Path(item) for item in str(args.audit_artifacts).split(",") if item]
+    packet = read_json_file(packet_path) or {}
+    gallery = read_json_file(gallery_path) or {}
+    assumptions = packet.get("assumptions", {})
+    summary = packet.get("summary", {})
+    cases = gallery.get("cases", [])
+    case_titles = [item.get("title", item.get("slug", "untitled")) for item in cases]
+    assumption_lines = [
+        f"{key}: {assumptions[key]}"
+        for key in sorted(assumptions)
+    ]
+    prompts = [
+        {
+            "name": "assumptions_changed",
+            "prompt": (
+                "Draft a research-note section named Assumptions Changed. Use only the local packet and gallery artifacts. "
+                "Compare the packet assumptions against the gallery cases and identify which assumption fields would need a human reviewer to mark as changed. "
+                "Do not infer live market conditions or make tax, legal, investment, or buy/sell/hold recommendations."
+            ),
+        },
+        {
+            "name": "human_verification",
+            "prompt": (
+                "Draft a research-note section named Human Verification Needed. List the inputs a human must verify before sharing: holdings, allocation sum, expense ratios, cash return, gross return, turnover, realized gain, tax rate, taxable allocation, rebalance frequency, contribution timing, and audit statuses. "
+                "Use public-safe wording and do not imply that the arithmetic is personalized advice."
+            ),
+        },
+        {
+            "name": "no_advice_boundary",
+            "prompt": (
+                f"Draft a research-note boundary paragraph using this exact boundary: {SAFETY_BOUNDARY} "
+                "State that the note is a deterministic local scenario review and not tax, legal, investment, or buy/sell/hold advice."
+            ),
+        },
+        {
+            "name": "next_review_date",
+            "prompt": (
+                "Add a Next Review Date field in YYYY-MM-DD format for a human reviewer to fill in. "
+                "Leave the value blank unless a human supplies the date."
+            ),
+        },
+    ]
+    return {
+        "schema": "portfolio-fee-drag-decision-journal-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "packet_source": packet_path.as_posix(),
+        "gallery_source": gallery_path.as_posix(),
+        "audit_sources": [path.as_posix() for path in audit_paths],
+        "next_review_date": "",
+        "research_note_prompts": prompts,
+        "packet_summary": {
+            "weighted_expense_ratio": summary.get("weighted_expense_ratio"),
+            "cash_allocation": summary.get("cash_allocation"),
+            "cash_drag_rate": summary.get("cash_drag_rate"),
+            "turnover_tax_drag_rate": summary.get("turnover_tax_drag_rate"),
+            "rebalance_drag_rate": summary.get("rebalance_drag_rate"),
+            "total_annual_drag_rate": summary.get("total_annual_drag_rate"),
+            "total_drag": summary.get("total_drag"),
+        },
+        "packet_assumptions": assumption_lines,
+        "gallery_cases": case_titles,
+        "audit_statuses": audit_status_rows(audit_paths),
+        "human_verification_items": [
+            "Confirm holdings and allocation sum against the source ledger.",
+            "Confirm expense ratios and cash-like classifications from approved source material.",
+            "Confirm gross return, cash return, turnover, realized gain, tax rate, taxable allocation, rebalance, and contribution timing assumptions.",
+            "Confirm audit artifacts are current for the artifacts being reviewed.",
+            "Confirm the next review date is supplied by a human reviewer.",
+        ],
+    }
+
+
+def decision_journal_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Decision Journal Prompts",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        f"Packet: `{payload['packet_source']}`",
+        f"Gallery: `{payload['gallery_source']}`",
+        f"Next review date: `{payload['next_review_date']}`",
+        "",
+        "## Research Note Prompts",
+        "",
+    ]
+    for item in payload["research_note_prompts"]:
+        lines.extend([f"### {item['name']}", "", item["prompt"], ""])
+    lines.extend(["## Packet Summary", "", "| Field | Value |", "| --- | ---: |"])
+    for key, value in payload["packet_summary"].items():
+        lines.append(f"| {key} | `{value}` |")
+    lines.extend(["", "## Packet Assumptions", ""])
+    lines.extend(f"- `{item}`" for item in payload["packet_assumptions"]) if payload["packet_assumptions"] else lines.append("- Packet assumptions missing.")
+    lines.extend(["", "## Gallery Cases", ""])
+    lines.extend(f"- {item}" for item in payload["gallery_cases"]) if payload["gallery_cases"] else lines.append("- Gallery cases missing.")
+    lines.extend(["", "## Audit Statuses", "", "| Source | Schema | Status |", "| --- | --- | --- |"])
+    for item in payload["audit_statuses"]:
+        lines.append(f"| `{item['path']}` | `{item['schema']}` | {item['status']} |")
+    lines.extend(["", "## Human Verification Needed", ""])
+    lines.extend(f"- {item}" for item in payload["human_verification_items"])
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_decision_journal(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    payload = decision_journal_payload(args)
+    write_json(output / "decision_journal.json", payload)
+    write_text(output / "decision_journal.md", decision_journal_markdown(payload))
+    print(f"wrote {output / 'decision_journal.md'}")
+    print(f"wrote {output / 'decision_journal.json'}")
+    return 0
+
+
+def artifact_catalog_payload(root: Path) -> dict[str, Any]:
+    artifacts = []
+    for path_name, route, producer, role, usefulness in DEMO_ARTIFACT_SPECS:
+        path = root / path_name
+        artifacts.append(
+            {
+                "path": path_name,
+                "route": route.replace("demo/", f"{root.as_posix().rstrip('/')}/", 1),
+                "bytes": path.stat().st_size if path.exists() else 0,
+                "sha256": file_sha256(path) if path.exists() else None,
+                "producer_command": producer.replace("demo/", f"{root.as_posix().rstrip('/')}/"),
+                "role": role,
+                "promotion_usefulness": usefulness,
+                "exists": path.exists(),
+            }
+        )
+    return {
+        "schema": "portfolio-fee-drag-artifact-catalog-v1",
+        "version": __version__,
+        "boundary": SAFETY_BOUNDARY,
+        "catalog_scope": "Inventories deterministic demo artifacts produced before artifact-catalog is run; the catalog does not hash itself.",
+        "complete": all(item["exists"] for item in artifacts),
+        "artifacts": artifacts,
+    }
+
+
+def artifact_catalog_markdown(payload: dict[str, Any]) -> str:
+    lines = [
+        "# Artifact Catalog",
+        "",
+        f"Version: {payload['version']}",
+        "",
+        f"Boundary: {payload['boundary']}",
+        "",
+        payload["catalog_scope"],
+        "",
+        "| Artifact | Route | Bytes | SHA-256 | Producer Command | Role | Promotion Usefulness |",
+        "| --- | --- | ---: | --- | --- | --- | --- |",
+    ]
+    for item in payload["artifacts"]:
+        digest = item["sha256"] or "missing"
+        lines.append(
+            f"| `{item['path']}` | `{item['route']}` | {item['bytes']} | `{digest}` | "
+            f"`{item['producer_command']}` | {item['role']} | {item['promotion_usefulness']} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def cmd_artifact_catalog(args: argparse.Namespace) -> int:
+    output = Path(args.output)
+    root = Path(args.artifact_root)
+    payload = artifact_catalog_payload(root)
+    write_json(output / "artifact_catalog.json", payload)
+    write_text(output / "artifact_catalog.md", artifact_catalog_markdown(payload))
+    print(f"wrote {output / 'artifact_catalog.md'}")
+    print(f"wrote {output / 'artifact_catalog.json'}")
+    return 0 if payload["complete"] else 1
 
 
 def read_json_file(path: Path) -> dict[str, Any] | None:
@@ -1103,6 +1338,22 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
     cmd_package_audit(argparse.Namespace(root=Path("."), output=output))
     cmd_selfcheck(argparse.Namespace(output=output / "selfcheck.json"))
     cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
+    cmd_decision_journal(
+        argparse.Namespace(
+            packet=output / "fee_drag_packet.json",
+            gallery=output / "case_gallery.json",
+            audit_artifacts=",".join(
+                [
+                    (output / "fixture_doctor.json").as_posix(),
+                    (output / "package_audit.json").as_posix(),
+                    (output / "visual_receipt.json").as_posix(),
+                    (output / "public_scan.json").as_posix(),
+                ]
+            ),
+            output=output,
+        )
+    )
+    cmd_public_scan(argparse.Namespace(root=Path("."), output=output / "public_scan.json"))
     cmd_release_manifest(argparse.Namespace(root=Path("."), output=output / "release_manifest.json"))
     cmd_release_audit_summary(
         argparse.Namespace(
@@ -1117,6 +1368,7 @@ def cmd_quickstart_check(args: argparse.Namespace) -> int:
             package_audit=output / "package_audit.json",
         )
     )
+    cmd_artifact_catalog(argparse.Namespace(artifact_root=output, output=output))
     print("quickstart check complete")
     return 0
 
@@ -1165,6 +1417,8 @@ def cmd_maturity_report(args: argparse.Namespace) -> int:
         ("Cold-start walkthrough Markdown/JSON route included", "pass"),
         ("Fixture doctor Markdown/JSON route included", "pass"),
         ("Package audit Markdown/JSON route included", "pass"),
+        ("Decision journal Markdown/JSON prompt route included", "pass"),
+        ("Artifact catalog Markdown/JSON route included", "pass"),
         ("Release audit summary Markdown/JSON route included", "pass"),
     ]
     lines = ["# Project Maturity Report", "", f"Boundary: {SAFETY_BOUNDARY}", "", "| Check | Status |", "| --- | --- |"]
@@ -1210,6 +1464,18 @@ def cmd_selfcheck(args: argparse.Namespace) -> int:
     package = package_audit_payload(Path("."))
     if package["status"] != "pass":
         errors.append(f"package audit status {package['status']}")
+    journal = decision_journal_payload(
+        argparse.Namespace(
+            packet=Path("demo/fee_drag_packet.json"),
+            gallery=Path("demo/case_gallery.json"),
+            audit_artifacts="demo/release_audit_summary.json,demo/fixture_doctor.json,demo/package_audit.json,demo/visual_receipt.json,demo/public_scan.json",
+        )
+    )
+    if journal["schema"] != "portfolio-fee-drag-decision-journal-v1" or len(journal["research_note_prompts"]) != 4:
+        errors.append("decision journal generation failed")
+    catalog = artifact_catalog_payload(Path("demo"))
+    if catalog["schema"] != "portfolio-fee-drag-artifact-catalog-v1":
+        errors.append("artifact catalog payload generation failed")
     if set(COMMANDS) != set(build_parser()._subparsers._group_actions[0].choices):
         errors.append("command registration mismatch")
     status = "pass" if not errors else "fail"
@@ -1324,6 +1590,21 @@ def build_parser() -> argparse.ArgumentParser:
     package.add_argument("--root", default=".")
     package.add_argument("--output", default="demo")
     package.set_defaults(func=cmd_package_audit)
+
+    journal = sub.add_parser("decision-journal", help="Write deterministic research-note prompt journal artifacts.")
+    journal.add_argument("--packet", default="demo/fee_drag_packet.json")
+    journal.add_argument("--gallery", default="demo/case_gallery.json")
+    journal.add_argument(
+        "--audit-artifacts",
+        default="demo/release_audit_summary.json,demo/fixture_doctor.json,demo/package_audit.json,demo/visual_receipt.json,demo/public_scan.json",
+    )
+    journal.add_argument("--output", default="demo")
+    journal.set_defaults(func=cmd_decision_journal)
+
+    catalog = sub.add_parser("artifact-catalog", help="Inventory deterministic demo artifacts with hashes and promotion notes.")
+    catalog.add_argument("--artifact-root", default="demo")
+    catalog.add_argument("--output", default="demo")
+    catalog.set_defaults(func=cmd_artifact_catalog)
 
     quick = sub.add_parser("quickstart-check", help="Run deterministic demo route.")
     quick.add_argument("--output", default="demo")

@@ -34,11 +34,15 @@ The quickstart writes deterministic demo artifacts:
 - `demo/fixture_doctor.json`
 - `demo/package_audit.md`
 - `demo/package_audit.json`
+- `demo/decision_journal.md`
+- `demo/decision_journal.json`
 - `demo/selfcheck.json`
 - `demo/release_manifest.json`
 - `demo/release_audit_summary.md`
 - `demo/release_audit_summary.json`
 - `demo/maturity_report.md`
+- `demo/artifact_catalog.md`
+- `demo/artifact_catalog.json`
 - `demo/public_scan.json`
 
 ## Commands
@@ -54,6 +58,8 @@ The quickstart writes deterministic demo artifacts:
 - `cold-start-walkthrough`: write a deterministic 10-minute Markdown/JSON guide for a first-time GitHub user to install, run, evaluate, and understand boundaries.
 - `fixture-doctor`: validate holdings, assumptions, and scenario preset fixtures with actionable warnings.
 - `package-audit`: inspect zero-dependency metadata, package-data readiness, script wiring, and command coverage.
+- `decision-journal`: generate deterministic Markdown/JSON research-note prompts from packet, gallery, and audit artifacts, including assumptions changed, human verification needs, no-advice boundary, and a next review date field.
+- `artifact-catalog`: inventory deterministic demo artifacts with route, bytes, SHA-256, producer command, role, and promotion usefulness.
 - `quickstart-check`: run the full deterministic demo route.
 - `release-manifest`: hash source files for release review.
 - `release-audit-summary`: combine tests, selfcheck, public scan, manifest, visual receipt, fixture doctor, and package audit status into Markdown and JSON for release owners.
@@ -100,7 +106,7 @@ It compares annual compounding at the gross return against compounding at `gross
 
 ## Scenario Presets, Case Gallery, and Receipts
 
-Version 0.4 bundles three deterministic scenario presets:
+Version 0.5 bundles three deterministic scenario presets:
 
 - `low-cost-etf`: diversified low-expense ETF-style allocation with modest turnover and limited cash drag.
 - `high-turnover-taxable-fund`: taxable fund-style allocation with higher expense, turnover, realized gains, and quarterly rebalancing assumptions.
@@ -135,6 +141,22 @@ portfolio-fee-drag cold-start-walkthrough --output demo
 ```
 
 The walkthrough emits `cold_start_walkthrough.md` and `cold_start_walkthrough.json` with a 10-minute GitHub install/run/evaluate path, expected outputs, and explicit boundaries.
+
+Build the investor workflow prompts:
+
+```bash
+portfolio-fee-drag decision-journal --output demo
+```
+
+The decision journal emits `decision_journal.md` and `decision_journal.json`. It creates deterministic prompts for a research note covering assumptions changed, human verification needs, the no-advice boundary, and a blank `next_review_date` field for human completion.
+
+Inventory generated demo artifacts:
+
+```bash
+portfolio-fee-drag artifact-catalog --output demo
+```
+
+The artifact catalog emits `artifact_catalog.md` and `artifact_catalog.json`. It records local routes, byte counts, SHA-256 hashes, producer commands, artifact roles, and promotion usefulness for deterministic demo artifacts produced before the catalog runs.
 
 ## Release-Owner Audit
 
@@ -172,6 +194,8 @@ python -m portfolio_fee_drag_simulator fixture-doctor --output demo
 python -m portfolio_fee_drag_simulator package-audit --root . --output demo
 python -m portfolio_fee_drag_simulator visual-receipt --output demo
 python -m portfolio_fee_drag_simulator cold-start-walkthrough --output demo
+python -m portfolio_fee_drag_simulator decision-journal --output demo
+python -m portfolio_fee_drag_simulator artifact-catalog --output demo
 python -m portfolio_fee_drag_simulator public-scan --root . --output demo/public_scan.json
 python -m portfolio_fee_drag_simulator release-manifest --root . --output demo/release_manifest.json
 python -m portfolio_fee_drag_simulator release-audit-summary --output demo --tests-status pass

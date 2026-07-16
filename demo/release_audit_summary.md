@@ -1,6 +1,6 @@
 # Release Audit Summary
 
-Version: 0.4.0
+Version: 0.5.0
 Status: pass
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.

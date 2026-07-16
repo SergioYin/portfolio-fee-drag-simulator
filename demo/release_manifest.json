@@ -11,9 +11,19 @@
       "sha256": "d3e4669f22f295c841f35f586ec645f7fd9c785e5a7d9433d7a3397d65532df8"
     },
     {
-      "bytes": 7654,
+      "bytes": 9016,
       "path": "README.md",
-      "sha256": "a6de1931452d7f01e784e7e6700142c84c3e466f7a62f71ab994f6d4b696867d"
+      "sha256": "2d29bf5b90f5f618b1d2ccef80aedce6997d5f29c934a44690ca979a489cde78"
+    },
+    {
+      "bytes": 13590,
+      "path": "demo/artifact_catalog.json",
+      "sha256": "8f28489493944762cee46a3161022ac805a5f7c5335678f4b09b3cd06fa2b585"
+    },
+    {
+      "bytes": 9319,
+      "path": "demo/artifact_catalog.md",
+      "sha256": "3b4bcd11f642f41fd1a51a8090933ddc93cc81665413fd214f99c699e5a9f1e9"
     },
     {
       "bytes": 2854,
@@ -23,7 +33,7 @@
     {
       "bytes": 9655,
       "path": "demo/case_gallery.json",
-      "sha256": "8b1c959bcdb23435200befd2ae7d6e280d0527be5be2ac1bfa1520f45c60db5f"
+      "sha256": "66b8ec799ce4015637f461bda3b73f67054ff3941bbd2ae79ffab2bd61c30dfd"
     },
     {
       "bytes": 2693,
@@ -31,19 +41,29 @@
       "sha256": "4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e"
     },
     {
-      "bytes": 3379,
+      "bytes": 3672,
       "path": "demo/cold_start_walkthrough.json",
-      "sha256": "bcb1da0c2bc5154f897512a41537f3fdd991417b5e279c8d644da95128b331e2"
+      "sha256": "eb6e094824a7c08cb9ec259d8df769703118ef1466d038c82e49be0015f409a0"
     },
     {
-      "bytes": 2680,
+      "bytes": 2947,
       "path": "demo/cold_start_walkthrough.md",
-      "sha256": "ba48269aafc1ea09addda31bf54beaf54d1393a51aed702639c77e54263da7d8"
+      "sha256": "cafc7b1db57c51b9a2b2c4ab4446ddaee61abec12a2697a75571e77a4e25186c"
     },
     {
       "bytes": 2808,
       "path": "demo/dashboard.html",
       "sha256": "966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381"
+    },
+    {
+      "bytes": 3849,
+      "path": "demo/decision_journal.json",
+      "sha256": "781961318b7ff4cc02ad1a1562a8f5f2655f683cf7e0a4874a35121a97505814"
+    },
+    {
+      "bytes": 3212,
+      "path": "demo/decision_journal.md",
+      "sha256": "96cfe09f1fe827ba244134edd7bb25e5cc3ba7f921e07cab24ae53c2b2829869"
     },
     {
       "bytes": 1848,
@@ -58,12 +78,12 @@
     {
       "bytes": 975,
       "path": "demo/fixture_doctor.json",
-      "sha256": "8be7452ad7cc23a20d5ea999883e231978ad38467539cb37262e2d8c9da29e18"
+      "sha256": "aacf62a7785b01bf42975f44d9059bedc93c5f7aec8b698da292ee63cf7e8be8"
     },
     {
       "bytes": 627,
       "path": "demo/fixture_doctor.md",
-      "sha256": "d3ebd5cbd021377be771d4f59c34a77179dbc737211cf7f6d8e1777d280464d5"
+      "sha256": "5eace055e65f0e4fbb317ad062879a8b60789930f19f5ecb31c0922b1052887f"
     },
     {
       "bytes": 511,
@@ -71,24 +91,24 @@
       "sha256": "726e1d20c2ccd31ba109d655eada3f26dc9965fd307980e2679fb40ad75ba44a"
     },
     {
-      "bytes": 1003,
+      "bytes": 1124,
       "path": "demo/maturity_report.md",
-      "sha256": "94d970346ba01822b353ba52bd4dd3dfe089215a168d4cece0b03c5921637e70"
+      "sha256": "6874575616d1c3e97cf7a4b78ad14944882aee3eed190c6a2b966f7b65e66865"
     },
     {
-      "bytes": 1100,
+      "bytes": 1163,
       "path": "demo/package_audit.json",
-      "sha256": "531695f836bb3dfe0d94dc2d4ccc6a71ac32a2b424eff48cb4587f8107f4d2ed"
+      "sha256": "b6f78efdfe10c307491990e617e6c596c2b4c9119676a49c578b99be19c667a2"
     },
     {
-      "bytes": 556,
+      "bytes": 569,
       "path": "demo/package_audit.md",
-      "sha256": "9a6d6a78e744b7b19bc864b8dd52b01000f89cae4fb6a16b711799c6680a7dad"
+      "sha256": "42b45354a3548c6dc962c100e1e3ea9d0a8dda97dfbd4971865093fa913d91e6"
     },
     {
       "bytes": 163,
       "path": "demo/public_scan.json",
-      "sha256": "771102084b7818a5378ecba02683a54549b22571afaa6dc9afded3e0d83e9ecf"
+      "sha256": "c60500ab4d88dd09c6efc6f2fc8e3d831df5181b0ddfc545ae1542a1314c5bd6"
     },
     {
       "bytes": 344,
@@ -98,12 +118,12 @@
     {
       "bytes": 4612,
       "path": "demo/scenario_presets.json",
-      "sha256": "fbc82ad4d8b30c8ec599eadbc80ff9030b72680d139ac88f3bf16c633f51f87c"
+      "sha256": "7b73a4163dc14fc72e3b4e25ff212186619a6c6c69aed7a6c73cbe0af90a55e7"
     },
     {
       "bytes": 243,
       "path": "demo/selfcheck.json",
-      "sha256": "cb750579ba4abc2baa2b00c7318bd6f875cca8a2473021f13a2786709105345c"
+      "sha256": "4bc0b5ac3f5c2ebc45a97b1a43e860efa4fbe74fee344072df5ad6fac4daa431"
     },
     {
       "bytes": 944,
@@ -113,22 +133,22 @@
     {
       "bytes": 2830,
       "path": "demo/visual_receipt.html",
-      "sha256": "40e8021a0e5c09f8e38f096b8315087b2e8a762c259987fdc30117d2ee58d193"
+      "sha256": "38abfef9382387a3fd1cbe37429ca91aca917f16ebdb5f77cc5f8cb3f0ae634f"
     },
     {
       "bytes": 2261,
       "path": "demo/visual_receipt.json",
-      "sha256": "e5a096d2d2994f22c02979e91fa884881b93ae89486fd793d53c1f762ca0d365"
+      "sha256": "fa16acdd3275c567817ba31d81bc77eba42eaa123a54b0928063a9339461e935"
     },
     {
       "bytes": 1779,
       "path": "demo/visual_receipt.md",
-      "sha256": "2a0a83eb887d2887b32c145fa48b91c682b929c711fcb3401a160b300981209a"
+      "sha256": "c63306118c60007799362f7eff22a8e66a65431b50aabd14e3f7560452dc43cc"
     },
     {
       "bytes": 66,
       "path": "portfolio_fee_drag_simulator/__init__.py",
-      "sha256": "623a33e815f571e3a42f3eabc6c89427022f76b0c0bacf9bedc604b4f1ebc1c5"
+      "sha256": "4b4866352808ba1a3814b90a2431e38b94180309a9b6731fc28cbdf24f8f421f"
     },
     {
       "bytes": 80,
@@ -136,9 +156,9 @@
       "sha256": "6a170fc866c867a1e5812daad308396f0940a23f2ecf55e56be39d5d67d23f10"
     },
     {
-      "bytes": 59087,
+      "bytes": 77706,
       "path": "portfolio_fee_drag_simulator/cli.py",
-      "sha256": "b042d431ce67074aed8338cf261a0ac8cf68a20f50226323a683ec507f4f40c5"
+      "sha256": "629a9b4bc749bd52751e3ba9692166cc3c8a9d59e17130a2f87715a79a97f241"
     },
     {
       "bytes": 328,
@@ -158,7 +178,7 @@
     {
       "bytes": 4612,
       "path": "portfolio_fee_drag_simulator/data/scenario_presets.json",
-      "sha256": "7d2abefc6517b5d134b2787b2b4f3fde0a63564753d84eea84edef38ef20675d"
+      "sha256": "2ac98f440a06389a0e9d992e1f3a822c5cc4e5dfb1108837e8b9f43813701be6"
     },
     {
       "bytes": 13751,
@@ -168,17 +188,17 @@
     {
       "bytes": 1058,
       "path": "pyproject.toml",
-      "sha256": "1986bd22a3113015de959b51ed3c1b9c894da85b810099d1f0eebd99658c19ed"
+      "sha256": "668fd23216c2904ed650b8c8f4114ea14078ad2a9ae8af6185da349d754f2b28"
     },
     {
-      "bytes": 2583,
+      "bytes": 3079,
       "path": "skills/agent/portfolio-fee-drag-simulator/SKILL.md",
-      "sha256": "4ec067e35acc63d973abdc5022cd69d3105868513f7e162fefba1a97e0c52e1d"
+      "sha256": "b1885a8f018f700a2e37881558226d48fe57540afff7b01d0540c457343931a6"
     },
     {
-      "bytes": 9187,
+      "bytes": 11525,
       "path": "tests/test_cli.py",
-      "sha256": "a124c44eccc9f96e7acf5990158f108855e927db34146cad33dbb2d6562460d9"
+      "sha256": "3adbc094db6527e772e7dc1e07c88b40eabdf0ac8f4da7597bcc5437dae795bd"
     }
   ],
   "schema": "portfolio-fee-drag-release-manifest-v1"

@@ -18,4 +18,6 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | Cold-start walkthrough Markdown/JSON route included | pass |
 | Fixture doctor Markdown/JSON route included | pass |
 | Package audit Markdown/JSON route included | pass |
+| Decision journal Markdown/JSON prompt route included | pass |
+| Artifact catalog Markdown/JSON route included | pass |
 | Release audit summary Markdown/JSON route included | pass |

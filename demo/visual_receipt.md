@@ -1,6 +1,6 @@
 # Portfolio Fee Drag Visual Receipt
 
-Version: 0.4.0
+Version: 0.5.0
 
 Boundary: Static local assumptions only; no live data, broker API, orders, predictions, portfolio optimization, tax/legal/investment advice, or buy/sell/hold recommendations.
 
@@ -8,7 +8,7 @@ Boundary: Static local assumptions only; no live data, broker API, orders, predi
 | --- | --- | ---: | --- | --- | --- |
 | `dashboard.html` | `file://demo/dashboard.html` | 2808 | `966abc2509c1ee136e95d5d508c871c6f2c786c430c370e943a65a6580a82381` | Standalone dashboard receipt for the bundled packet. | `python -m portfolio_fee_drag_simulator static-dashboard --packet demo/fee_drag_packet.json --output demo/dashboard.html` |
 | `case_gallery.md` | `file://demo/case_gallery.md` | 2693 | `4896ca052b5643bbc2d292ddf8cdfa2dee114d3f9e62a213bcc282b014c95e5e` | Markdown comparison gallery for bundled deterministic scenarios. | `python -m portfolio_fee_drag_simulator case-gallery --output demo` |
-| `case_gallery.json` | `file://demo/case_gallery.json` | 9655 | `8b1c959bcdb23435200befd2ae7d6e280d0527be5be2ac1bfa1520f45c60db5f` | Machine-readable case gallery with complete packet payloads. | `python -m portfolio_fee_drag_simulator case-gallery --output demo` |
+| `case_gallery.json` | `file://demo/case_gallery.json` | 9655 | `66b8ec799ce4015637f461bda3b73f67054ff3941bbd2ae79ffab2bd61c30dfd` | Machine-readable case gallery with complete packet payloads. | `python -m portfolio_fee_drag_simulator case-gallery --output demo` |
 | `case_gallery.html` | `file://demo/case_gallery.html` | 2854 | `f96b447afdeabc5b2ced578226d7b9a0366e76bbef18d04658734e5ee09edced` | Standalone HTML gallery for visual review. | `python -m portfolio_fee_drag_simulator case-gallery --output demo` |
 
 ## Safety Boundaries

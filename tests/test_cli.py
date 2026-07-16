@@ -47,9 +47,13 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertTrue((out / "fixture_doctor.json").exists())
             self.assertTrue((out / "package_audit.md").exists())
             self.assertTrue((out / "package_audit.json").exists())
+            self.assertTrue((out / "decision_journal.md").exists())
+            self.assertTrue((out / "decision_journal.json").exists())
             self.assertTrue((out / "selfcheck.json").exists())
             self.assertTrue((out / "release_audit_summary.md").exists())
             self.assertTrue((out / "release_audit_summary.json").exists())
+            self.assertTrue((out / "artifact_catalog.md").exists())
+            self.assertTrue((out / "artifact_catalog.json").exists())
             packet = json.loads((out / "fee_drag_packet.json").read_text())
             self.assertIn("cash_drag_rate", packet["summary"])
             self.assertIn("turnover_tax_drag_rate", packet["summary"])
@@ -81,6 +85,21 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(doctor["status"], "pass")
             package = json.loads((out / "package_audit.json").read_text())
             self.assertEqual(package["status"], "pass")
+            journal = json.loads((out / "decision_journal.json").read_text())
+            self.assertEqual(journal["schema"], "portfolio-fee-drag-decision-journal-v1")
+            self.assertEqual(journal["next_review_date"], "")
+            self.assertEqual([item["name"] for item in journal["research_note_prompts"]], [
+                "assumptions_changed",
+                "human_verification",
+                "no_advice_boundary",
+                "next_review_date",
+            ])
+            catalog = json.loads((out / "artifact_catalog.json").read_text())
+            self.assertEqual(catalog["schema"], "portfolio-fee-drag-artifact-catalog-v1")
+            self.assertTrue(catalog["complete"])
+            catalog_paths = [item["path"] for item in catalog["artifacts"]]
+            self.assertIn("decision_journal.json", catalog_paths)
+            self.assertTrue(all("promotion_usefulness" in item for item in catalog["artifacts"]))
             summary = json.loads((out / "release_audit_summary.json").read_text())
             self.assertEqual(summary["status"], "review")
             self.assertEqual(summary["checks"][0]["status"], "not-run")
@@ -127,6 +146,21 @@ class PortfolioFeeDragTests(unittest.TestCase):
             self.assertEqual(package["status"], "pass")
             self.assertEqual(package["runtime_dependencies"], [])
             self.assertEqual(set(package["commands"]), set(COMMANDS))
+
+    def test_decision_journal_and_artifact_catalog_commands_export_bundles(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "demo"
+            self.assertEqual(main(["quickstart-check", "--output", str(out)]), 0)
+            self.assertEqual(main(["decision-journal", "--packet", str(out / "fee_drag_packet.json"), "--gallery", str(out / "case_gallery.json"), "--output", str(out)]), 0)
+            journal = json.loads((out / "decision_journal.json").read_text())
+            self.assertIn("Human Verification Needed", journal["research_note_prompts"][1]["prompt"])
+            self.assertIn("buy/sell/hold", journal["research_note_prompts"][2]["prompt"])
+
+            self.assertEqual(main(["artifact-catalog", "--artifact-root", str(out), "--output", str(out)]), 0)
+            catalog = json.loads((out / "artifact_catalog.json").read_text())
+            first = catalog["artifacts"][0]
+            self.assertEqual(set(first), {"path", "route", "bytes", "sha256", "producer_command", "role", "promotion_usefulness", "exists"})
+            self.assertTrue(first["sha256"])
 
     def test_release_audit_summary_can_pass_after_release_owner_checks(self):
         with tempfile.TemporaryDirectory() as tmp:
